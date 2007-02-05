@@ -1,0 +1,38 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>images/add.png</file>
+        <file>images/back.png</file>
+        <file>images/cancel.png</file>
+        <file>images/complete.png</file>
+        <file>images/configure.png</file>
+        <file>images/default-rect.png</file>
+        <file>images/describe.png</file>
+        <file>images/editphoto.png</file>
+        <file>images/exit.png</file>
+        <file>images/exitedit.png</file>
+        <file>images/failed.png</file>
+        <file>images/findimageeditor.png</file>
+        <file>images/folder-open.png</file>
+        <file>images/folder.png</file>
+        <file>images/forward.png</file>
+        <file>images/galerist.png</file>
+        <file>images/hide-progress.png</file>
+        <file>images/image-big.png</file>
+        <file>images/image.png</file>
+        <file>images/input_ok.png</file>
+        <file>images/input_wrong.png</file>
+        <file>images/loading.png</file>
+        <file>images/new.png</file>
+        <file>images/qt.png</file>
+        <file>images/remove.png</file>
+        <file>images/rename.png</file>
+        <file>images/round-rect.png</file>
+        <file>images/show-progress.png</file>
+        <file>images/upgrade.png</file>
+        <file>images/zommselect.png</file>
+        <file>images/zoomactual.png</file>
+        <file>images/zoomin.png</file>
+        <file>images/zoomout.png</file>
+        <file>images/zoomscreen.png</file>
+    </qresource>
+</RCC>
