@@ -26,10 +26,13 @@
 #include <QtCore/QModelIndex>
 #include <QtGui/QAction>
 #include <QtGui/QMessageBox>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
 
 #include <QtCore/QtDebug>
 
 #include "core/imagemodel.h"
+#include "core/imageitem.h"
 #include "core/data.h"
 
 namespace GWidgets
@@ -62,8 +65,9 @@ void GalleryTreeView::slotCheckSelection(const QModelIndex &selected)
   clearFocus();
   if (selected.isValid()) {
     emit signalSelected(true);
-  } else
+  } else {
     emit signalSelected(false);
+  }
 }
 
 GalleryTreeView::~GalleryTreeView()

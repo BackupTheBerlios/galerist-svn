@@ -24,6 +24,8 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QIcon>
 
+class QDir;
+
 namespace GCore
 {
 
@@ -131,6 +133,7 @@ class ImageModel : public QAbstractItemModel
 
   private:
     void setupModelData(const QString &path);
+    void processPath(const QDir &path, ImageItem *root = 0);
 
     QString m_path;
     mutable GCore::GJobs::ReadJob *m_currentJob;

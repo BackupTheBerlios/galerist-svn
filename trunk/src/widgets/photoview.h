@@ -24,6 +24,7 @@
 #include <QtGui/QGraphicsView>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QVector>
+#include <QtCore/QHash>
 #include <QtCore/QList>
 
 class QTimeLine;
@@ -359,6 +360,7 @@ class PhotoView : public QGraphicsView
 
     QAbstractItemModel *m_model;
     QModelIndex m_rootIndex;
+    QHash<QModelIndex, PhotoItem*> m_itemHash;
     QVector<PhotoItem*> m_itemVector;
 
     QList<PhotoItem*> m_removeList;

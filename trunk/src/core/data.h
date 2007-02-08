@@ -28,6 +28,7 @@
 class QCompleter;
 class QSettings;
 class QMenu;
+class QSortFilterProxyModel;
 
 typedef QMap<QString, QString> Translations;
 
@@ -238,6 +239,11 @@ class Data : public QObject
      */
     QWidget *getMainWindow();
 
+    /**
+     * Gets the model proxy.
+     */
+    QSortFilterProxyModel *getModelProxy();
+
 #ifdef WANT_UPDATER
     /**
      * Returns an Updater object.
@@ -297,6 +303,7 @@ class Data : public QObject
     GNetwork::Updater *m_updater;
 #endif
     QWidget *m_mainWindow;
+    QSortFilterProxyModel *m_modelProxy;
 
     // Methods
 

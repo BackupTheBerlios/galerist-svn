@@ -24,6 +24,7 @@
 #include <QtGui/QTreeView>
 
 class QModelIndex;
+class QPaintEvent;
 
 namespace GWidgets
 {

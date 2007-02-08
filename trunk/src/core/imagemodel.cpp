@@ -225,38 +225,72 @@ QVariant ImageModel::headerData(int section, Qt::Orientation orientation, int ro
 
 void ImageModel::setupModelData(const QString &path)
 {
-  // Initialise the path to the gallery
-  QDir galleriesPath(path);
+  processPath(QDir(QDir::fromNativeSeparators(path)));
+  
+//   // Initialise the path to the gallery
+//   QDir galleriesPath(path);
+// 
+//   // We get the list of galleries
+//   QStringList galleries(galleriesPath.entryList(QDir::Dirs));
+// 
+//   // Calculate the number of galleries
+//   QStringList::const_iterator limit = galleries.constEnd();
+// 
+//   // We go through every gallery and create a tree of galleries
+//   for (QStringList::const_iterator count = galleries.constBegin(); count != limit; count++) {
+//     // Btw. We skip the . and .. directories, because they are not galleries!
+//     if (!(*count != "." && *count != ".." && *count != ".thumbnails" && *count != ".metadata"))
+//       continue;
+// 
+//     // and images
+//     QDir imagesPath(galleriesPath);
+//     imagesPath.cd(*count);
+// 
+//     // Get the list of images
+//     QStringList images(imagesPath.entryList(Data::self()->getImageFormats(), QDir::Files));
+// 
+//     // Calculate the number of images
+//     QStringList::const_iterator limitImage = images.constEnd();
+// 
+//     // Let's add the galleries and images into a healthy tree
+//     ImageItem *gallery = new ImageItem(QDir::fromNativeSeparators(*count), m_rootItem, ImageItem::Gallery);
+//     m_rootItem->appendChild(gallery);
+// 
+//     for (QStringList::const_iterator countImage = images.constBegin(); countImage != limitImage; countImage++) {
+//       gallery->appendChild(new ImageItem(*countImage, gallery, ImageItem::Image));
+//     }
+// 
+//     // Get the list of subgalleries
+// 
+//   }
+}
 
-  // We get the list of galleries
-  QStringList galleries(galleriesPath.entryList(QDir::Dirs));
+void ImageModel::processPath(const QDir &path, ImageItem *root)
+{
+  if (!root)
+    root = m_rootItem;
+  
+  QStringList items = path.entryList(QDir::Dirs);
+  items.removeAll(".");
+  items.removeAll("..");
+  items.removeAll(".thumbnails");
 
-  // Calculate the number of galleries
-  QStringList::const_iterator limit = galleries.constEnd();
+  for (QStringList::const_iterator count = items.begin(); count != items.end(); count++) {
+    QDir temp = path;
+    temp.cd(*count);
+    ImageItem *gallery = new ImageItem(*count, root, ImageItem::Gallery);
+    root->appendChild(gallery);
+    processPath(temp, gallery);
+  }
 
-  // We go through every gallery and create a tree of galleries
-  for (QStringList::const_iterator count = galleries.constBegin(); count != limit; count++) {
-    // Btw. We skip the . and .. directories, because they are not galleries!
-    if (!(*count != "." && *count != ".." && *count != ".thumbnails" && *count != ".metadata"))
-      continue;
+  if (!items.isEmpty())
+  qDebug() << items;
 
-    // and images
-    QDir imagesPath(galleriesPath);
-    imagesPath.cd(*count);
+  QStringList images = path.entryList(QDir::Files);
+  images.removeAll(".metadata");
 
-    // Get the list of images
-    QStringList images(imagesPath.entryList(Data::self()->getImageFormats(), QDir::Files));
-
-    // Calculate the number of images
-    QStringList::const_iterator limitImage = images.constEnd();
-
-    // Let's add the galleries and images into a healthy tree
-    ImageItem *gallery = new ImageItem(QDir::fromNativeSeparators(*count), m_rootItem, ImageItem::Gallery);
-    m_rootItem->appendChild(gallery);
-
-    for (QStringList::const_iterator countImage = images.constBegin(); countImage != limitImage; countImage++) {
-      gallery->appendChild(new ImageItem(*countImage, gallery, ImageItem::Image));
-    }
+  for (QStringList::const_iterator count = images.begin(); count != images.end(); count++) {
+    root->appendChild(new ImageItem(*count, root, ImageItem::Image));
   }
 }
 

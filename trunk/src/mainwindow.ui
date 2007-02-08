@@ -34,7 +34,7 @@
      <x>0</x>
      <y>0</y>
      <width>1045</width>
-     <height>21</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="viewMenu" >
@@ -122,12 +122,6 @@
          <width>22</width>
          <height>22</height>
         </size>
-       </property>
-       <property name="rootIsDecorated" >
-        <bool>false</bool>
-       </property>
-       <property name="itemsExpandable" >
-        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -358,11 +352,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GWidgets::GalleryTreeView</class>
-   <extends>QTreeView</extends>
-   <header>widgets/gallerytreeview.h</header>
-  </customwidget>
-  <customwidget>
    <class>GWidgets::PhotoView</class>
    <extends>QGraphicsView</extends>
    <header>widgets/photoview.h</header>
@@ -371,6 +360,11 @@
    <class>GWidgets::PhotoControl</class>
    <extends>QWidget</extends>
    <header>widgets/photocontrol.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GWidgets::GalleryTreeView</class>
+   <extends>QTreeView</extends>
+   <header>widgets/gallerytreeview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

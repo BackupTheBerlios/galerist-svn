@@ -26,9 +26,11 @@
 #include <QtGui/QCompleter>
 #include <QtCore/QSettings>
 #include <QtGui/QMenu>
+#include <QtGui/QSortFilterProxyModel>
 
 #include "core/errorhandler.h"
 #include "core/imagemodel.h"
+#include "core/imageitem.h"
 
 #include "core/network/updater.h"
 
@@ -51,7 +53,8 @@ Data::Data(QObject *parent)
 #ifdef WANT_UPDATER
     m_updater(0),
 #endif
-    m_mainWindow(0)
+    m_mainWindow(0),
+    m_modelProxy(0)
 
 {
   m_self = this;
@@ -368,6 +371,18 @@ void Data::setMainWindow(QWidget *mainWindow)
 QWidget *Data::getMainWindow()
 {
   return m_mainWindow;
+}
+
+QSortFilterProxyModel *Data::getModelProxy()
+{
+  if (!m_modelProxy) {
+    m_modelProxy = new QSortFilterProxyModel(this);
+    m_modelProxy->setFilterRole(GCore::ImageModel::ImageTypeRole);
+    m_modelProxy->setFilterWildcard(QString::number(GCore::ImageItem::Gallery));
+    m_modelProxy->setSourceModel(getImageModel());
+  }
+
+  return m_modelProxy;
 }
 
 #ifdef WANT_UPDATER

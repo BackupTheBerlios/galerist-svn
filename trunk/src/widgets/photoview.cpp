@@ -46,6 +46,7 @@
 #include <QtGui/QMenu>
 #include <QtGui/QAction>
 #include <QtCore/QUrl>
+#include <QtGui/QSortFilterProxyModel>
 
 #include <QtCore/QtDebug>
 
@@ -118,12 +119,14 @@ void PhotoView::setModel(QAbstractItemModel *model)
 
 void PhotoView::setRootIndex(const QModelIndex &index)
 {
-  if (!index.isValid() || index.model() != m_model || index == m_rootIndex)
+  QModelIndex mappedIndex = GCore::Data::self()->getModelProxy()->mapToSource(index);
+  
+  if (!mappedIndex.isValid() || mappedIndex.model() != m_model || mappedIndex == m_rootIndex)
     return;
 
   setFocus();
 
-  m_rootIndex = index;
+  m_rootIndex = mappedIndex;
   setEditMode(false);
   m_currentEdited = 0;
 
@@ -152,32 +155,32 @@ void PhotoView::slotDescribe()
 
 void PhotoView::slotSelectAll()
 {
-  QVector<PhotoItem*>::const_iterator end = m_itemVector.constEnd();
-  for (QVector<PhotoItem*>::const_iterator count = m_itemVector.constBegin(); count != end; count++)
-    (*count)->setSelected(true);
+  QHash<QModelIndex, PhotoItem*>::const_iterator end = m_itemHash.constEnd();
+  for (QHash<QModelIndex, PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
+    count.value()->setSelected(true);
 }
 
 void PhotoView::slotDeselectAll()
 {
-  QVector<PhotoItem*>::const_iterator end = m_itemVector.constEnd();
-  for (QVector<PhotoItem*>::const_iterator count = m_itemVector.constBegin(); count != end; count++)
-    (*count)->setSelected(false);
+  QHash<QModelIndex, PhotoItem*>::const_iterator end = m_itemHash.constEnd();
+  for (QHash<QModelIndex, PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
+    count.value()->setSelected(false);
 }
 
 void PhotoView::slotInvertSelection()
 {
-  QVector<PhotoItem*>::const_iterator end = m_itemVector.constEnd();
-  for (QVector<PhotoItem*>::const_iterator count = m_itemVector.constBegin(); count != end; count++)
-    (*count)->setSelected(!(*count)->isSelected());
+  QHash<QModelIndex, PhotoItem*>::const_iterator end = m_itemHash.constEnd();
+  for (QHash<QModelIndex, PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
+    count.value()->setSelected(!(*count)->isSelected());
 }
 
 PhotoItem *PhotoView::itemForIndex(const QModelIndex &index)
 {
   // !index.isValid() || m_itemVector.count() < index.row()
-  //if (index.isValid() && m_itemVector.count() >= index.row())
-  //  return 0;
+  if (index.isValid())
+    return 0;
 
-  return m_itemVector.value(index.row());
+  return m_itemHash.value(index);
 }
 
 void PhotoView::readModel()
@@ -187,13 +190,14 @@ void PhotoView::readModel()
   scene()->clearSelection();
 
   // Remove all current items
-  foreach(PhotoItem *item, m_itemVector) {
+  foreach(PhotoItem *item, m_itemHash) {
     if (!item->deleteItself())
       m_removeList << item;
     //scene()->removeItem(item);
     //delete item;
   }
 
+  m_itemHash.clear();
   m_itemVector.clear();
 
   int rowCount = m_model->rowCount(m_rootIndex);
@@ -201,12 +205,17 @@ void PhotoView::readModel()
   for (int i = 0; i < rowCount; i++) {
     QModelIndex row = m_model->index(i, 0, m_rootIndex);
 
+    // We don't want to show directories(galleries), don't we?
+    if (row.data(GCore::ImageModel::ImageTypeRole).toInt() == GCore::ImageItem::Gallery)
+      continue;
+
     PhotoItem *item = new PhotoItem(this);
     item->setText(row.data(Qt::DisplayRole).toString(), row.data(GCore::ImageModel::ImageDescriptionRole).toString());
     item->setPixmap(row.data(Qt::DecorationRole).value<QIcon>().pixmap(128, 128));
     item->setToolTip(row.data(Qt::ToolTipRole).toString());
 
     // Add to item vector
+    m_itemHash.insert(row, item);
     m_itemVector.append(item);
   }
 
@@ -240,6 +249,7 @@ void PhotoView::slotModelRowsInserted(const QModelIndex &parent, int start, int 
     item->setToolTip(row.data(Qt::ToolTipRole).toString());
 
     // Add to item vector
+    m_itemHash.insert(row, item);
     m_itemVector.append(item);
   }
   updateScene();
@@ -253,9 +263,10 @@ void PhotoView::slotModelRowsRemoved(const QModelIndex &parent, int start, int e
     return;
 
   for (int count = end; count >= start; count--) {
-    PhotoItem *picture = m_itemVector.value(count);
+    PhotoItem *picture = m_itemHash.value(parent.child(count, 0));
     if (picture) {
       m_removeList << picture;
+      m_itemHash.remove(parent.child(count, 0));
       m_itemVector.remove(count);
     }
   }
@@ -524,7 +535,7 @@ void PhotoView::dropEvent(QDropEvent *event)
 
 void PhotoView::keyPressEvent(QKeyEvent *event)
 {
-  if (!scene()->focusItem() && !m_itemVector.isEmpty())
+  if (!scene()->focusItem() && !m_itemHash.isEmpty())
     scene()->setFocusItem(static_cast<QGraphicsItem*>(m_itemVector.at(0)));
 
   PhotoItem *focusedItem = static_cast<PhotoItem*>(scene()->focusItem());
@@ -822,9 +833,7 @@ void PhotoView::slotConnectNavButtons()
 
 QModelIndex PhotoView::indexForItem(PhotoItem *item)
 {
-  int row = m_itemVector.indexOf(item);
-
-  return m_model->index(row, 0, m_rootIndex);
+  return m_itemHash.key(item);
 }
 
 QAbstractItemModel *PhotoView::model()

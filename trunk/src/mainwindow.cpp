@@ -32,6 +32,7 @@
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QPixmap>
 #include <QtCore/QDir>
+#include <QtGui/QSortFilterProxyModel>
 
 #include <QtCore/QtDebug>
 
@@ -189,11 +190,9 @@ void MainWindow::initToolbar()
 
 void MainWindow::initDocks()
 {
-  GCore::ImageModel *imageModel = GCore::Data::self()->getImageModel();
-
   albumView->header()->setVisible(false);
-  albumView->setModel(imageModel);
-  imageList->setModel(imageModel);
+  albumView->setModel(GCore::Data::self()->getModelProxy());
+  imageList->setModel(GCore::Data::self()->getImageModel());
 
   connect(imageList, SIGNAL(signalOneSelected(bool)), actionPreview, SLOT(setEnabled(bool)));
   connect(imageList, SIGNAL(signalOneSelected(bool)), actionRename, SLOT(setEnabled(bool)));
@@ -265,7 +264,6 @@ void MainWindow::slotProgressHide(bool checked)
 
 void MainWindow::slotQuit()
 {
-  //GCore::Data::self()->saveChanges();
   GCore::Data::self()->clear();
 }
 
