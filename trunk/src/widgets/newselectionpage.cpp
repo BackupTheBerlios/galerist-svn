@@ -33,8 +33,7 @@ namespace GWidgets
 
 NewSelectionPage::NewSelectionPage(QWidget *parent)
     : WizardPage(parent)
-{
-}
+{}
 
 QString NewSelectionPage::getName()
 {
@@ -49,7 +48,7 @@ QString NewSelectionPage::getImagePath()
 void NewSelectionPage::initialise()
 {
   setVerification(false);
-  
+
   // Setup the .ui file
   setupUi(this);
 
@@ -68,6 +67,12 @@ void NewSelectionPage::initialise()
 
   // Set focus to the name edit
   imagesEdit->setFocus();
+}
+
+void NewSelectionPage::nextEvent()
+{
+  getWizard()->setValue("GalleryName", QVariant(nameEdit->text()));
+  getWizard()->setValue("GalleryPath", QVariant(QDir::fromNativeSeparators(imagesEdit->text())));
 }
 
 void NewSelectionPage::slotCheckImagesPath(const QString &path)
@@ -139,8 +144,7 @@ void NewSelectionPage::slotTextChanged()
 }
 
 NewSelectionPage::~NewSelectionPage()
-{
-}
+{}
 
 
 }

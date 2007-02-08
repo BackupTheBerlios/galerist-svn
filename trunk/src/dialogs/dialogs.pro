@@ -6,13 +6,9 @@ CONFIG += warn_on \
           staticlib 
 TEMPLATE = lib 
 FORMS += configuration.ui 
-HEADERS += newwizard.h \
-           wizard.h \
-           configuration.h \
+HEADERS += configuration.h \
            gwizard.h  \
            newgallery.h
-SOURCES += newwizard.cpp \
-           wizard.cpp \
-           configuration.cpp \
+SOURCES += configuration.cpp \
            gwizard.cpp  \
            newgallery.cpp

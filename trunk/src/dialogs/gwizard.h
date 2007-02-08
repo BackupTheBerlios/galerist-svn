@@ -23,10 +23,13 @@
 #define GWIZARD__H
 
 #include <QtGui/QDialog>
+#include <QtCore/QMap>
+
 
 class QStackedWidget;
 class QPushButton;
 class QLabel;
+class QVariant;
 
 namespace GWidgets
 {
@@ -43,7 +46,7 @@ namespace GDialogs
  */
 class GWizard : public QDialog
 {
-  Q_OBJECT
+    Q_OBJECT
   signals:
     void signalChangedPage(int index);
     void signalPageAdded();
@@ -63,6 +66,22 @@ class GWizard : public QDialog
      * @param requester Who is requesting this action.
      */
     void setValidInput(bool valid, const QWidget *requester);
+
+    /**
+     * Sets a value for the atribute.
+     *
+     * @param atribute Name of the atribute.
+     * @param value Value of the atribute.
+     */
+    void setValue(const QString &atribute, const QVariant &value);
+    /**
+     * Gets atributes value.
+     *
+     * @param atribute Name of the atribute.
+     *
+     * @return Value of the atribute.
+     */
+    QVariant getValue(const QString &atribute);
 
     /**
      * A default destructor.
@@ -126,6 +145,8 @@ class GWizard : public QDialog
     QWidget *m_helpDialog;
     QLabel *m_bigImage;
     QWidget *m_topSlide;
+
+    QMap<QString, QVariant> m_wizardData;
 };
 
 }

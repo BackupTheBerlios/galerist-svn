@@ -33,8 +33,8 @@ NewGallery::NewGallery(QWidget *parent)
 {
   addPage(new GWidgets::NewWelcomePage);
   addPage(new GWidgets::NewSelectionPage);
-//  addPage(new GWidgets::NewCopyPage);
-//  addPage(new GWidgets::NewFinishPage);
+  addPage(new GWidgets::NewCopyPage);
+  addPage(new GWidgets::NewFinishPage);
 }
 
 

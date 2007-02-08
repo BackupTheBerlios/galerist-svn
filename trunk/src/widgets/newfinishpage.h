@@ -21,7 +21,7 @@
 #ifndef GWIDGETSNEWFINISHPAGE_H
 #define GWIDGETSNEWFINISHPAGE_H
 
-#include <QtGui/QWidget>
+#include "widgets/wizardpage.h"
 #include "ui_newfinishpage.h"
 
 namespace GWidgets
@@ -32,7 +32,7 @@ namespace GWidgets
  * @short Finish page.
  * @author Gregor Kalisnik <gregor@podnapisi.net>
  */
-class NewFinishPage : public QWidget, private Ui::NewFinishPage
+class NewFinishPage : public GWidgets::WizardPage, private Ui::NewFinishPage
 {
     Q_OBJECT
   public:
@@ -40,14 +40,19 @@ class NewFinishPage : public QWidget, private Ui::NewFinishPage
      * Default constructor.
      *
      * @param parent Parent widget.
-     * @param completed Is it completed?
      */
-    NewFinishPage(QWidget *parent = 0, bool completed = true);
+    NewFinishPage(QWidget *parent = 0);
 
     /**
      * Default destructor.
      */
     ~NewFinishPage();
+
+  protected:
+    /**
+     * Overloaded method.
+     */
+    void initialise();
 
 };
 

@@ -24,11 +24,6 @@
 #include "widgets/wizardpage.h"
 #include "ui_newcopypage.h"
 
-namespace GDialogs
-{
-class GWizard;
-}
-
 namespace GWidgets
 {
 
@@ -64,6 +59,11 @@ class NewCopyPage : public WizardPage, private Ui::NewCopyPage
      * Overloaded method.
      */
     void initialise();
+
+    /**
+     * Overloaded nethod. Executes the next step instructions.
+     */
+    void nextEvent();
 
   private:
     /**

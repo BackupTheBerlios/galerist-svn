@@ -26,16 +26,17 @@
 #include <QtGui/QStackedWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QLabel>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+#include <QtCore/QVariant>
 
 namespace GDialogs
 {
 
 GWizard::GWizard(QWidget *parent)
     : QDialog(parent),
-      m_helpDialog(0),
-      m_bigImage(0)
+    m_helpDialog(0),
+    m_bigImage(0)
 {
   setAttribute(Qt::WA_DeleteOnClose, true);
 
@@ -101,9 +102,19 @@ void GWizard::setValidInput(bool valid, const QWidget *requester)
   }
 }
 
-GWizard::~GWizard()
+void GWizard::setValue(const QString &atribute, const QVariant &value)
 {
+  QString a = value.toString();
+  m_wizardData.insert(atribute, value);
 }
+
+QVariant GWizard::getValue(const QString &atribute)
+{
+  return m_wizardData.value(atribute);
+}
+
+GWizard::~GWizard()
+{}
 
 void GWizard::addPage(GWidgets::WizardPage *page)
 {
@@ -169,16 +180,20 @@ void GWizard::next()
     return;
   }
 
-  GWidgets::WizardPage *oldPage = static_cast<GWidgets::WizardPage*> (m_pages->widget(m_pages->currentIndex()));
+  GWidgets::WizardPage *oldPage = static_cast<GWidgets::WizardPage*>(m_pages->widget(m_pages->currentIndex()));
   disconnect(oldPage, SIGNAL(verificationChanged(bool)), m_next, SLOT(setEnabled(bool)));
   disconnect(oldPage, SIGNAL(verificationChanged(bool)), m_finish, SLOT(setEnabled(bool)));
 
-  GWidgets::WizardPage *page = static_cast<GWidgets::WizardPage*> (m_pages->widget(m_pages->currentIndex() + 1));
-  connect(page, SIGNAL(verificationChanged(bool)), m_next, SLOT(setEnabled(bool)));
-  connect(page, SIGNAL(verificationChanged(bool)), m_finish, SLOT(setEnabled(bool)));
-  page->startInitialisation();
+  oldPage->nextEvent();
 
-  m_pages->setCurrentIndex(m_pages->currentIndex() + 1);
+  if (oldPage->steps() == 1 || (oldPage->steps() - 1) == oldPage->currentStep()) {
+    GWidgets::WizardPage *page = static_cast<GWidgets::WizardPage*>(m_pages->widget(m_pages->currentIndex() + 1));
+    connect(page, SIGNAL(verificationChanged(bool)), m_next, SLOT(setEnabled(bool)));
+    connect(page, SIGNAL(verificationChanged(bool)), m_finish, SLOT(setEnabled(bool)));
+    page->startInitialisation();
+
+    m_pages->setCurrentIndex(m_pages->currentIndex() + 1);
+  }
 
   emit signalChangedPage(m_pages->currentIndex());
 }
@@ -190,11 +205,11 @@ void GWizard::back()
     return;
   }
 
-  GWidgets::WizardPage *oldPage = static_cast<GWidgets::WizardPage*> (m_pages->widget(m_pages->currentIndex()));
+  GWidgets::WizardPage *oldPage = static_cast<GWidgets::WizardPage*>(m_pages->widget(m_pages->currentIndex()));
   disconnect(oldPage, SIGNAL(verificationChanged(bool)), m_next, SLOT(setEnabled(bool)));
   disconnect(oldPage, SIGNAL(verificationChanged(bool)), m_finish, SLOT(setEnabled(bool)));
 
-  GWidgets::WizardPage *page = static_cast<GWidgets::WizardPage*> (m_pages->widget(m_pages->currentIndex() - 1));
+  GWidgets::WizardPage *page = static_cast<GWidgets::WizardPage*>(m_pages->widget(m_pages->currentIndex() - 1));
   connect(page, SIGNAL(verificationChanged(bool)), m_next, SLOT(setEnabled(bool)));
   connect(page, SIGNAL(verificationChanged(bool)), m_finish, SLOT(setEnabled(bool)));
 

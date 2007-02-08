@@ -94,12 +94,17 @@ class NewSelectionPage : public WizardPage, private Ui::NewSelectionPage
      */
     void initialise();
 
+    /**
+     * Overloaded event. Saves all the data before switching to next page.
+     */
+    void nextEvent();
+
   private:
     GDialogs::GWizard *m_wizard;
 
   private slots:
     /**
-   * Defines the behaviour when text changes.
+    * Defines the behaviour when text changes.
      */
     void slotTextChanged();
     /**

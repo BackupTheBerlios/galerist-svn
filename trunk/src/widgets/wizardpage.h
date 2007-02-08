@@ -40,7 +40,7 @@ class WizardPage : public QWidget
     Q_OBJECT
   signals:
     void verificationChanged(bool verification);
-    
+
   public:
     WizardPage(QWidget *parent = 0);
 
@@ -112,12 +112,19 @@ class WizardPage : public QWidget
      */
     void previousStep();
 
+    /**
+     * An event that is called right before going to next page.
+     */
+    virtual void nextEvent();
+
   private:
     bool m_initialised;
     GDialogs::GWizard *m_wizard;
     bool m_verified;
     unsigned short m_steps;
     unsigned short m_currentStep;
+
+    friend class GDialogs::GWizard;
 
 };
 

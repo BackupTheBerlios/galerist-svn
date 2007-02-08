@@ -23,20 +23,19 @@
 namespace GWidgets
 {
 
-NewFinishPage::NewFinishPage(QWidget *parent, bool completed)
-    : QWidget(parent), Ui::NewFinishPage()
-{
-  setupUi(this);
-
-  if (completed)
-    labelFailed->setVisible(false);
-  else
-    labelSuccess->setVisible(false);
-}
+NewFinishPage::NewFinishPage(QWidget *parent)
+    : GWidgets::WizardPage(parent), Ui::NewFinishPage()
+{}
 
 
 NewFinishPage::~NewFinishPage()
 {}
 
+void NewFinishPage::initialise()
+{
+  setupUi(this);
+
+  labelFailed->setVisible(false);
+}
 
 }

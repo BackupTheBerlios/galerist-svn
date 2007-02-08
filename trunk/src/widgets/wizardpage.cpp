@@ -31,8 +31,7 @@ WizardPage::WizardPage(QWidget *parent)
     m_verified(true),
     m_steps(1),
     m_currentStep(0)
-{
-}
+{}
 
 WizardPage::~WizardPage()
 {
@@ -104,5 +103,8 @@ void WizardPage::previousStep()
   else
     m_currentStep--;
 }
+
+void WizardPage::nextEvent()
+{}
 
 }

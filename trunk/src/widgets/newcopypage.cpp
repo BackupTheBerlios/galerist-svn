@@ -37,7 +37,7 @@ NewCopyPage::NewCopyPage(QWidget *parent)
 {
 //   //Setup the .ui file.
 //   setupUi(this);
-// 
+//
 // #ifdef _WIN32
 //   linuxLabel->setVisible(false);
 // #endif
@@ -55,7 +55,7 @@ NewCopyPage::NewCopyPage(QWidget *parent)
 //     case (StepCopy) : {
 //       startCopy();
 //       hideFinish();
-// 
+//
 //       break;
 //     }
 //   }
@@ -77,16 +77,20 @@ void NewCopyPage::startCopy()
   // Disable the next button.
   //GDialogs::NewWizard *wizard = static_cast<GDialogs::NewWizard*>(parent());
   //wizard->enableButtons(false);
+
+  progressFrame->setVisible(true);
+  progressThumbnailFrame->setVisible(true);
+
   setVerification(false);
 
   // We copy the images to the right place
-  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(getWizard()->getGalleryName(), getWizard()->getGalleryPath());
+  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(getWizard()->getValue("GalleryName").toString(), getWizard()->getValue("GalleryPath").toString());
 
   // We close the wizard if the copy failed
-  if (!copyProcess) {
-    wizard->reject();
+  /*if (!copyProcess) {
+    getWizard->reject();
     return;
-  }
+  }*/
 
   // Connect the gallery handler.
   qRegisterMetaType<QImage>("QImage");
@@ -104,37 +108,38 @@ void NewCopyPage::slotProgress(int finished, int total, const QString &current, 
   if (!image.isNull())
     imageLabel->setPixmap(QPixmap::fromImage(image));
 
-  getWizard()->enableBack(false);
+//  getWizard()->enableBack(false);
 
-  if (current.isEmpty()) {
-    progressLabel->setText(tr("Copy cancelled."));
-    setVerification(true);
-    //wizard->enableButtons(true, true);
-    return;
-  }
+//   if (current.isEmpty()) {
+//     progressLabel->setText(tr("Copy cancelled."));
+//     setVerification(true);
+//     //wizard->enableButtons(true, true);
+//     return;
+//   }
 
   if (finished != total) {
     //Add the name to the progress label.
     progressLabel->setText(tr("Copying picture %1 ...").arg(current));
     //wizard->enableButtons(false);
     setVerification(false);
-  } else if (current.isEmpty()) {
-    progressLabel->setText(tr("Copy cancelled."));
-    //wizard->enableButtons(true, true);
-    setVerification(true);
-    imageLabel->setPixmap(QPixmap(":/images/cancel.png").scaled(128, 128));
-    return;
-  } else if (current == "failed") {
-    progressLabel->setText(tr("Copy failed."));
-    //wizard->enableButtons(true, true);
-    setVerification(true);
-    imageLabel->setPixmap(QPixmap(":/images/failed.png").scaled(128, 128));
-    return;
-  } else {
+  } else /*if (current.isEmpty()) {
+        progressLabel->setText(tr("Copy cancelled."));
+        //wizard->enableButtons(true, true);
+        setVerification(true);
+        imageLabel->setPixmap(QPixmap(":/images/cancel.png").scaled(128, 128));
+        return;
+      } else if (current == "failed") {
+        progressLabel->setText(tr("Copy failed."));
+        //wizard->enableButtons(true, true);
+        setVerification(true);
+        imageLabel->setPixmap(QPixmap(":/images/failed.png").scaled(128, 128));
+        return;
+      } else */ {
     //The copy has finished!
     progressLabel->setText(tr("Copy finished"));
     imageLabel->setPixmap(QPixmap(":/images/complete.png"));
     finishLabel->setVisible(true);
+    nextEvent();
     //wizard->enableButtons(true);
     setVerification(true);
   }
@@ -147,12 +152,38 @@ void NewCopyPage::initialise()
 {
   setupUi(this);
 
+  hideProgress();
+  hideFinish();
+
+  setSteps(3);
+
 #ifdef _WIN32
   linuxLabel->setVisible(false);
 #endif
 #ifdef unix
   windowsLabel->setVisible(false);
 #endif
+}
+
+void NewCopyPage::nextEvent()
+{
+  nextStep();
+  switch (currentStep()) {
+      // First step. The warning
+    case (0) : {
+      break;
+    }
+    // Second step. The copy
+    case (1) : {
+      startCopy();
+      break;
+    }
+    // Third step. The finish
+    case (2) : {
+      finishLabel->setVisible(true);
+      break;
+    }
+  }
 }
 
 

@@ -43,7 +43,7 @@ class NewGallery : public GWizard
     void accept();
     void reject();
 
-    
+
 
 };
 
