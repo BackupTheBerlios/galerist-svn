@@ -182,7 +182,11 @@ void Configuration::slotProcessEdit(const QString &filePath, bool firstRun)
 
 void Configuration::slotBrowse()
 {
+#ifdef _WIN32
   QString editorPath = QFileDialog::getOpenFileName(this, tr("Select image editor"), "/", tr("Executables (*.exe)"));
+#else
+  QString editorPath = QFileDialog::getOpenFileName(this, tr("Select image editor"), "/");
+#endif
   if (!editorPath.isEmpty())
     imageEditorEdit->setText(editorPath);
 }

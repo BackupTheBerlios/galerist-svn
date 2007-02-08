@@ -132,8 +132,8 @@ class ImageModel : public QAbstractItemModel
     void timerEvent(QTimerEvent*);
 
   private:
-    void setupModelData(const QString &path);
-    void processPath(const QDir &path, ImageItem *root = 0);
+    void setupModelData(const QString &path) const;
+    void processPath(const QDir &path, ImageItem *root = 0) const;
 
     QString m_path;
     mutable GCore::GJobs::ReadJob *m_currentJob;

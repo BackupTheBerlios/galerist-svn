@@ -41,7 +41,7 @@ namespace GWidgets
 GalleryTreeView::GalleryTreeView(QWidget *parent)
     : QTreeView(parent)
 {
-  connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotCheckSelection(const QModelIndex&)));
+  connect(this, SIGNAL(pressed(const QModelIndex&)), this, SLOT(slotCheckSelection(const QModelIndex&)));
 }
 
 void GalleryTreeView::contextMenuEvent(QContextMenuEvent *event)
@@ -63,8 +63,14 @@ void GalleryTreeView::slotDelete()
 void GalleryTreeView::slotCheckSelection(const QModelIndex &selected)
 {
   clearFocus();
+  collapseAll();
+  
   if (selected.isValid()) {
     emit signalSelected(true);
+
+    // Expand the whole tree up
+    for (QModelIndex count = selected; count.isValid(); count = count.parent())
+      expand(count);
   } else {
     emit signalSelected(false);
   }
