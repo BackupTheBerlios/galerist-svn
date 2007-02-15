@@ -103,9 +103,14 @@ class GWizard : public QDialog
      */
     void setHelp(QWidget *help);
 
+    /**
+     * Stops all activity.
+     */
+    void stop();
+
   protected slots:
     /**
-     * Overloaded accept method.
+     * Reimplemented accept method.
      */
     virtual void accept() = 0;
 

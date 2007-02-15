@@ -3,7 +3,8 @@ FORMS += newcopypage.ui \
          newwelcomepage.ui \
          newfinishpage.ui \
          imageaddprogress.ui \
-         photocontrol.ui 
+         photocontrol.ui  \
+         newimageselectpage.ui
 HEADERS += newwelcomepage.h \
            newselectionpage.h \
            newcopypage.h \
@@ -18,7 +19,8 @@ HEADERS += newwelcomepage.h \
            textedit.h \
            photocontrol.h \
            tooltip.h  \
-           wizardpage.h
+           wizardpage.h \
+           newimageselectpage.h
 SOURCES += newwelcomepage.cpp \
            newselectionpage.cpp \
            newcopypage.cpp \
@@ -33,7 +35,8 @@ SOURCES += newwelcomepage.cpp \
            textedit.cpp \
            photocontrol.cpp \
            tooltip.cpp  \
-           wizardpage.cpp
+           wizardpage.cpp \
+           newimageselectpage.cpp
 QT += opengl
 INCLUDEPATH += ../../src
 DESTDIR = ./

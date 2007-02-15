@@ -73,7 +73,7 @@ class CopyJob : public GCore::GJobs::AbstractJob
     QStringList m_fileNames;
     QModelIndex m_gallery;
     CopyMode m_mode;
-    QRegExp m_supportedFormats;
+    //QRegExp m_supportedFormats;
 
 };
 

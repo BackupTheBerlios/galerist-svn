@@ -107,4 +107,13 @@ void WizardPage::previousStep()
 void WizardPage::nextEvent()
 {}
 
+void WizardPage::backEvent()
+{}
+
+void WizardPage::viewEvent()
+{}
+
+void WizardPage::stopEvent()
+{}
+
 }

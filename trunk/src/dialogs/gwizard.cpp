@@ -34,7 +34,7 @@ namespace GDialogs
 {
 
 GWizard::GWizard(QWidget *parent)
-    : QDialog(parent),
+  : QDialog(parent),
     m_helpDialog(0),
     m_bigImage(0)
 {
@@ -65,7 +65,6 @@ GWizard::GWizard(QWidget *parent)
 
   // Next button
   m_next = new QPushButton(tr("&Next"), this);
-  m_next->setEnabled(false);
   buttons->addWidget(m_next);
 
   // Finish button (hidden)
@@ -151,6 +150,11 @@ void GWizard::setHelp(QWidget *help)
   }
 }
 
+void GWizard::stop()
+{
+  static_cast<GWidgets::WizardPage*> (m_pages->currentWidget())->stopEvent();
+}
+
 void GWizard::accept()
 {
   QDialog::accept();
@@ -169,7 +173,6 @@ void GWizard::slotUpdateNavigation(int index)
   } else {
     m_next->setVisible(true);
     m_finish->setVisible(false);
-    m_next->setEnabled(true);
   }
 }
 
@@ -191,6 +194,7 @@ void GWizard::next()
     connect(page, SIGNAL(verificationChanged(bool)), m_next, SLOT(setEnabled(bool)));
     connect(page, SIGNAL(verificationChanged(bool)), m_finish, SLOT(setEnabled(bool)));
     page->startInitialisation();
+    page->viewEvent();
 
     m_pages->setCurrentIndex(m_pages->currentIndex() + 1);
   }
@@ -208,10 +212,12 @@ void GWizard::back()
   GWidgets::WizardPage *oldPage = static_cast<GWidgets::WizardPage*>(m_pages->widget(m_pages->currentIndex()));
   disconnect(oldPage, SIGNAL(verificationChanged(bool)), m_next, SLOT(setEnabled(bool)));
   disconnect(oldPage, SIGNAL(verificationChanged(bool)), m_finish, SLOT(setEnabled(bool)));
+  oldPage->backEvent();
 
   GWidgets::WizardPage *page = static_cast<GWidgets::WizardPage*>(m_pages->widget(m_pages->currentIndex() - 1));
   connect(page, SIGNAL(verificationChanged(bool)), m_next, SLOT(setEnabled(bool)));
   connect(page, SIGNAL(verificationChanged(bool)), m_finish, SLOT(setEnabled(bool)));
+  page->viewEvent();
 
   m_pages->setCurrentIndex(m_pages->currentIndex() - 1);
 

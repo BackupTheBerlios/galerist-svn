@@ -28,6 +28,7 @@
 #include <QtCore/QDir>
 #include <QtGui/QImage>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 #include <QtCore/QAbstractItemModel>
 
 namespace GCore
@@ -37,8 +38,15 @@ namespace GJobs
 {
 
 ReadJob::ReadJob(const QAbstractItemModel *model)
-    : GCore::GJobs::AbstractJob(const_cast<QAbstractItemModel*>(model)),
+  : GCore::GJobs::AbstractJob(const_cast<QAbstractItemModel*>(model)),
     m_model(model)
+{}
+
+ReadJob::ReadJob(QObject *parent, const QDir &path, bool recursive)
+  : GCore::GJobs::AbstractJob(parent),
+    m_model(0),
+    m_path(path),
+    m_recursive(recursive)
 {}
 
 QModelIndex ReadJob::getItem()
@@ -53,42 +61,83 @@ void ReadJob::queuePhoto(const QModelIndex &item)
 
 void ReadJob::job()
 {
-  QModelIndex item;
-  while (!m_items.isEmpty()) {
-    if (getStop())
-      break;
+  if (m_model) {
+    QModelIndex item;
+    while (!m_items.isEmpty()) {
+      if (getStop())
+        break;
 
-    // Let's use our first item
-    item = m_items.takeFirst();
+      // Let's use our first item
+      item = m_items.takeFirst();
 
-    // We set gallery path.
-    QDir galleryPath(m_model->data(item, GCore::ImageModel::ImageDirPathRole).toString());
-    //galleryPath.cdUp();
+      // We set gallery path.
+      QDir galleryPath(m_model->data(item, GCore::ImageModel::ImageDirPathRole).toString());
+      //galleryPath.cdUp();
 
-    // We set the name of the file.
-    QString fileName(m_model->data(item, GCore::ImageModel::ImageFilenameRole).toString());
-    //fileName.remove(QDir::toNativeSeparators(galleryPath.absolutePath() + "/"));
+      // We set the name of the file.
+      QString fileName(m_model->data(item, GCore::ImageModel::ImageFilenameRole).toString());
+      //fileName.remove(QDir::toNativeSeparators(galleryPath.absolutePath() + "/"));
 
-    // We make sure, the others know what we are doing!
-    emit signalThumb(fileName);
+      // We make sure, the others know what we are doing!
+      emit signalThumb(fileName);
 
-    // Thumbnails path.
-    QDir thumbPath(galleryPath);
-    if (!thumbPath.cd(".thumbnails")) {
-      thumbPath.mkdir(".thumbnails");
-      thumbPath.cd(".thumbnails");
+      // Thumbnails path.
+      QDir thumbPath(galleryPath);
+      if (!thumbPath.cd(".thumbnails")) {
+        thumbPath.mkdir(".thumbnails");
+        thumbPath.cd(".thumbnails");
+      }
+
+      // Create the thumbnail.
+      QImage thumbnail = QImage(QDir::toNativeSeparators(galleryPath.absoluteFilePath(fileName))).scaled(128, 128, Qt::KeepAspectRatio);
+      thumbnail.save(QDir::toNativeSeparators(thumbPath.absoluteFilePath(fileName.remove(QRegExp("\\..+$")).append(".jpg"))), "JPG");
+
+      // We report about our achievement.
+      emit signalThumb(QString());
+      emit signalProcessed(item);
+
+      if (getStop())
+        break;
     }
+  } else {
+    readPath(m_path);
+    emit signalProcessed("", QImage());
+  }
+}
 
-    // Create the thumbnail.
-    QImage thumbnail = QImage(QDir::toNativeSeparators(galleryPath.absoluteFilePath(fileName))).scaled(128, 128, Qt::KeepAspectRatio);
-    thumbnail.save(QDir::toNativeSeparators(thumbPath.absoluteFilePath(fileName.remove(QRegExp("\\..+$")).append(".jpg"))), "JPG");
+void ReadJob::readPath(const QDir &path)
+{
+  if (!path.exists() || getStop())
+    return;
 
-    // We report about our achievement.
-    emit signalThumb(QString());
-    emit signalProcessed(item);
+  QImage image2;
 
+  if (m_recursive) {
+    QStringList items = path.entryList(QDir::Dirs);
+    items.removeAll(".");
+    items.removeAll("..");
+
+    foreach (QString item, items) {
+      QDir temp = path;
+      temp.cd(item);
+      readPath(temp);
+      if (getStop())
+        return;
+    }
+  }
+
+  QStringList images = path.entryList(QDir::Files);
+  foreach (QString image, images) {
     if (getStop())
-      break;
+      return;
+    
+    if (!image.contains(GCore::Data::self()->getSupportedFormats()) || QFileInfo(path, image).size() == 0)
+      continue;
+
+    //new QListWidgetItem(QIcon(QPixmap(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio)), image, imageList);
+    image2 = QImage(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio);
+
+    emit signalProcessed(image, image2);
   }
 }
 

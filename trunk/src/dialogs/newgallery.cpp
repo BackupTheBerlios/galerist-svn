@@ -22,8 +22,11 @@
 
 #include "widgets/newwelcomepage.h"
 #include "widgets/newselectionpage.h"
+#include "widgets/newimageselectpage.h"
 #include "widgets/newcopypage.h"
 #include "widgets/newfinishpage.h"
+
+#include <QtCore/QTimer>
 
 namespace GDialogs
 {
@@ -33,6 +36,7 @@ NewGallery::NewGallery(QWidget *parent)
 {
   addPage(new GWidgets::NewWelcomePage);
   addPage(new GWidgets::NewSelectionPage);
+  addPage(new GWidgets::NewImageSelectPage);
   addPage(new GWidgets::NewCopyPage);
   addPage(new GWidgets::NewFinishPage);
 }
@@ -48,7 +52,9 @@ void NewGallery::accept()
 
 void NewGallery::reject()
 {
-  QDialog::reject();
+  stop();
+  hide();
+  QTimer::singleShot(100, this, SLOT(close()));
 }
 
 

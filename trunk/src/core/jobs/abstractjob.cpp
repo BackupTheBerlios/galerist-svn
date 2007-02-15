@@ -25,6 +25,8 @@
 
 #include <QtCore/QMutex>
 
+#include <QtGui/QApplication>
+
 namespace GCore
 {
 
@@ -37,6 +39,7 @@ AbstractJob::AbstractJob(QObject *parent)
 {
   // Connect with the error handler.
   connect(this, SIGNAL(signalFailed(const QString&, int)), Data::self()->getErrorHandler(), SLOT(slotReporter(const QString&, int)));
+  connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(terminate()));
 }
 
 AbstractJob::~AbstractJob()
@@ -49,22 +52,12 @@ void AbstractJob::run()
 
 void AbstractJob::stop()
 {
-  while (!m_locker.tryLock())
-    usleep(10);
-
   m_stop = true;
-  m_locker.unlock();
 }
 
 bool AbstractJob::getStop()
 {
-  while (!m_locker.tryLock())
-    usleep(10);
-
-  bool stop = m_stop;
-  m_locker.unlock();
-
-  return stop;
+  return m_stop;
 }
 
 void AbstractJob::slotDeleteLater()

@@ -40,7 +40,14 @@ class NewGallery : public GWizard
     ~NewGallery();
 
   private slots:
+    /**
+     * Reimplemented method.
+     */
     void accept();
+    
+    /**
+     * Reimplemented method.
+     */
     void reject();
 
 

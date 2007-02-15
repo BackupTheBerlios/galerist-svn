@@ -34,32 +34,7 @@ namespace GWidgets
 
 NewCopyPage::NewCopyPage(QWidget *parent)
     : WizardPage(parent)
-{
-//   //Setup the .ui file.
-//   setupUi(this);
-//
-// #ifdef _WIN32
-//   linuxLabel->setVisible(false);
-// #endif
-// #ifdef unix
-//   windowsLabel->setVisible(false);
-// #endif
-
-//   //Hide parts of the page.
-//   switch (step) {
-//     case (StepWarning) : {
-//       hideProgress();
-//       hideFinish();
-//       break;
-//     }
-//     case (StepCopy) : {
-//       startCopy();
-//       hideFinish();
-//
-//       break;
-//     }
-//   }
-}
+{}
 
 void NewCopyPage::hideProgress()
 {

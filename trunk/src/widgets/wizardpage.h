@@ -117,6 +117,21 @@ class WizardPage : public QWidget
      */
     virtual void nextEvent();
 
+    /**
+     * An event that is called right before going to previous page.
+     */
+    virtual void backEvent();
+
+    /**
+     * An event that is called when the page has been selected.
+     */
+    virtual void viewEvent();
+
+    /**
+     * An event that is called when the wizard requests for all activities to stop.
+     */
+    virtual void stopEvent();
+
   private:
     bool m_initialised;
     GDialogs::GWizard *m_wizard;

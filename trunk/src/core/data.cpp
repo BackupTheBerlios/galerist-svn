@@ -153,11 +153,6 @@ GCore::Data::ViewType Data::getImageView()
   return m_viewType;
 }
 
-void Data::saveChanges()
-{
-  m_settings->sync();
-}
-
 QString Data::getGalleriesPath()
 {
   QDir galleriesPath(QDir::homePath() + "/.goya/galleries");
@@ -408,6 +403,22 @@ void Data::setAppVersion(const QString &version)
 QString Data::getAppVersion()
 {
   return m_appVersion;
+}
+
+void Data::setSupportedFormats(const QRegExp &supportedFormats)
+{
+  m_supportedFormats = supportedFormats;
+  m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
+}
+
+QRegExp Data::getSupportedFormats()
+{
+  return m_supportedFormats;
+}
+
+void Data::saveChanges()
+{
+  m_settings->sync();
 }
 
 void Data::clear()

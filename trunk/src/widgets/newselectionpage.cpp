@@ -67,12 +67,15 @@ void NewSelectionPage::initialise()
 
   // Set focus to the name edit
   imagesEdit->setFocus();
+
+  slotTextChanged();
 }
 
 void NewSelectionPage::nextEvent()
 {
-  getWizard()->setValue("GalleryName", QVariant(nameEdit->text()));
-  getWizard()->setValue("GalleryPath", QVariant(QDir::fromNativeSeparators(imagesEdit->text())));
+  getWizard()->setValue("GalleryName", nameEdit->text());
+  getWizard()->setValue("GalleryPath", QDir::fromNativeSeparators(imagesEdit->text()));
+  getWizard()->setValue("RecursiveSearch", recursiveBox->isChecked());
 }
 
 void NewSelectionPage::slotCheckImagesPath(const QString &path)

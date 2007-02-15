@@ -272,6 +272,23 @@ class Data : public QObject
      */
     QString getAppVersion();
 
+    /**
+     * Set the list of supported images.
+     *
+     * @param supportedFormats List of the supported formats (QRegExp).
+     */
+    void setSupportedFormats(const QRegExp &supportedFormats);
+
+    /**
+     * Get the list of supported images.
+     *
+     * @return Returns the list of supported image formats in a QRegExp.
+     */
+    QRegExp getSupportedFormats();
+
+    /**
+     * Saves all the changes.
+     */
     void saveChanges();
 
     /**
@@ -304,6 +321,7 @@ class Data : public QObject
 #endif
     QWidget *m_mainWindow;
     QSortFilterProxyModel *m_modelProxy;
+    QRegExp m_supportedFormats;
 
     // Methods
 

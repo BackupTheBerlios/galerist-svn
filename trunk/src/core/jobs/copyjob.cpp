@@ -42,8 +42,8 @@ CopyJob::CopyJob(const QString &source, const QString &destination, const QModel
     m_gallery(gallery),
     m_mode(MultiMode)
 {
-  m_supportedFormats = QRegExp("gif|jpg|jpeg|png");
-  m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
+  //m_supportedFormats = QRegExp("gif|jpg|jpeg|png");
+  //m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
 }
 
 CopyJob::CopyJob(const QString &source, const QStringList &fileNames, const QString &destination, const QModelIndex &gallery, QObject *parent)
@@ -54,8 +54,8 @@ CopyJob::CopyJob(const QString &source, const QStringList &fileNames, const QStr
     m_gallery(gallery),
     m_mode(SingleMode)
 {
-  m_supportedFormats = QRegExp("gif|jpg|jpeg|png");
-  m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
+  //m_supportedFormats = QRegExp("gif|jpg|jpeg|png");
+  //m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
 }
 
 void CopyJob::job()
@@ -96,7 +96,7 @@ void CopyJob::singleCopy()
     }
 
     // If the file is 0 in size, it's a fake (need to get a better verification process)
-    if (QFileInfo(*m_source, *count).size() == 0 || !(*count).contains(m_supportedFormats)) {
+    if (QFileInfo(*m_source, *count).size() == 0 || !(*count).contains(Data::self()->getSupportedFormats())) {
       emit signalProgress(processed, numberImages, *count, QImage());
       processed++;
       continue;
@@ -168,7 +168,7 @@ void CopyJob::multiCopy()
     }
 
     // If the file is 0 in size, it's a fake (need to get a better verification process)
-    if (QFileInfo(*m_source, imageFiles.at(count)).size() == 0 || !imageFiles.at(count).contains(m_supportedFormats)) {
+    if (QFileInfo(*m_source, imageFiles.at(count)).size() == 0 || !imageFiles.at(count).contains(Data::self()->getSupportedFormats())) {
       emit signalProgress(count, numberImages, imageFiles.at(count), QImage());
       continue;
     }

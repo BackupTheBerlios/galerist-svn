@@ -18,81 +18,85 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GCORE_GJOBSREADJOB_H
-#define GCORE_GJOBSREADJOB_H
 
-#include "core/jobs/abstractjob.h"
-#include "core/imageitem.h"
+#ifndef NEWIMAGESELECTPAGE_H
+#define NEWIMAGESELECTPAGE_H
 
-#include <QtCore/QModelIndex>
-#include <QtCore/QDir>
+#include "widgets/wizardpage.h"
+#include "ui_newimageselectpage.h"
+
+class QDir;
+class QImage;
 
 namespace GCore
 {
-
 namespace GJobs
 {
+class ReadJob;
+}
+}
 
-/**
- @author Gregor Kalisnik <gregor@podnapisi.net>
-*/
-class ReadJob : public GCore::GJobs::AbstractJob
+namespace GWidgets
 {
-    Q_OBJECT
-  signals:
-    void signalThumb(const QString &fileName);
-    void signalProcessed(const QModelIndex &item);
-    void signalProcessed(const QString &filename, const QImage &image);
 
+class NewImageSelectPage : public WizardPage, private Ui::NewImageSelectPage
+{
+  Q_OBJECT
   public:
     /**
-     * Constructor for reading and adding to the model.
+     * A default constructor.
      *
-     * @param model Model to which new images will be added.
+     * @param parent Parent widget of this page.
      */
-    ReadJob(const QAbstractItemModel *model);
+    NewImageSelectPage(QWidget* parent = 0);
 
     /**
-     * Constructor for reading only.
-     *
-     * @param parent Parent of this job.
-     * @param path Path to the gallery.
-     * @param recursive Read recursevly.
+     * A default destructor.
      */
-    ReadJob(QObject *parent, const QDir &path, bool recursive = false);
+    ~NewImageSelectPage();
 
-    /**
-     * Returns the currently processed item.
-     */
-    QModelIndex getItem();
-
-    /**
-     * Adds a photo to the queue.
-     */
-    void queuePhoto(const QModelIndex &item);
-
-    ~ReadJob();
+  public slots:
 
   protected:
-    // Inherited method
-    void job();
+    /**
+     * Reimplemented method.
+     */
+    void initialise();
+
+    /**
+     * Reimplemented method for clearing all the images from the list.
+     */
+    void backEvent();
+
+    /**
+     * Reimplemented method that searches the images path.
+     */
+    void viewEvent();
+
+    /**
+     * Reimplemented stop event. Need to stop the read job.
+     */
+    void stopEvent();
+
+  protected slots:
 
   private:
-    // Methods
-    void readPath(const QDir &path);
+    GCore::GJobs::ReadJob *m_job;
 
-    // Variables
-    const QAbstractItemModel *m_model;
-    QString m_filePath;
-    QList<QModelIndex> m_items;
+    /**
+     * Searches for possible images from the selected directory.
+     */
+    void searchForImages(const QDir &path);
 
-    QDir m_path;
-    bool m_recursive;
+  private slots:
+    /**
+     * Process the readed images.
+     */
+    void slotProcess(const QString &filename, const QImage &image);
 
 };
 
 }
 
-}
-
 #endif
+
