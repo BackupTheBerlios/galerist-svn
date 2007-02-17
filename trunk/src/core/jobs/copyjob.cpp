@@ -41,10 +41,7 @@ CopyJob::CopyJob(const QString &source, const QString &destination, const QModel
     m_destination(new QDir(destination)),
     m_gallery(gallery),
     m_mode(MultiMode)
-{
-  //m_supportedFormats = QRegExp("gif|jpg|jpeg|png");
-  //m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
-}
+{}
 
 CopyJob::CopyJob(const QString &source, const QStringList &fileNames, const QString &destination, const QModelIndex &gallery, QObject *parent)
     : GCore::GJobs::AbstractJob(parent),
@@ -53,9 +50,11 @@ CopyJob::CopyJob(const QString &source, const QStringList &fileNames, const QStr
     m_fileNames(fileNames),
     m_gallery(gallery),
     m_mode(SingleMode)
+{}
+
+QModelIndex CopyJob::getGalleryIndex()
 {
-  //m_supportedFormats = QRegExp("gif|jpg|jpeg|png");
-  //m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
+  return m_gallery;
 }
 
 void CopyJob::job()

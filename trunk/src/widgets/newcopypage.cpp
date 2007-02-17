@@ -50,16 +50,13 @@ void NewCopyPage::hideFinish()
 void NewCopyPage::startCopy()
 {
   // Disable the next button.
-  //GDialogs::NewWizard *wizard = static_cast<GDialogs::NewWizard*>(parent());
-  //wizard->enableButtons(false);
+  setVerification(false);
 
   progressFrame->setVisible(true);
   progressThumbnailFrame->setVisible(true);
 
-  setVerification(false);
-
   // We copy the images to the right place
-  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(getWizard()->getValue("GalleryName").toString(), getWizard()->getValue("GalleryPath").toString());
+  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(getWizard()->getValue("GalleryName").toString(), getWizard()->getValue("SelectedImages").toStringList(), getWizard()->getValue("GalleryPath").toString());
 
   // We close the wizard if the copy failed
   /*if (!copyProcess) {
@@ -75,8 +72,6 @@ void NewCopyPage::startCopy()
 
 void NewCopyPage::slotProgress(int finished, int total, const QString &current, const QImage &image)
 {
-  //GDialogs::Wizard *wizard = static_cast<GDialogs::Wizard*>(parent());
-
   progressBar->setMaximum(total);
   progressBar->setValue(finished);
 

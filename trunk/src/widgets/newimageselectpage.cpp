@@ -31,6 +31,8 @@
 
 #include <QtGui/QListWidgetItem>
 
+#include <QtDebug>
+
 namespace GWidgets
 {
 
@@ -48,6 +50,20 @@ void NewImageSelectPage::initialise()
   progressFrame->setVisible(false);
 }
 
+void NewImageSelectPage::nextEvent()
+{
+  QStringList selectedFileNames;
+
+  QList<QListWidgetItem*> selectedImages = imageList->selectedItems();
+  foreach (QListWidgetItem *image, selectedImages) {
+    selectedFileNames << image->text();
+  }
+
+  getWizard()->setValue("SelectedImages", selectedFileNames);
+  m_directories.sort();
+  getWizard()->setValue("Directories", m_directories);
+}
+
 void NewImageSelectPage::backEvent()
 {
   if (m_job) {
@@ -61,8 +77,9 @@ void NewImageSelectPage::backEvent()
 void NewImageSelectPage::viewEvent()
 {
   if (!imageList->count()) {
+    setVerification(false);
     m_job = new GCore::GJobs::ReadJob(this, getWizard()->getValue("GalleryPath").toString(), getWizard()->getValue("RecursiveSearch").toBool());
-    connect(m_job, SIGNAL(signalProcessed(const QString&, const QImage&)), this, SLOT(slotProcess(const QString&, const QImage&)));
+    connect(m_job, SIGNAL(signalProgress(const QString&, const QImage&, const QString&)), this, SLOT(slotProcess(const QString&, const QImage&, const QString&)));
     m_job->start();
   }
 }
@@ -73,50 +90,22 @@ void NewImageSelectPage::stopEvent()
     m_job->terminate();
 }
 
-void NewImageSelectPage::searchForImages(const QDir &path)
-{
-//   if (!path.exists())
-//     return;
-// 
-//   bool recursiveSearch = getWizard()->getValue("RecursiveSearch").toBool();
-// 
-//   if (recursiveSearch) {
-//     QStringList items = path.entryList(QDir::Dirs);
-//     items.removeAll(".");
-//     items.removeAll("..");
-// 
-//     foreach (QString item, items) {
-//       QDir temp = path;
-//       temp.cd(item);
-//       searchForImages(temp);
-//     }
-// 
-//   }
-// 
-//   QStringList images = path.entryList(QDir::Files);
-// 
-//   foreach (QString image, images) {
-//     if (!image.contains(GCore::Data::self()->getSupportedFormats()) || QFileInfo(path, image).size() == 0)
-//       continue;
-// 
-//     new QListWidgetItem(QIcon(QPixmap(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio)), image, imageList);
-//   }
-}
-
-void NewImageSelectPage::slotProcess(const QString &filename, const QImage &image)
+void NewImageSelectPage::slotProcess(const QString &filename, const QImage &image, const QString &directory)
 {
   if (!filename.isEmpty()) {
       if (m_job) {
       new QListWidgetItem(QIcon(QPixmap::fromImage(image)), filename, imageList);
+      if (!m_directories.contains(directory))
+        m_directories << directory;
       outputLabel->setText(tr("Searching for images... Current image %1").arg(filename));
       progressFrame->setVisible(true);
-    } else {
-      progressFrame->setVisible(false);
+      return;
     }
-  } else {
-    progressFrame->setVisible(false);
-    m_job = 0;
   }
+  
+  progressFrame->setVisible(false);
+  m_job = 0;
+  setVerification(true);
 }
 
 }

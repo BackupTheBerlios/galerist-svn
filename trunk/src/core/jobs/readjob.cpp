@@ -101,7 +101,7 @@ void ReadJob::job()
     }
   } else {
     readPath(m_path);
-    emit signalProcessed("", QImage());
+    emit signalProgress("", QImage());
   }
 }
 
@@ -110,7 +110,7 @@ void ReadJob::readPath(const QDir &path)
   if (!path.exists() || getStop())
     return;
 
-  QImage image2;
+  QImage imageThumbnail;
 
   if (m_recursive) {
     QStringList items = path.entryList(QDir::Dirs);
@@ -134,10 +134,9 @@ void ReadJob::readPath(const QDir &path)
     if (!image.contains(GCore::Data::self()->getSupportedFormats()) || QFileInfo(path, image).size() == 0)
       continue;
 
-    //new QListWidgetItem(QIcon(QPixmap(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio)), image, imageList);
-    image2 = QImage(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio);
+    imageThumbnail = QImage(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio);
 
-    emit signalProcessed(image, image2);
+    emit signalProgress(image, imageThumbnail, path.absolutePath());
   }
 }
 

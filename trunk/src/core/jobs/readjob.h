@@ -42,7 +42,7 @@ class ReadJob : public GCore::GJobs::AbstractJob
   signals:
     void signalThumb(const QString &fileName);
     void signalProcessed(const QModelIndex &item);
-    void signalProcessed(const QString &filename, const QImage &image);
+    void signalProgress(const QString &filename, const QImage &image, const QString &directory = 0);
 
   public:
     /**

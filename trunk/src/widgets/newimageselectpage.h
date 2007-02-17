@@ -64,6 +64,11 @@ class NewImageSelectPage : public WizardPage, private Ui::NewImageSelectPage
     void initialise();
 
     /**
+     * Reimplemented method. Stores the filenames list of selected images.
+     */
+    void nextEvent();
+
+    /**
      * Reimplemented method for clearing all the images from the list.
      */
     void backEvent();
@@ -82,17 +87,13 @@ class NewImageSelectPage : public WizardPage, private Ui::NewImageSelectPage
 
   private:
     GCore::GJobs::ReadJob *m_job;
-
-    /**
-     * Searches for possible images from the selected directory.
-     */
-    void searchForImages(const QDir &path);
+    QStringList m_directories;
 
   private slots:
     /**
      * Process the readed images.
      */
-    void slotProcess(const QString &filename, const QImage &image);
+    void slotProcess(const QString &filename, const QImage &image, const QString &directory);
 
 };
 

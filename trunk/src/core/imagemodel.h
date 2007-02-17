@@ -103,7 +103,7 @@ class ImageModel : public QAbstractItemModel
     void reconstruct();
 
     QObject *addImages(const QModelIndex &parent, const QString &sourcePath, const QStringList &fileNames = QStringList());
-    QObject *createGallery(const QString &name, const QString &sourcePath);
+    QObject *createGallery(const QString &name, const QStringList &fileNames, const QString &sourcePath, const QModelIndex &parent = QModelIndex());
 
     bool removeGallery(const QModelIndex &index);
     QModelIndex removeImages(const QModelIndexList &indexList);

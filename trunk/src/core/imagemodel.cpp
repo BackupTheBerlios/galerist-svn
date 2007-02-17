@@ -23,6 +23,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtGui/QIcon>
+#include <QtGui/QSortFilterProxyModel>
 #include <QtCore/QSize>
 #include <QtCore/QRegExp>
 
@@ -460,6 +461,7 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
 
   qDebug() << gallery->getFilePath() << endl;
 
+  // Copy the whole directory
   if (fileNames.isEmpty()) {
     if (!m_currentCopyJob) {
       m_currentCopyParent = parent;
@@ -471,6 +473,7 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
     }
   }
 
+  // Copy only the fileNames
   if (!m_currentCopyJob) {
     m_currentCopyParent = parent;
     m_currentCopyJob = new GCore::GJobs::CopyJob(sourcePath, fileNames, gallery->getFilePath(), parent);
@@ -483,25 +486,38 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
   return 0;
 }
 
-QObject *ImageModel::createGallery(const QString &name, const QString &sourcePath)
+QObject *ImageModel::createGallery(const QString &name, const QStringList &fileNames, const QString &sourcePath, const QModelIndex &parent)
 {
   // We create the destination directory
   QDir destPath(GCore::Data::self()->getGalleriesPath());
-
   if (!destPath.mkdir(name)) {
     ErrorHandler::reportMessage(tr("Cannot create gallery directory."), ErrorHandler::Critical);
     return 0;
   }
   destPath.cd(name);
 
-  // Notify the viewers we are making a new gallery
-  beginInsertRows(QModelIndex(), m_rootItem->childCount(), m_rootItem->childCount() + 1);
+  QModelIndex parentIndex;
 
-  m_rootItem->appendChild(new GCore::ImageItem(name, m_rootItem, GCore::ImageItem::Gallery));
+  if (!parent.isValid()) {
+    // Notify the viewers we are making a new gallery
+    beginInsertRows(QModelIndex(), m_rootItem->childCount(), m_rootItem->childCount());
 
+    m_rootItem->appendChild(new GCore::ImageItem(name, m_rootItem, GCore::ImageItem::Gallery));
+
+    parentIndex = index(m_rootItem->childCount() - 1, 0);
+  } else {
+    ImageItem *parentItem = static_cast<ImageItem*>(parent.internalPointer());
+    
+    beginInsertRows(QModelIndex(), parentItem->childCount(), parentItem->childCount());
+
+    parentItem->appendChild(new GCore::ImageItem(name, parentItem, GCore::ImageItem::Gallery));
+
+    parentIndex = parent;
+  }
+  
   endInsertRows();
 
-  return addImages(index(m_rootItem->childCount() - 1, 0), sourcePath);
+  return addImages(parentIndex, sourcePath, fileNames);
 }
 
 void ImageModel::slotProcess(const QString &fileName)
@@ -512,7 +528,7 @@ void ImageModel::slotProcess(const QString &fileName)
   ImageItem *gallery = static_cast<ImageItem*>(m_currentCopyParent.internalPointer());
 
   if (!fileName.isEmpty()) {
-    beginInsertRows(m_currentCopyParent, rowCount(m_currentCopyParent), rowCount(m_currentCopyParent) + 1);
+    beginInsertRows(m_currentCopyParent, rowCount(m_currentCopyParent), rowCount(m_currentCopyParent));
 
     ImageItem *image = new ImageItem(fileName, gallery, ImageItem::Image);
     image->metadata()->addImage(fileName);
@@ -530,13 +546,12 @@ bool ImageModel::removeGallery(const QModelIndex &index)
     return false;
 
   ImageItem *item = static_cast<ImageItem*>(index.internalPointer());
+  QDir gallery(item->getFilePath());
 
   beginRemoveRows(QModelIndex(), 0, item->childCount());
 
   // Remove the images
   removeImages(childs(index));
-
-  QDir gallery(item->getFilePath());
 
   // Delete what is left in the gallery
   QDir thumbnails(gallery);

@@ -55,6 +55,8 @@ class CopyJob : public GCore::GJobs::AbstractJob
     CopyJob(const QString &source, const QString &destination, const QModelIndex &gallery, QObject *parent = 0);
     CopyJob(const QString &source, const QStringList &fileNames, const QString &destination, const QModelIndex &gallery, QObject *parent = 0);
 
+    QModelIndex getGalleryIndex();
+
     ~CopyJob();
 
   protected:
