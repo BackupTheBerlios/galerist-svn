@@ -528,7 +528,7 @@ void ImageModel::slotProcess(const QString &fileName)
   ImageItem *gallery = static_cast<ImageItem*>(m_currentCopyParent.internalPointer());
 
   if (!fileName.isEmpty()) {
-    beginInsertRows(m_currentCopyParent, rowCount(m_currentCopyParent), rowCount(m_currentCopyParent));
+    beginInsertRows(m_currentCopyParent, gallery->childCount(), gallery->childCount() + 1);
 
     ImageItem *image = new ImageItem(fileName, gallery, ImageItem::Image);
     image->metadata()->addImage(fileName);
@@ -536,8 +536,13 @@ void ImageModel::slotProcess(const QString &fileName)
     gallery->appendChild(image);
 
     endInsertRows();
-  } else
+
+    // Is there any better option?
+    Data::self()->getModelProxy()->setSourceModel(this);
+    
+  } else {
     removeGallery(m_currentCopyParent);
+  }
 }
 
 bool ImageModel::removeGallery(const QModelIndex &index)
@@ -548,7 +553,8 @@ bool ImageModel::removeGallery(const QModelIndex &index)
   ImageItem *item = static_cast<ImageItem*>(index.internalPointer());
   QDir gallery(item->getFilePath());
 
-  beginRemoveRows(QModelIndex(), 0, item->childCount());
+  beginRemoveRows(index.parent(), item->row(), item->row());
+  emit layoutAboutToBeChanged();
 
   // Remove the images
   removeImages(childs(index));
@@ -593,6 +599,8 @@ bool ImageModel::removeGallery(const QModelIndex &index)
     ErrorHandler::reportMessage(tr("Cannot delete gallery. It's directory cannot be removed."), ErrorHandler::Critical);
 
   endRemoveRows();
+
+  emit layoutChanged();
 
   return status;
 }

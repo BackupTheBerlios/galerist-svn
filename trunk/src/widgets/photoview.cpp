@@ -263,10 +263,11 @@ void PhotoView::slotModelRowsRemoved(const QModelIndex &parent, int start, int e
     return;
 
   for (int count = end; count >= start; count--) {
-    PhotoItem *picture = m_itemHash.value(parent.child(count, 0));
+    PhotoItem *picture = m_itemVector.value(count);
+    QModelIndex index = indexForItem(picture);
     if (picture) {
       m_removeList << picture;
-      m_itemHash.remove(parent.child(count, 0));
+      m_itemHash.remove(index);
       m_itemVector.remove(count);
     }
   }
