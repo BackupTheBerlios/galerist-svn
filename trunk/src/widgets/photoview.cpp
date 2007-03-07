@@ -242,6 +242,8 @@ void PhotoView::slotModelRowsInserted(const QModelIndex &parent, int start, int 
 
   for (int count = start; count < end; count++) {
     QModelIndex row = m_model->index(count, 0, index);
+    if (row.data(GCore::ImageModel::ImageTypeRole) != GCore::ImageItem::Image)
+      continue;
 
     PhotoItem *item = new PhotoItem(this);
     item->setText(row.data(Qt::DisplayRole).toString(), row.data(GCore::ImageModel::ImageDescriptionRole).toString());

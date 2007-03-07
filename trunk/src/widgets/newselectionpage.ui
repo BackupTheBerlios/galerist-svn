@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>522</width>
-    <height>300</height>
+    <width>635</width>
+    <height>460</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -19,80 +19,175 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="3" column="0" colspan="2" >
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
+   <item row="2" column="0" >
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Parent gallery</string>
      </property>
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="GWidgets::LineEdit" name="imagesEdit" />
-     </item>
-     <item>
-      <widget class="QPushButton" name="browseButton" >
-       <property name="text" >
-        <string/>
-       </property>
-       <property name="icon" >
-        <iconset resource="../images.qrc" >:/images/folder-open.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>Please select the folder that contains the pictures you'd like to add your gallery.</string>
-     </property>
-     <property name="buddy" >
-      <cstring>imagesEdit</cstring>
-     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QComboBox" name="parentBox" >
+        <item>
+         <property name="text" >
+          <string>None</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>Parent gallery.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2" >
+   <item row="3" column="0" >
     <widget class="QLabel" name="messageLabel" >
      <property name="text" >
       <string/>
      </property>
     </widget>
    </item>
+   <item row="0" column="0" >
+    <widget class="QGroupBox" name="groupBox_3" >
+     <property name="title" >
+      <string>General</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="3" column="0" colspan="2" >
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="GWidgets::LineEdit" name="imagesEdit" />
+        </item>
+        <item>
+         <widget class="QPushButton" name="browseButton" >
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="icon" >
+           <iconset resource="../images.qrc" >:/images/folder-open.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Please select the folder that contains the pictures you'd like to add your gallery.</string>
+        </property>
+        <property name="buddy" >
+         <cstring>imagesEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>50</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0" >
+       <widget class="GWidgets::LineEdit" name="nameEdit" />
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Please select a name for this new gallery.</string>
+        </property>
+        <property name="buddy" >
+         <cstring>nameEdit</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item row="1" column="0" >
-    <widget class="GWidgets::LineEdit" name="nameEdit" />
-   </item>
-   <item row="1" column="1" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Subdirectories</string>
      </property>
-     <property name="sizeHint" >
-      <size>
-       <width>50</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="0" colspan="2" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Please select a name for this new gallery.</string>
-     </property>
-     <property name="buddy" >
-      <cstring>nameEdit</cstring>
-     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="2" column="0" >
+       <widget class="QRadioButton" name="thisRadio" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+        <property name="text" >
+         <string>Include pictures in subdirectories in this gallery</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QRadioButton" name="subRadio" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+        <property name="text" >
+         <string>Include pictures in subdirectories as subgalleries</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QCheckBox" name="recursiveBox" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+        <property name="text" >
+         <string>Include pictures in subdirectories</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="4" column="0" >
-    <widget class="QCheckBox" name="recursiveBox" >
-     <property name="text" >
-      <string>Include pictures in subdirectories</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="2" >
+   <item row="5" column="0" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
@@ -122,5 +217,38 @@
  <resources>
   <include location="../images.qrc" />
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>recursiveBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>subRadio</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>67</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>71</x>
+     <y>225</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>recursiveBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>thisRadio</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>123</x>
+     <y>195</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>148</x>
+     <y>256</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

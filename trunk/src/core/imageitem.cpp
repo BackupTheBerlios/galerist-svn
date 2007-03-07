@@ -76,7 +76,7 @@ int ImageItem::childCount() const
 int ImageItem::row() const
 {
   if (m_parentItem)
-    return m_parentItem->m_childItems.indexOf(const_cast<ImageItem*>(this));
+    return m_parentItem->m_childItems.indexOf(const_cast<ImageItem*> (this));
 
   return 0;
 }

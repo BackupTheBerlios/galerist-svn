@@ -55,8 +55,12 @@ void NewCopyPage::startCopy()
   progressFrame->setVisible(true);
   progressThumbnailFrame->setVisible(true);
 
+  QModelIndex parentGallery = QModelIndex();
+  if (getWizard()->getValue("ParentGallery").toString() != "None")
+    parentGallery = GCore::Data::self()->getImageModel()->findGallery(getWizard()->getValue("ParentGallery").toString());
+  QString a = getWizard()->getValue("ParentGallery").toString();
   // We copy the images to the right place
-  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(getWizard()->getValue("GalleryName").toString(), getWizard()->getValue("SelectedImages").toStringList(), getWizard()->getValue("GalleryPath").toString());
+  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(getWizard()->getValue("GalleryName").toString(), getWizard()->getValue("SelectedImages").toStringList(), getWizard()->getValue("GalleryPath").toString(), parentGallery);
 
   // We close the wizard if the copy failed
   /*if (!copyProcess) {

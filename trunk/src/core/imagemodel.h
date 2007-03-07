@@ -126,6 +126,22 @@ class ImageModel : public QAbstractItemModel
      */
     bool checkName(const QString &filename, const QModelIndex &root = QModelIndex()) const;
 
+    /**
+     * Gets the list of all galleries in the model.
+     *
+     * @return List of galleries.
+     */
+    QStringList getGalleriesList();
+
+    /**
+     * Get the model index by name.
+     *
+     * @param name Name of the gallery.
+     *
+     * @return Index of the gallery.
+     */
+    QModelIndex findGallery(const QString &name);
+
     void stopCopy();
 
   protected:
@@ -134,6 +150,25 @@ class ImageModel : public QAbstractItemModel
   private:
     void setupModelData(const QString &path) const;
     void processPath(const QDir &path, ImageItem *root = 0) const;
+
+    /**
+     * A recursive method for actualy getting the gallery list.
+     *
+     * @param root Root item.
+     *
+     * @return The gallery list.
+     */
+    QStringList processGalleriesList(ImageItem *root = 0);
+
+    /**
+     * A recursive method for searching a gallery by name.
+     *
+     * @param name Name of the gallery.
+     * @param parent Parent index.
+     *
+     * @return Index of the found gallery.
+     */
+    QModelIndex processGallerySearch(const QString &name, const QModelIndex &parent = QModelIndex());
 
     QString m_path;
     mutable GCore::GJobs::ReadJob *m_currentJob;

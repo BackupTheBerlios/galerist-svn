@@ -68,6 +68,9 @@ void NewSelectionPage::initialise()
   // Set focus to the name edit
   imagesEdit->setFocus();
 
+  // Add all available galleries
+  parentBox->addItems(GCore::Data::self()->getImageModel()->getGalleriesList());
+
   slotTextChanged();
 }
 
@@ -76,6 +79,8 @@ void NewSelectionPage::nextEvent()
   getWizard()->setValue("GalleryName", nameEdit->text());
   getWizard()->setValue("GalleryPath", QDir::fromNativeSeparators(imagesEdit->text()));
   getWizard()->setValue("RecursiveSearch", recursiveBox->isChecked());
+  getWizard()->setValue("RecursiveGallery", subRadio->isChecked() ? "SubGallery" : "ThisGallery");
+  getWizard()->setValue("ParentGallery", parentBox->currentText());
 }
 
 void NewSelectionPage::slotCheckImagesPath(const QString &path)
