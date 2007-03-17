@@ -42,12 +42,11 @@
 
 #include "core/network/updater.h"
 
-#include "dialogs/newgallery.h"
+#include "dialogs/newgallerywizard.h"
 #include "dialogs/configuration.h"
 
 #include "widgets/imageaddprogress.h"
 #include "widgets/photocontrol.h"
-
 
 MainWindow::MainWindow()
     : QMainWindow(), Ui::MainWindow()
@@ -215,7 +214,7 @@ void MainWindow::about()
 void MainWindow::slotNew()
 {
   //We create a wizard for creation a new gallery.
-  GDialogs::NewGallery *newWizard = new GDialogs::NewGallery(this);
+  GDialogs::NewGalleryWizard *newWizard = new GDialogs::NewGalleryWizard(this);
   newWizard->resize(600, 500);
   newWizard->show();
 }

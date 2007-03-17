@@ -37,7 +37,7 @@ namespace GWidgets
 TipLabel *TipLabel::m_tipLabel = 0;
 
 TipLabel::TipLabel(QWidget *parent)
-    : QLabel(parent, Qt::Tool | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint)
+    : QLabel(parent, Qt::ToolTip)
 {}
 
 void TipLabel::move(const QPoint &pos)

@@ -18,55 +18,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "newcopypage.h"
+#include "copypage.h"
 
 #include "core/data.h"
 #include "core/imagemodel.h"
-#include "dialogs/gwizard.h"
-
-#include "widgets/newselectionpage.h"
 
 #include <QtCore/QDir>
+
 #include <QtGui/QPixmap>
 
-namespace GWidgets
-{
+namespace GWidgets {
 
-NewCopyPage::NewCopyPage(QWidget *parent)
-    : WizardPage(parent)
-{}
+namespace GWizard {
 
-void NewCopyPage::hideProgress()
+CopyPage::CopyPage()
+ : QWizardPage(),
+   m_finished(false)
 {
-  progressFrame->setVisible(false);
-  progressThumbnailFrame->setVisible(false);
+  setTitle(tr("Copy"));
+  
+  setupUi(this);
 }
 
-void NewCopyPage::hideFinish()
+CopyPage::~CopyPage()
 {
-  finishLabel->setVisible(false);
 }
 
-void NewCopyPage::startCopy()
+void CopyPage::initializePage()
 {
-  // Disable the next button.
-  setVerification(false);
-
-  progressFrame->setVisible(true);
-  progressThumbnailFrame->setVisible(true);
-
+  // We determine which gallery is the parent
   QModelIndex parentGallery = QModelIndex();
-  if (getWizard()->getValue("ParentGallery").toString() != "None")
-    parentGallery = GCore::Data::self()->getImageModel()->findGallery(getWizard()->getValue("ParentGallery").toString());
-  QString a = getWizard()->getValue("ParentGallery").toString();
+  if (field("ParentGallery").toString() != "None")
+    parentGallery = GCore::Data::self()->getImageModel()->findGallery(field("ParentGallery").toString());
+  
   // We copy the images to the right place
-  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(getWizard()->getValue("GalleryName").toString(), getWizard()->getValue("SelectedImages").toStringList(), getWizard()->getValue("GalleryPath").toString(), parentGallery);
+  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery);
 
   // We close the wizard if the copy failed
   /*if (!copyProcess) {
-    getWizard->reject();
-    return;
-  }*/
+  getWizard->reject();
+  return;
+}*/
 
   // Connect the gallery handler.
   qRegisterMetaType<QImage>("QImage");
@@ -74,7 +66,12 @@ void NewCopyPage::startCopy()
   connect(copyProcess, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(slotProgress(int, int, const QString&, const QImage&)));
 }
 
-void NewCopyPage::slotProgress(int finished, int total, const QString &current, const QImage &image)
+bool CopyPage::isComplete() const
+{
+  return m_finished;
+}
+
+void CopyPage::slotProgress(int finished, int total, const QString &current, const QImage &image)
 {
   progressBar->setMaximum(total);
   progressBar->setValue(finished);
@@ -95,70 +92,28 @@ void NewCopyPage::slotProgress(int finished, int total, const QString &current, 
     //Add the name to the progress label.
     progressLabel->setText(tr("Copying picture %1 ...").arg(current));
     //wizard->enableButtons(false);
-    setVerification(false);
   } else /*if (current.isEmpty()) {
-        progressLabel->setText(tr("Copy cancelled."));
+    progressLabel->setText(tr("Copy cancelled."));
         //wizard->enableButtons(true, true);
-        setVerification(true);
-        imageLabel->setPixmap(QPixmap(":/images/cancel.png").scaled(128, 128));
-        return;
-      } else if (current == "failed") {
-        progressLabel->setText(tr("Copy failed."));
-        //wizard->enableButtons(true, true);
-        setVerification(true);
-        imageLabel->setPixmap(QPixmap(":/images/failed.png").scaled(128, 128));
-        return;
-      } else */ {
-    //The copy has finished!
-    progressLabel->setText(tr("Copy finished"));
-    imageLabel->setPixmap(QPixmap(":/images/complete.png"));
-    finishLabel->setVisible(true);
-    nextEvent();
-    //wizard->enableButtons(true);
     setVerification(true);
-  }
+    imageLabel->setPixmap(QPixmap(":/images/cancel.png").scaled(128, 128));
+    return;
+} else if (current == "failed") {
+    progressLabel->setText(tr("Copy failed."));
+        //wizard->enableButtons(true, true);
+    setVerification(true);
+    imageLabel->setPixmap(QPixmap(":/images/failed.png").scaled(128, 128));
+    return;
+} else */ {
+    //The copy has finished!
+            progressLabel->setText(tr("Copy finished"));
+            imageLabel->setPixmap(QPixmap(":/images/complete.png"));
+            m_finished = true;
+            emit completeChanged();
+    //wizard->enableButtons(true);
+}
 }
 
-NewCopyPage::~NewCopyPage()
-{}
-
-void NewCopyPage::initialise()
-{
-  setupUi(this);
-
-  hideProgress();
-  hideFinish();
-
-  setSteps(3);
-
-#ifdef _WIN32
-  linuxLabel->setVisible(false);
-#endif
-#ifdef unix
-  windowsLabel->setVisible(false);
-#endif
 }
-
-void NewCopyPage::nextEvent()
-{
-  nextStep();
-  switch (currentStep()) {
-      // First step. The warning
-    case (0) : {
-      break;
-    }
-    // Second step. The copy
-    case (1) : {
-      startCopy();
-      break;
-    }
-    // Third step. The finish
-    case (2) : {
-      finishLabel->setVisible(true);
-      break;
-    }
-  }
-}
-
 
 }

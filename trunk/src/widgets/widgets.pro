@@ -1,15 +1,6 @@
-FORMS += newcopypage.ui \
-         newselectionpage.ui \
-         newwelcomepage.ui \
-         newfinishpage.ui \
-         imageaddprogress.ui \
-         photocontrol.ui  \
-         newimageselectpage.ui
-HEADERS += newwelcomepage.h \
-           newselectionpage.h \
-           newcopypage.h \
-           newfinishpage.h \
-           lineedit.h \
+FORMS += imageaddprogress.ui \
+         photocontrol.ui
+HEADERS += lineedit.h \
            gallerytreeview.h \
            imageaddprogress.h \
            photoview.h \
@@ -18,14 +9,8 @@ HEADERS += newwelcomepage.h \
            photodescription.h \
            textedit.h \
            photocontrol.h \
-           tooltip.h  \
-           wizardpage.h \
-           newimageselectpage.h
-SOURCES += newwelcomepage.cpp \
-           newselectionpage.cpp \
-           newcopypage.cpp \
-           newfinishpage.cpp \
-           lineedit.cpp \
+           tooltip.h
+SOURCES += lineedit.cpp \
            gallerytreeview.cpp \
            imageaddprogress.cpp \
            photoview.cpp \
@@ -34,9 +19,7 @@ SOURCES += newwelcomepage.cpp \
            photodescription.cpp \
            textedit.cpp \
            photocontrol.cpp \
-           tooltip.cpp  \
-           wizardpage.cpp \
-           newimageselectpage.cpp
+           tooltip.cpp
 QT += opengl
 INCLUDEPATH += ../../src
 DESTDIR = ./

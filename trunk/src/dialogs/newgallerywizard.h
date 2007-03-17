@@ -18,24 +18,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "newfinishpage.h"
+#ifndef GDIALOGSNEWGALLERYWIZARD_H
+#define GDIALOGSNEWGALLERYWIZARD_H
 
-namespace GWidgets
+#include <QtGui/QWizard>
+
+namespace GDialogs {
+
+/**
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
+class NewGalleryWizard : public QWizard
 {
+  Q_OBJECT
+  public:
+    /**
+     * A default constructor.
+     *
+     * @param parent Parent of this wizard.
+     */
+    NewGalleryWizard(QWidget *parent = 0);
 
-NewFinishPage::NewFinishPage(QWidget *parent)
-    : GWidgets::WizardPage(parent), Ui::NewFinishPage()
-{}
+    /**
+     * A default destructor.
+     */
+    ~NewGalleryWizard();
 
+};
 
-NewFinishPage::~NewFinishPage()
-{}
-
-void NewFinishPage::initialise()
-{
-  setupUi(this);
-
-  labelFailed->setVisible(false);
 }
 
-}
+#endif

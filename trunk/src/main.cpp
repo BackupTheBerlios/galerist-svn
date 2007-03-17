@@ -31,8 +31,6 @@
 #include "core/data.h"
 #include "mainwindow.h"
 
-#include "dialogs/newgallery.h"
-
 int main(int argc, char *argv[])
 {
   QApplication app(argc, argv);

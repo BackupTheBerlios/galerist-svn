@@ -18,81 +18,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GWIDGETSNEWCOPYPAGE_H
-#define GWIDGETSNEWCOPYPAGE_H
+#include "finishpage.h"
 
-#include "widgets/wizardpage.h"
-#include "ui_newcopypage.h"
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QLabel>
 
-namespace GWidgets
+namespace GWidgets {
+
+namespace GWizard {
+
+FinishPage::FinishPage()
+ : QWizardPage()
 {
+  setTitle(tr("Finish"));
+  QLabel *label = new QLabel(this);
+  label->setText(tr("<p>The gallery has been created. You can now edit the pictures, remove them or add new pictures to your liking.</p><p>To close this wizard, press <br>Finish</b>.</p>"));
+  label->setWordWrap(true);
 
-/**
- * Class that represents a copy page of a wizard.
- * @short Copy page.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
- */
-class NewCopyPage : public WizardPage, private Ui::NewCopyPage
+  QVBoxLayout *layout = new QVBoxLayout(this);
+  layout->addWidget(label);
+
+  setLayout(layout);
+}
+
+
+FinishPage::~FinishPage()
 {
-    Q_OBJECT
-  public:
-    /**
-     * Defines the step at which it is.
-     */
-    enum Step {
-      StepWarning,
-      StepCopy
-  };
+}
 
-    /**
-     * Default constructor.
-     */
-    NewCopyPage(QWidget *parent = 0);
-
-    /**
-     * Default destructor.
-     */
-    ~NewCopyPage();
-
-  protected:
-    /**
-     * Overloaded method.
-     */
-    void initialise();
-
-    /**
-     * Overloaded nethod. Executes the next step instructions.
-     */
-    void nextEvent();
-
-  private:
-    /**
-     * Hides the progress bar.
-     */
-    void hideProgress();
-    /**
-     * Hides the finish button.
-     */
-    void hideFinish();
-
-    /**
-     * Starts the copy process.
-     */
-    void startCopy();
-
-  private slots:
-    /**
-     * Updates the progress bar.
-     *
-     * @param finished Finished number of units.
-     * @param total Total number of units.
-     * @param current Name of the current item.
-     * @param image Thumbnail of the current photo.
-     */
-    void slotProgress(int finished, int total, const QString &current, const QImage &image);
-
-};
 
 }
 
-#endif
+}

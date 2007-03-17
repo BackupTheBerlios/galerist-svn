@@ -18,22 +18,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "newwelcomepage.h"
+#include "summarypage.h"
 
-namespace GWidgets
-{
 
-NewWelcomePage::NewWelcomePage(QWidget *parent)
-    : WizardPage(parent)
-{
-}
+namespace GWidgets {
 
-void NewWelcomePage::initialise()
+namespace GWizard {
+
+SummaryPage::SummaryPage()
+ : QWizardPage()
 {
+  setTitle(tr("Summary"));
   setupUi(this);
 }
 
-NewWelcomePage::~NewWelcomePage()
-{}
+SummaryPage::~SummaryPage()
+{
+}
+
+void SummaryPage::initializePage()
+{
+  nameLabel->setText(field("GalleryName").toString());
+  pathLabel->setText(field("GalleryPath").toString());
+  recursiveLabel->setText("No");
+  parentLabel->setText(field("ParentGallery").toString());
+}
+
+
+}
 
 }

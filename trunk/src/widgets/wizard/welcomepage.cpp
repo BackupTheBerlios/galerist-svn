@@ -18,102 +18,38 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "wizardpage.h"
+#include "welcomepage.h"
 
-#include "dialogs/gwizard.h"
+#include <QtGui/QLabel>
 
-namespace GWidgets
+#include <QtGui/QVBoxLayout>
+
+namespace GWidgets {
+
+namespace GWizard {
+
+WelcomePage::WelcomePage(QWidget *parent)
+ : QWizardPage(parent)
 {
+  setTitle(tr("Welcome"));
 
-WizardPage::WizardPage(QWidget *parent)
-    : QWidget(parent),
-    m_initialised(false),
-    m_verified(true),
-    m_steps(1),
-    m_currentStep(0)
-{}
+  QString welcome = "<p>With this wizard you will select a name of the gallery and designate a folder with picture, you'd like to add to your gallery.</p><p>To proceed, click <b>next</b>.</p>";
 
-WizardPage::~WizardPage()
-{
-  m_wizard = 0;
+  QLabel *label = new QLabel(welcome, this);
+  label->setWordWrap(true);
+  label->setTextFormat(Qt::RichText);
+
+  QVBoxLayout *layout = new QVBoxLayout(this);
+  layout->addWidget(label);
+  setLayout(layout);
 }
 
-bool WizardPage::verified()
+
+WelcomePage::~WelcomePage()
 {
-  return m_verified;
 }
 
-void WizardPage::startInitialisation()
-{
-  if (!m_initialised) {
-    initialise();
-    m_initialised = true;
-  }
+
 }
-
-bool WizardPage::initialised()
-{
-  return m_initialised;
-}
-
-unsigned short WizardPage::steps()
-{
-  return m_steps;
-}
-
-unsigned short WizardPage::currentStep()
-{
-  return m_currentStep;
-}
-
-void WizardPage::setParent(QObject *parent)
-{
-  m_wizard = static_cast<GDialogs::GWizard*>(parent);
-  QObject::setParent(parent);
-}
-
-GDialogs::GWizard *WizardPage::getWizard()
-{
-  return m_wizard;
-}
-
-void WizardPage::setVerification(bool verified)
-{
-  m_verified = verified;
-  emit verificationChanged(verified);
-}
-
-void WizardPage::setSteps(unsigned short steps)
-{
-  m_steps = steps;
-}
-
-void WizardPage::nextStep()
-{
-  if ((m_steps - 1) == m_currentStep)
-    qWarning("WizardPage: Out of bounds!");
-  else
-    m_currentStep++;
-}
-
-void WizardPage::previousStep()
-{
-  if (!m_currentStep)
-    qWarning("WizardPage: Out of bounds!");
-  else
-    m_currentStep--;
-}
-
-void WizardPage::nextEvent()
-{}
-
-void WizardPage::backEvent()
-{}
-
-void WizardPage::viewEvent()
-{}
-
-void WizardPage::stopEvent()
-{}
 
 }

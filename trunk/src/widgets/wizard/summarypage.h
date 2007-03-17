@@ -18,41 +18,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GDIALOGSNEWGALLERY_H
-#define GDIALOGSNEWGALLERY_H
+#ifndef GWIDGETS_GWIZARDSUMMARYPAGE_H
+#define GWIDGETS_GWIZARDSUMMARYPAGE_H
 
-#include "../dialogs/gwizard.h"
+#include <QtGui/QWizardPage>
 
-namespace GDialogs
-{
+#include "ui_summarypage.h"
+
+namespace GWidgets {
+
+namespace GWizard {
 
 /**
- * A wizard for creating new galleries.
- * @short Gallery creating wizard.
  * @author Gregor Kalisnik <gregor@podnapisi.net>
  */
-class NewGallery : public GWizard
+class SummaryPage : public QWizardPage, private Ui::SummaryPage
 {
-    Q_OBJECT
+  Q_OBJECT
   public:
-    NewGallery(QWidget *parent = 0);
-
-    ~NewGallery();
-
-  private slots:
     /**
-     * Reimplemented method.
+     * A default constructor.
      */
-    void accept();
-    
+    SummaryPage();
+
     /**
-     * Reimplemented method.
+     * A default destructor
      */
-    void reject();
+    ~SummaryPage();
 
-
+    /**
+     * Reimplemented method for setting the page.
+     */
+    void initializePage();
 
 };
+
+}
 
 }
 

@@ -18,57 +18,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GWIDGETSNEWSELECTIONPAGE_H
-#define GWIDGETSNEWSELECTIONPAGE_H
 
-#include "widgets/wizardpage.h"
-#include "widgets/lineedit.h"
-#include "ui_newselectionpage.h"
+#ifndef GWIDGETSGWIZARDSELECTIONPAGE_H
+#define GWIDGETSGWIZARDSELECTIONPAGE_H
 
-namespace GDialogs
-{
-class NewWizard;
-class GWizard;
-}
+#include <QtGui/QWizardPage>
+#include "ui_selectionpage.h"
 
-namespace GWidgets
-{
+namespace GWidgets {
 
-/**
- * Class that represents a selection page in the wizard.
- * @short Selection page.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
- */
-class NewSelectionPage : public WizardPage, private Ui::NewSelectionPage
+namespace GWizard {
+
+class SelectionPage : public QWizardPage, private Ui::SelectionPage
 {
     Q_OBJECT
+
   public:
     /**
-     * Default constructor.
-     *
-     * @param parent Parent widget.
+     * A default constructor.
      */
-    NewSelectionPage(QWidget *parent = 0);
+    SelectionPage();
 
     /**
-     * Default destructor.
+     * A default destructor.
      */
-    ~NewSelectionPage();
+    ~SelectionPage();
 
     /**
-     * Gets the gallery's name. Used by the wizard (usually).
-     *
-     * @return Name of the gallery.
+     * Reimplemented method. Sets all values to default.
      */
-    QString getName();
+    void initializePage();
+    /**
+     * Reimplemented method. Cleans the values.
+     */
+    void cleanupPage();
 
     /**
-     * Gets path with images. Used by the wizard (usually).
-     *
-     * @return Image directory path.
+     * Reimplemented method for determening if this page is fully filled up.
      */
-    QString getImagePath();
+    bool isComplete() const;
 
+  public slots:
+
+  private:
     /**
      * Checks if the image path is valid.
      *
@@ -77,7 +69,7 @@ class NewSelectionPage : public WizardPage, private Ui::NewSelectionPage
      * @return @c true Path is valid.
      * @return @c false Path is invalid.
      */
-    bool checkImagesPath(const QString &path);
+    bool checkImagesPath(const QString &path) const;
     /**
      * Checks if the name is valid.
      *
@@ -86,27 +78,9 @@ class NewSelectionPage : public WizardPage, private Ui::NewSelectionPage
      * @return @c true Name is valid.
      * @return @c false Name is invalid.
      */
-    bool checkName(const QString &name);
-
-  protected:
-    /**
-     * Overloaded method.
-     */
-    void initialise();
-
-    /**
-     * Overloaded event. Saves all the data before switching to next page.
-     */
-    void nextEvent();
-
-  private:
-    GDialogs::GWizard *m_wizard;
+    bool checkName(const QString &name) const;
 
   private slots:
-    /**
-    * Defines the behaviour when text changes.
-     */
-    void slotTextChanged();
     /**
      * Defines the behaviour when browse button is clicked.
      */
@@ -129,4 +103,7 @@ class NewSelectionPage : public WizardPage, private Ui::NewSelectionPage
 
 }
 
+}
+
 #endif
+

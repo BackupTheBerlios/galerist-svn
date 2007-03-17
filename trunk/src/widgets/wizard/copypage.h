@@ -18,44 +18,61 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "newgallery.h"
+#ifndef GWIDGETS_GWIZARDCOPYPAGE_H
+#define GWIDGETS_GWIZARDCOPYPAGE_H
 
-#include "widgets/newwelcomepage.h"
-#include "widgets/newselectionpage.h"
-#include "widgets/newimageselectpage.h"
-#include "widgets/newcopypage.h"
-#include "widgets/newfinishpage.h"
+#include <QtGui/QWizardPage>
+#include "ui_copypage.h"
 
-#include <QtCore/QTimer>
+namespace GWidgets {
 
-namespace GDialogs
+namespace GWizard {
+
+/**
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
+class CopyPage : public QWizardPage, private Ui::CopyPage
 {
+  Q_OBJECT
+  public:
+    /**
+     * A default constructor.
+     */
+    CopyPage();
 
-NewGallery::NewGallery(QWidget *parent)
-    : GWizard(parent)
-{
-  addPage(new GWidgets::NewWelcomePage);
-  addPage(new GWidgets::NewSelectionPage);
-  addPage(new GWidgets::NewImageSelectPage);
-  addPage(new GWidgets::NewCopyPage);
-  addPage(new GWidgets::NewFinishPage);
+    /**
+     * A default destructor.
+     */
+    ~CopyPage();
+
+    /**
+     * Reimplemented method for starting the copy process.
+     */
+    void initializePage();
+
+    /**
+     * Reimplemented method for defining when the copy has finished.
+     */
+    bool isComplete() const;
+
+  private:
+    bool m_finished;
+
+  private slots:
+    /**
+     * Updates the progress bar.
+     *
+     * @param finished Finished number of units.
+     * @param total Total number of units.
+     * @param current Name of the current item.
+     * @param image Thumbnail of the current photo.
+     */
+    void slotProgress(int finished, int total, const QString &current, const QImage &image);
+
+};
+
 }
 
-
-NewGallery::~NewGallery()
-{}
-
-void NewGallery::accept()
-{
-  QDialog::accept();
 }
 
-void NewGallery::reject()
-{
-  stop();
-  hide();
-  QTimer::singleShot(100, this, SLOT(close()));
-}
-
-
-}
+#endif

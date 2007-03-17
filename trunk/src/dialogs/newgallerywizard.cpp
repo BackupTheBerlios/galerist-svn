@@ -18,44 +18,34 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GWIDGETSNEWWELCOMEPAGE_H
-#define GWIDGETSNEWWELCOMEPAGE_H
+#include "newgallerywizard.h"
 
-#include "widgets/wizardpage.h"
-#include "ui_newwelcomepage.h"
+#include "widgets/wizard/welcomepage.h"
+#include "widgets/wizard/selectionpage.h"
+#include "widgets/wizard/summarypage.h"
+#include "widgets/wizard/copypage.h"
+#include "widgets/wizard/finishpage.h"
 
-namespace GWidgets
+namespace GDialogs {
+
+NewGalleryWizard::NewGalleryWizard(QWidget *parent)
+ : QWizard(parent)
 {
+  setWindowTitle(tr("Create a new gallery"));
 
-/**
- * Class that represents a welcome page of the wizard.
- * @short Welcome page.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
- */
-class NewWelcomePage : public WizardPage, private Ui::NewWelcomePage
-{
-    Q_OBJECT
-  public:
-    /**
-     * Default constructor.
-     *
-     * @param parent Parent widget.
-     */
-    NewWelcomePage(QWidget *parent = 0);
+  setDefaultProperty("QComboBox", "currentText", "currentIndexChanged()");
 
-    /**
-     * Default destructor.
-     */
-    ~NewWelcomePage();
-
-  protected:
-    /**
-     * Overloaded function.
-     */
-    void initialise();
-
-};
-
+  addPage(new GWidgets::GWizard::WelcomePage);
+  addPage(new GWidgets::GWizard::SelectionPage);
+  addPage(new GWidgets::GWizard::SummaryPage);
+  addPage(new GWidgets::GWizard::CopyPage);
+  addPage(new GWidgets::GWizard::FinishPage);
 }
 
-#endif
+
+NewGalleryWizard::~NewGalleryWizard()
+{
+}
+
+
+}

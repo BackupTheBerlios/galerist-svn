@@ -18,86 +18,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef GWIDGETS_GWIZARDFINISHPAGE_H
+#define GWIDGETS_GWIZARDFINISHPAGE_H
 
-#ifndef NEWIMAGESELECTPAGE_H
-#define NEWIMAGESELECTPAGE_H
+#include <QtGui/QWizardPage>
 
-#include "widgets/wizardpage.h"
-#include "ui_newimageselectpage.h"
+namespace GWidgets {
 
-class QDir;
-class QImage;
+namespace GWizard {
 
-namespace GCore
-{
-namespace GJobs
-{
-class ReadJob;
-}
-}
-
-namespace GWidgets
-{
-
-class NewImageSelectPage : public WizardPage, private Ui::NewImageSelectPage
+/**
+	@author Gregor Kalisnik <gregor@podnapisi.net>
+*/
+class FinishPage : public QWizardPage
 {
   Q_OBJECT
   public:
     /**
      * A default constructor.
-     *
-     * @param parent Parent widget of this page.
      */
-    NewImageSelectPage(QWidget* parent = 0);
+    FinishPage();
 
     /**
      * A default destructor.
      */
-    ~NewImageSelectPage();
-
-  public slots:
-
-  protected:
-    /**
-     * Reimplemented method.
-     */
-    void initialise();
-
-    /**
-     * Reimplemented method. Stores the filenames list of selected images.
-     */
-    void nextEvent();
-
-    /**
-     * Reimplemented method for clearing all the images from the list.
-     */
-    void backEvent();
-
-    /**
-     * Reimplemented method that searches the images path.
-     */
-    void viewEvent();
-
-    /**
-     * Reimplemented stop event. Need to stop the read job.
-     */
-    void stopEvent();
-
-  protected slots:
-
-  private:
-    GCore::GJobs::ReadJob *m_job;
-    QStringList m_directories;
-
-  private slots:
-    /**
-     * Process the readed images.
-     */
-    void slotProcess(const QString &filename, const QImage &image, const QString &directory);
+    ~FinishPage();
 
 };
 
 }
 
-#endif
+}
 
+#endif

@@ -18,72 +18,87 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "newselectionpage.h"
 
-#include "dialogs/newgallery.h"
+#include "selectionpage.h"
+
 #include "core/data.h"
 #include "core/imagemodel.h"
 
+#include "widgets/lineedit.h"
+
 #include <QtCore/QDir>
+#include <QtCore/QFile>
+
 #include <QtGui/QFileDialog>
-#include <QtGui/QDirModel>
 
-namespace GWidgets
+namespace GWidgets {
+
+namespace GWizard {
+
+SelectionPage::SelectionPage()
+    : QWizardPage()
 {
+  setTitle(tr("Gallery settings"));
+  
+  setupUi(this);
+  
+  registerField("GalleryName*", nameEdit);
+  registerField("GalleryPath*", imagesEdit);
+  registerField("RecursiveSearch", recursiveBox);
+  registerField("RecursiveSubGallery", subRadio);
+  registerField("ParentGallery", parentBox);
+  
+  connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowseClicked()));
+}
 
-NewSelectionPage::NewSelectionPage(QWidget *parent)
-    : WizardPage(parent)
+SelectionPage::~SelectionPage()
 {}
 
-QString NewSelectionPage::getName()
+void SelectionPage::initializePage()
 {
-  return nameEdit->text();
-}
-
-QString NewSelectionPage::getImagePath()
-{
-  return QDir::fromNativeSeparators(imagesEdit->text());
-}
-
-void NewSelectionPage::initialise()
-{
-  setVerification(false);
-
-  // Setup the .ui file
-  setupUi(this);
-
-  // Connect the buttons and line edits
-  connect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
-  connect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
-  connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowseClicked()));
-
-  nameEdit->setType(GWidgets::LineEdit::WithVerify);
-  imagesEdit->setType(GWidgets::LineEdit::FileSelector);
-
-  QString homeDir = QDir::homePath();
-
-  // Insert the path to the home directory
-  imagesEdit->setText(homeDir);
-
   // Set focus to the name edit
-  imagesEdit->setFocus();
+  nameEdit->setFocus();
+  setField("GalleryName", "");
 
   // Add all available galleries
   parentBox->addItems(GCore::Data::self()->getImageModel()->getGalleriesList());
 
-  slotTextChanged();
+  nameEdit->setType(GWidgets::LineEdit::WithVerify);
+  imagesEdit->setType(GWidgets::LineEdit::FileSelector);
+
+  connect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
+  connect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
+
+  // Insert the path to the home directory
+  setField("GalleryPath", QDir::homePath());
 }
 
-void NewSelectionPage::nextEvent()
+void SelectionPage::cleanupPage()
 {
-  getWizard()->setValue("GalleryName", nameEdit->text());
-  getWizard()->setValue("GalleryPath", QDir::fromNativeSeparators(imagesEdit->text()));
-  getWizard()->setValue("RecursiveSearch", recursiveBox->isChecked());
-  getWizard()->setValue("RecursiveGallery", subRadio->isChecked() ? "SubGallery" : "ThisGallery");
-  getWizard()->setValue("ParentGallery", parentBox->currentText());
+  disconnect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
+  disconnect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
+  
+  // Set focus to the name edit
+  nameEdit->setFocus();
+
+  setField("GalleryName", "");
+
+  // Insert the path to the home directory
+  setField("GalleryPath", QDir::homePath());
+
+  // Add all available galleries
+  parentBox->clear();
 }
 
-void NewSelectionPage::slotCheckImagesPath(const QString &path)
+bool SelectionPage::isComplete() const
+{
+  if (checkName(nameEdit->text()) && checkImagesPath(imagesEdit->text()))
+    return QWizardPage::isComplete();
+  
+  return false;
+}
+
+void SelectionPage::slotCheckImagesPath(const QString &path)
 {
   if (imagesEdit->text().isEmpty()) {
     imagesEdit->setValidity(false, tr("Please enter a path to the directory with images."));
@@ -96,33 +111,33 @@ void NewSelectionPage::slotCheckImagesPath(const QString &path)
     imagesEdit->setValidity(true);
   }
 
-  slotTextChanged();
+  //slotTextChanged();
 }
 
-void NewSelectionPage::slotBrowseClicked()
+void SelectionPage::slotBrowseClicked()
 {
   QString directory = QFileDialog::getExistingDirectory(0, tr("Select the directory with images for you gallary."), imagesEdit->text());
   if (!directory.isEmpty())
     imagesEdit->setText(directory);
 }
 
-void NewSelectionPage::slotCheckName(const QString &name)
+void SelectionPage::slotCheckName(const QString &name)
 {
   if (nameEdit->text().isEmpty()) {
     nameEdit->setValidity(false, tr("Please enter a name."));
     //messageLabel->setText(tr("Please enter a name."));
   } else if (!nameEdit->text().isEmpty() && !GCore::Data::self()->getImageModel()->checkName(name)) {
-    messageLabel->setText("");
+    //messageLabel->setText("");
     nameEdit->setValidity(true);
   } else {
     //messageLabel->setText(tr("Gallery allready exists. Please select a different name."));
     nameEdit->setValidity(false, tr("Gallery allready exists. Please select a different name."));
   }
 
-  slotTextChanged();
+  //slotTextChanged();
 }
 
-bool NewSelectionPage::checkImagesPath(const QString &path)
+bool SelectionPage::checkImagesPath(const QString &path) const
 {
   if (imagesEdit->text().isEmpty())
     return false;
@@ -132,7 +147,7 @@ bool NewSelectionPage::checkImagesPath(const QString &path)
     return true;
 }
 
-bool NewSelectionPage::checkName(const QString &name)
+bool SelectionPage::checkName(const QString &name) const
 {
   if (nameEdit->text().isEmpty())
     return false;
@@ -142,17 +157,7 @@ bool NewSelectionPage::checkName(const QString &name)
     return false;
 }
 
-void NewSelectionPage::slotTextChanged()
-{
-  bool nameCheck = checkName(nameEdit->text());
-  bool imagesCheck = checkImagesPath(imagesEdit->text());
-
-//   getWizard()->setValidInput(nameCheck && imagesCheck, this);
-  setVerification(nameCheck && imagesCheck);
 }
 
-NewSelectionPage::~NewSelectionPage()
-{}
-
-
 }
+

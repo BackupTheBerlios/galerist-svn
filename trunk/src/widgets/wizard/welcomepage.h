@@ -18,43 +18,29 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GWIDGETSNEWFINISHPAGE_H
-#define GWIDGETSNEWFINISHPAGE_H
+#ifndef GWIDGETS_GWIZARDWELCOMEPAGE_H
+#define GWIDGETS_GWIZARDWELCOMEPAGE_H
 
-#include "widgets/wizardpage.h"
-#include "ui_newfinishpage.h"
+#include <QWizardPage>
 
-namespace GWidgets
-{
+namespace GWidgets {
+
+namespace GWizard {
 
 /**
- * Class that represents a finish page in a wizard.
- * @short Finish page.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
- */
-class NewFinishPage : public GWidgets::WizardPage, private Ui::NewFinishPage
+	@author Gregor Kalisnik <gregor@podnapisi.net>
+*/
+class WelcomePage : public QWizardPage
 {
-    Q_OBJECT
-  public:
-    /**
-     * Default constructor.
-     *
-     * @param parent Parent widget.
-     */
-    NewFinishPage(QWidget *parent = 0);
+Q_OBJECT
+public:
+    WelcomePage(QWidget *parent = 0);
 
-    /**
-     * Default destructor.
-     */
-    ~NewFinishPage();
-
-  protected:
-    /**
-     * Overloaded method.
-     */
-    void initialise();
+    ~WelcomePage();
 
 };
+
+}
 
 }
 

@@ -7,8 +7,6 @@ CONFIG += warn_on \
 TEMPLATE = lib 
 FORMS += configuration.ui 
 HEADERS += configuration.h \
-           gwizard.h  \
-           newgallery.h
+           newgallerywizard.h
 SOURCES += configuration.cpp \
-           gwizard.cpp  \
-           newgallery.cpp
+           newgallerywizard.cpp

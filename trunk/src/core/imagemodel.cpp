@@ -451,7 +451,7 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
   return 0;
 }
 
-QObject *ImageModel::createGallery(const QString &name, const QStringList &fileNames, const QString &sourcePath, const QModelIndex &parent)
+QObject *ImageModel::createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent, const QStringList &fileNames)
 {
   QString path;
   if (parent.isValid())

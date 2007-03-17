@@ -8,17 +8,6 @@ QT += qt \
 sql \
 opengl \
 network
-LIBS += -L../src \
--L../src/core \
--L../src/core/jobs \
--L../src/core/network \
--L../src/dialogs \
--L../src/widgets \
--lcore \
--ldialogs \
--lwidgets \
--lnetwork \
--ljobs
 TARGET = goya
 DESTDIR = ../bin
 CONFIG += warn_on \
@@ -27,21 +16,52 @@ opengl \
 thread \
 embed_manifest_exe
 TEMPLATE = app
-win32-g++ | unix{
-  TARGETDEPS += ../src/dialogs/libdialogs.a \
-  ../src/widgets/libwidgets.a \
-  ../src/core/jobs/libjobs.a \
-  ../src/core/network/libnetwork.a \
-  ../src/core/libcore.a
+win32-g++{
+    LIBS += core/libcore.a \
+core/network/libnetwork.a \
+core/jobs/libjobs.a \
+dialogs/libdialogs.a \
+widgets/libwidgets.a \
+widgets/wizard/libwizard.a \
+translations/libtranslations.a
+    TARGETDEPS += core/network/libnetwork.a \
+core/jobs/libjobs.a \
+core/libcore.a \
+widgets/libwidgets.a \
+widgets/wizard/libwizard.a \
+dialogs/libdialogs.a \
+translations/libtranslations.a
+}unix{
+    LIBS += core/libcore.a \
+core/network/libnetwork.a \
+core/jobs/libjobs.a \
+dialogs/libdialogs.a \
+widgets/libwidgets.a \
+widgets/wizard/libwizard.a \
+translations/libtranslations.a
+    TARGETDEPS += core/network/libnetwork.a \
+core/jobs/libjobs.a \
+core/libcore.a \
+widgets/libwidgets.a \
+widgets/wizard/libwizard.a \
+dialogs/libdialogs.a \
+translations/libtranslations.a
 }
 win32-msvc*{
-  TARGETDEPS += ../src/dialogs/dialogs.lib \
-  ../src/widgets/widgets.lib \
-  ../src/core/jobs/jobs.lib \
-  ../src/core/network/network.lib \
-  ../src/core/core.lib
+    LIBS += core/core.lib \
+dialogs/dialogs.lib \
+widgets/wizard/wizard.lib \
+widgets/widgets.lib \
+core/network/network.lib \
+core/jobs/jobs.lib
+    TARGETDEPS += ../src/dialogs/dialogs.lib \
+../src/widgets/wizard/wizard.lib \
+../src/widgets/widgets.lib \
+../src/core/jobs/jobs.lib \
+../src/core/network/network.lib \
+../src/core/core.lib
 }
 
-win32 {
-DEFINES += WANT_UPDATER
+win32{
+    DEFINES += WANT_UPDATER
 }

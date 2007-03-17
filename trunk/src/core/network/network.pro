@@ -9,6 +9,6 @@ TEMPLATE = lib
 SOURCES += updater.cpp
 HEADERS += updater.h
 
-win32 {
-DEFINES += WANT_UPDATER
+win32{
+    DEFINES += WANT_UPDATER
 }

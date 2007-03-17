@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>NewSelectionPage</class>
- <widget class="QWidget" name="NewSelectionPage" >
+ <class>SelectionPage</class>
+ <widget class="QWizardPage" name="SelectionPage" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -13,10 +13,22 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="margin" >
+   <property name="leftMargin" >
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>6</number>
+   </property>
+   <property name="verticalSpacing" >
     <number>6</number>
    </property>
    <item row="2" column="0" >
@@ -25,10 +37,22 @@
       <string>Parent gallery</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="1" column="0" colspan="2" >
@@ -43,9 +67,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>0</hsizetype>
-          <vsizetype>5</vsizetype>
+         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -71,19 +93,40 @@
       <string>General</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="3" column="0" colspan="2" >
        <layout class="QHBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
-        </property>
         <property name="spacing" >
          <number>6</number>
+        </property>
+        <property name="leftMargin" >
+         <number>0</number>
+        </property>
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
         </property>
         <item>
          <widget class="GWidgets::LineEdit" name="imagesEdit" />
@@ -94,7 +137,7 @@
            <string/>
           </property>
           <property name="icon" >
-           <iconset resource="../images.qrc" >:/images/folder-open.png</iconset>
+           <iconset resource="../../images.qrc" >:/images/folder-open.png</iconset>
           </property>
          </widget>
         </item>
@@ -145,10 +188,22 @@
       <string>Subdirectories</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="2" column="0" >
@@ -206,7 +261,12 @@
   <customwidget>
    <class>GWidgets::LineEdit</class>
    <extends>QLineEdit</extends>
-   <header>lineedit.h</header>
+   <header>widgets/lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QWizardPage</class>
+   <extends>QWidget</extends>
+   <header location="global" >QtGui/QWizard</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -215,7 +275,7 @@
   <tabstop>browseButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../images.qrc" />
+  <include location="../../images.qrc" />
  </resources>
  <connections>
   <connection>
