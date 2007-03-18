@@ -49,7 +49,7 @@ Updater::Updater(QObject *parent)
     m_changeLogRequestId(-1),
     m_downloadRequestId(-1)
 {
-  m_httpClient = new QHttp("www.vegovc.si", 80, this);
+  m_httpClient = new QHttp("goya.mojefotke.si", 80, this);
   m_progressDialog = new QProgressDialog(QString(), tr("&Cancel"), 0, 0, GCore::Data::self()->getMainWindow());
   m_progressDialog->hide();
 
@@ -59,7 +59,7 @@ Updater::Updater(QObject *parent)
 
 void Updater::checkUpdate()
 {
-  m_versionQuiteRequestId = m_httpClient->get("/~mastermind/goya/index.html");
+  m_versionQuiteRequestId = m_httpClient->get("/downloads/upgrade");
 }
 
 Updater::~Updater()
@@ -86,7 +86,7 @@ void Updater::slotProcess(int requestId, bool error)
 
       // Get the changelog
     } else if (requestId == m_changeLogRequestId) {
-      if (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Changelog"), tr("The changelog:\n\n%1").arg(response), tr("&Update"), tr("Do &not update"), QString(), 0, 1) == 0)
+      if (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Changelog"), tr("The changelog:\n\n%1").arg(response.remove("<br />")), tr("&Update"), tr("Do &not update"), QString(), 0, 1) == 0)
         downloadUpdate();
       m_changeLogRequestId = -1;
 
@@ -123,7 +123,7 @@ void Updater::slotShowProgress(int done, int total)
 
 void Updater::slotCheckUpdate()
 {
-  m_versionRequestId = m_httpClient->get("/~mastermind/goya/index.html");
+  m_versionRequestId = m_httpClient->get("/downloads/upgrade");
 
   // set up the Progress dialog
   m_progressDialog->setLabelText(tr("Checking for updates..."));
@@ -134,7 +134,7 @@ void Updater::slotCheckUpdate()
 
 void Updater::showChangeLog()
 {
-  m_changeLogRequestId = m_httpClient->get("/~mastermind/goya/changelog-" + m_latestVersion);
+  m_changeLogRequestId = m_httpClient->get("/downloads/changelog");
 
   // set up the Progress dialog
   m_progressDialog->setLabelText(tr("Downloading the changelog..."));
@@ -147,7 +147,7 @@ void Updater::downloadUpdate()
 {
   m_temp = new QTemporaryFile(this);
   m_temp->open();
-  m_downloadRequestId = m_httpClient->get("/~mastermind/goya/goya-patch-" + m_latestVersion + ".exe", m_temp);
+  m_downloadRequestId = m_httpClient->get("/uploads/files/goya-patch-" + m_latestVersion + ".exe", m_temp);
 
   // Set up the progress dialog
   m_progressDialog->setLabelText(tr("Downloading the update..."));
@@ -158,9 +158,9 @@ void Updater::downloadUpdate()
 void Updater::checkVersions(const QString &newVersion, bool quite)
 {
   QString version = newVersion;
-  version.remove("\n").replace(" ", "_");
+  version.remove("\n").remove(QRegExp("\\s"));
   // Is it newer?
-  if (version > GCore::Data::self()->getAppVersion().replace(" ", "_")) {
+  if (version > GCore::Data::self()->getAppVersion().remove(QRegExp("\\s")) && version != "_") {
     // We save the new version tag
     m_latestVersion = version.replace(" ", "_");
 

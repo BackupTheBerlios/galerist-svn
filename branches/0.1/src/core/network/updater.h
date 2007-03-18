@@ -51,6 +51,9 @@ class Updater : public QObject
      */
     void checkUpdate();
 
+	/**
+	 * A default destructor.
+	 */
     ~Updater();
 
   private slots:
