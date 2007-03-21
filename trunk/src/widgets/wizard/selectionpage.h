@@ -29,6 +29,10 @@ namespace GWidgets {
 
 namespace GWizard {
 
+/**
+ * @short Selection page for GDialogs::NewGalleryWizard.
+ * @author Gregor Kališnik <gregor@podnapisi.net>
+ */
 class SelectionPage : public QWizardPage, private Ui::SelectionPage
 {
     Q_OBJECT

@@ -32,8 +32,9 @@ namespace GCore
 class MetaDataManager;
 
 /**
- @author Gregor Kalisnik <gregor@podnapisi.net>
-*/
+ * @short Class that represends a tree of images.
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
 class ImageItem
 {
   public:
@@ -57,14 +58,58 @@ class ImageItem
      */
     ~ImageItem();
 
+    /**
+     * Appends a child.
+     *
+     * @param child The new child.
+     */
     void appendChild(ImageItem *child);
+    /**
+     * Removes a child.
+     *
+     * @param child Child reference.
+     */
     void removeChild(ImageItem *child);
 
+    /**
+     * Gets the child at the row.
+     *
+     * @param row Row where the child resides.
+     *
+     * @return A child.
+     */
     ImageItem *child(int row);
+    /**
+     * Returns the number of childs that resides in this item.
+     *
+     * @return Number of childs.
+     */
     int childCount() const;
+    /**
+     * Number of columns (the different data).
+     *
+     * @return Number of columns.
+     */
     int columnCount() const;
+    /**
+     * Gets the data at the column.
+     *
+     * @param column Column of which the data we need.
+     *
+     * @return The data.
+     */
     QVariant data(int column) const;
+    /**
+     * The row number of this item at parent's child list.
+     *
+     * @return Row.
+     */
     int row() const;
+    /**
+     * Returns the reference of item's parent.
+     *
+     * @return The reference.
+     */
     ImageItem *parent();
 
     /**
@@ -100,14 +145,43 @@ class ImageItem
      */
     QString getThumbName();
 
+    /**
+     * Returns the MetaData manager.
+     *
+     * @return Reference to the MetaData manager.
+     */
     MetaDataManager *metadata();
 
+    /**
+     * Returns item's name.
+     */
     QString name();
+    /**
+     * Returns item's description.
+     */
     QString description();
 
+    /**
+     * Sets the item's name.
+     *
+     * @return @c true Change was successful.
+     * @return @c false Change was unsuccesful.
+     */
     bool setName(const QString &name);
+    /**
+     * Sets the item's description.
+     *
+     * @return @c true Change was successful.
+     * @return @c false Change was unsuccesful.
+     */
     void setDescription(const QString &description);
 
+    /**
+     * Removes the item from the metadata.
+     *
+     * @return @c true Removal was successful.
+     * @return @c false Removal was unsuccesful.
+     */
     bool remove();
 
   private:

@@ -130,7 +130,7 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
       }
     case (Qt::ToolTipRole) : {
         if (item->imageType() == ImageItem::Gallery) {
-          return item->data(index.column());
+          return item->name();
         } else {
           return item->name() + ": <i>" + item->description().replace('\n', "<br/>") + "</i>";
         }
@@ -231,41 +231,37 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
     icon.addFile(":/images/folder.png", QSize(), QIcon::Normal, QIcon::Off);
     icon.addFile(":/images/folder-open.png", QSize(), QIcon::Normal, QIcon::On);
   } else {
-    // We check if we need to show thumbnails or a standard icon
-    if (Data::self()->getImageView() == Data::List) {
-      icon.addFile(":/images/image.png");
-    } else { // Thumbnail
-      QDir thumbPath(item.data(ImageModel::ImageFilepathRole).toString());
-      thumbPath.cdUp();
 
-      if (!thumbPath.cd(".thumbnails") || !QFile::exists(thumbPath.absoluteFilePath(item.data(ImageModel::ImageThumbnailPathRole).toString()))) {
-        /* if (!m_currentJob) {
-           m_currentJob = new GJobs::ReadJob(item.data(ImageModel::ImageFilepathRole).toString(), item);
-           connect(m_currentJob, SIGNAL(finished()), this, SLOT(slotRemoveJob()));
-           connect(m_currentJob, SIGNAL(signalThumb(const QString&)), this, SIGNAL(signalThumb(const QString&)));
-           m_currentJob->start();
-         } else {*/
-        //if (!m_pendingUpdate.contains(item))
-        // m_pendingUpdate << item;
-        //}
-        //queueIconMake(item);
+    QDir thumbPath(item.data(ImageModel::ImageFilepathRole).toString());
+    thumbPath.cdUp();
 
-        if (!m_currentJob) {
-          m_currentJob = new GJobs::ReadJob(this);
-          connect(m_currentJob, SIGNAL(finished()), this, SLOT(slotRemoveJob()));
-          connect(m_currentJob, SIGNAL(signalThumb(const QString&)), this, SIGNAL(signalThumb(const QString&)));
-          qRegisterMetaType<QModelIndex>("QModelIndex");
-          connect(m_currentJob, SIGNAL(signalProcessed(const QModelIndex&)), this, SLOT(slotChange(const QModelIndex&)));
-        }
+    if (!thumbPath.cd(".thumbnails") || !QFile::exists(thumbPath.absoluteFilePath(item.data(ImageModel::ImageThumbnailPathRole).toString()))) {
+      /* if (!m_currentJob) {
+         m_currentJob = new GJobs::ReadJob(item.data(ImageModel::ImageFilepathRole).toString(), item);
+         connect(m_currentJob, SIGNAL(finished()), this, SLOT(slotRemoveJob()));
+         connect(m_currentJob, SIGNAL(signalThumb(const QString&)), this, SIGNAL(signalThumb(const QString&)));
+         m_currentJob->start();
+       } else {*/
+      //if (!m_pendingUpdate.contains(item))
+      // m_pendingUpdate << item;
+      //}
+      //queueIconMake(item);
 
-        m_currentJob->queuePhoto(item);
-
-        m_currentJob->start();
-
-        icon.addFile(":/images/image-big.png");
-      } else {
-        icon.addFile(thumbPath.absoluteFilePath(item.data(ImageModel::ImageThumbnailPathRole).toString()));
+      if (!m_currentJob) {
+        m_currentJob = new GJobs::ReadJob(this);
+        connect(m_currentJob, SIGNAL(finished()), this, SLOT(slotRemoveJob()));
+        connect(m_currentJob, SIGNAL(signalThumb(const QString&)), this, SIGNAL(signalThumb(const QString&)));
+        qRegisterMetaType<QModelIndex>("QModelIndex");
+        connect(m_currentJob, SIGNAL(signalProcessed(const QModelIndex&)), this, SLOT(slotChange(const QModelIndex&)));
       }
+
+      m_currentJob->queuePhoto(item);
+
+      m_currentJob->start();
+
+      icon.addFile(":/images/image-big.png");
+    } else {
+      icon.addFile(thumbPath.absoluteFilePath(item.data(ImageModel::ImageThumbnailPathRole).toString()));
     }
   }
 
@@ -710,10 +706,6 @@ void ImageModel::stopCopy()
     m_currentCopyJob->stop();
     m_delete = true;
   }
-}
-
-void ImageModel::timerEvent(QTimerEvent*)
-{
 }
 
 void ImageModel::setupModelData(const QString &path) const

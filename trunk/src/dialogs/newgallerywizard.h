@@ -26,6 +26,7 @@
 namespace GDialogs {
 
 /**
+ * @short Wizard for easier creation of a gallery.
  * @author Gregor Kalisnik <gregor@podnapisi.net>
  */
 class NewGalleryWizard : public QWizard
@@ -33,14 +34,14 @@ class NewGalleryWizard : public QWizard
   Q_OBJECT
   public:
     /**
-     * A default constructor.
+     * A constructor.
      *
      * @param parent Parent of this wizard.
      */
     NewGalleryWizard(QWidget *parent = 0);
 
     /**
-     * A default destructor.
+     * A destructor.
      */
     ~NewGalleryWizard();
 

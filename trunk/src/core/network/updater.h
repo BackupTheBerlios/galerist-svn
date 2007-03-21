@@ -51,6 +51,9 @@ class Updater : public QObject
      */
     void checkUpdate();
 
+    /**
+     * A default destructor.
+     */
     ~Updater();
 
   private slots:
@@ -63,6 +66,9 @@ class Updater : public QObject
 
     /**
      * Used for showing progress.
+     *
+     * @param done How much of items is done.
+     * @param total How much of items are being processed.
      */
     void slotShowProgress(int done, int total);
 

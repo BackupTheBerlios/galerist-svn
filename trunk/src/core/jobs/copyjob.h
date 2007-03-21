@@ -36,37 +36,86 @@ namespace GJobs
 {
 
 /**
- @author Gregor Kalisnik <gregor@podnapisi.net>
-*/
+ * @short Class for copiing images.
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
 class CopyJob : public GCore::GJobs::AbstractJob
 {
-    Q_OBJECT
+  Q_OBJECT
   signals:
+    /**
+     * Signal for reporting process.
+     *
+     * @param name Name of the processed image.
+     */
     void signalProcess(const QString &name);
 
   public:
     //Types of copy.
     enum CopyMode
     {
+      /**
+       * Copy only one image.
+       */
       SingleMode,
+      /**
+       * Copy whole bunch of images.
+       */
       MultiMode
-  };
+    };
 
+    /**
+     * A constructor for copiing the whole folder.
+     *
+     * @param source Source path.
+     * @param destination Destination path.
+     * @param gallery Index of the gallery to which the images will be added.
+     * @param parent Parent of this job.
+     */
     CopyJob(const QString &source, const QString &destination, const QModelIndex &gallery, QObject *parent = 0);
+    /**
+     * A constructor for copiing a list of images.
+     *
+     * @param source Source path.
+     * @param fileNames List of files to copy.
+     * @param destination Destination path.
+     * @param gallery Index of the gallery to which the images will be added.
+     * @param parent Parent of this job.
+     */
     CopyJob(const QString &source, const QStringList &fileNames, const QString &destination, const QModelIndex &gallery, QObject *parent = 0);
 
+    /**
+     * Returns the index of the destination gallery.
+     *
+     * @return Gallery index.
+     */
     QModelIndex getGalleryIndex();
 
+    /**
+     * A destructor.
+     */
     ~CopyJob();
 
   protected:
     //Inherited method.
+    /**
+     * Reimplemented method to define the work process.
+     */
     void job();
 
   private:
     //Copy methods.
+    /**
+     * The copy process for copiing the whole folder.
+     */
     void multiCopy();
+    /**
+     * The copy process for a list of files.
+     */
     void singleCopy();
+    /**
+     * A cleanup method.
+     */
     void deleteCopied();
 
     //Variables.

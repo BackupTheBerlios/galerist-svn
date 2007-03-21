@@ -1,5 +1,6 @@
 FORMS += mainwindow.ui
-HEADERS += mainwindow.h
+HEADERS += mainwindow.h \
+namespace-def.h
 SOURCES += main.cpp \
            mainwindow.cpp
 RESOURCES = images.qrc

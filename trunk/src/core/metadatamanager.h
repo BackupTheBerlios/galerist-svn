@@ -32,39 +32,115 @@ namespace GCore
 
 class ImageItem;
 
+/**
+ * @short A manager of a gallery's metadata.
+ * @author Gregor Kališnik.
+ */
 class MetaDataManager : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
   signals:
-    void signalFailed(const QString &errorMessage, int type);
+    /**
+     * Insertion has just happened.
+     */
     void signalInsert();
 
   public:
+    /**
+     * A constructor.
+     *
+     * @param galleryPath Self explanatory.
+     * @param parent Parent of this manager.
+     */
     MetaDataManager(const QString &galleryPath, QObject *parent = 0);
 
+    /**
+     * Adds image to the metadata.
+     *
+     * @param filename Filename of the image.
+     */
     void addImage(const QString &filename);
 
+    /**
+     * Returns the metadata id of the image.
+     *
+     * @param filename Filename of the image.
+     */
     int imageId(const QString &filename);
 
+    /**
+     * Returns the logical name of the image.
+     *
+     * @param id ID of the image.
+     */
     QString name(int id);
+    /**
+     * Sets the image's logical name.
+     *
+     * @param name The new name.
+     * @param id Image's id.
+     *
+     * @return @c true The change was successful.
+     * @return @c false The change was unsuccessful.
+     */
     bool setName(const QString &name, int id);
 
+    /**
+     * Returns the image's description.
+     *
+     * @param id Image's ID.
+     */
     QString description(int id);
+    /**
+     * Sets image's description.
+     *
+     * @param description The new description.
+     * @param id Image's ID.
+     */
     void setDescription(const QString &description, int id);
 
+    /**
+     * Returns the full metadata info of the image.
+     *
+     * @param id Image's ID.
+     */
     QMap<QString, QString> metadataInfo(int id);
 
+    /**
+     * Checks if the name exists.
+     *
+     * @param name Name to check.
+     */
     bool checkName(const QString &name);
 
+    /**
+     * Removes the image from the metadata.
+     *
+     * @param id Image's ID.
+     *
+     * @return @c true Removal was successful.
+     * @return @c false Removal was unsuccessful.
+     */
     bool removePicture(int id);
 
+    /**
+     * Executes a query and returns the result.
+     *
+     * @param rawQuery The SQL query.
+     */
     QVariant query(const QString &rawQuery);
 
+    /**
+     * Checks if the needed SQL driver is available.
+     */
     static bool driverAvailable();
 
     ~MetaDataManager();
 
   protected:
+    /**
+     * Reimplemented method for preventing the flood of the insertion.
+     */
     void timerEvent(QTimerEvent*);
 
   private:
@@ -77,6 +153,9 @@ class MetaDataManager : public QObject
     int m_timerId;
 
   private slots:
+    /**
+     * Inserts the images that are in the list.
+     */
     void slotInsert();
 
 };

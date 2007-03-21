@@ -34,8 +34,9 @@ namespace GJobs
 {
 
 /**
- @author Gregor Kalisnik <gregor@podnapisi.net>
-*/
+ * @short Creates the missing thumbnails.
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
 class ReadJob : public GCore::GJobs::AbstractJob
 {
     Q_OBJECT

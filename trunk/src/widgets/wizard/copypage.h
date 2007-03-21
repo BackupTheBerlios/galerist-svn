@@ -29,6 +29,7 @@ namespace GWidgets {
 namespace GWizard {
 
 /**
+ * @short Copy page for GDialogs::NewGalleryWizard.
  * @author Gregor Kalisnik <gregor@podnapisi.net>
  */
 class CopyPage : public QWizardPage, private Ui::CopyPage

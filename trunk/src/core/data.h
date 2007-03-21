@@ -51,18 +51,19 @@ class ErrorHandler;
 class ImageModel;
 
 /**
- @author Gregor Kalisnik <gregor@podnapisi.net>
-*/
+ * @short Contains all the data for Goya.
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
 class Data : public QObject
 {
     Q_OBJECT
   public:
-    enum ViewType {
+    /*enum ViewType {
       Icon,
       List,
       Slide,
       Undefined
-  };
+  };*/
 
     enum BackgroundType {
       Round,
@@ -76,42 +77,119 @@ class Data : public QObject
       Unknown
   };
 
-    Data(QObject *parent = 0);
+  /**
+   * A constructor.
+   *
+   * @param parent Parent of this data class.
+   */
+  Data(QObject *parent = 0);
 
-    static Data *self();
+  /**
+   * Returns a reference to this class and creates it if it doesn't exist.
+   *
+   * @return This object.
+   */
+  static Data *self();
 
-    ErrorHandler *getErrorHandler();
+  /**
+   * Returns a refernce to the ErrorHandler.
+   *
+   * @return ErrorHandler object.
+   */
+  ErrorHandler *getErrorHandler();
 
-    QStringList getImageFormats();
+  /**
+   * Returns the list of supported image formats.
+   *
+   * @return List of supported image formats.
+   */
+  QStringList getImageFormats();
 
-    void setImageView(ViewType type);
-    GCore::Data::ViewType getImageView();
+  /**
+   * Returns path where galleries resides.
+   *
+   * @return Path of galleries as a string.
+   */
+  QString getGalleriesPath();
+  /**
+   * Returns the path to the settings.
+   *
+   * @return Path of settings as a string.
+   */
+  QString getSettingsPath();
 
-    QString getGalleriesPath();
-    QString getSettingsPath();
+  /**
+   * Returns the image model.
+   *
+   * @return Image model.
+   */
+  ImageModel *getImageModel();
 
-    ImageModel *getImageModel();
+  /**
+   * Returns the completer for the LineEdits.
+   *
+   * @return Completer.
+   */
+  QCompleter *getDirCompleter();
 
-    QCompleter *getDirCompleter();
+  /**
+   * Sets the look of image's background in PhotoView.
+   *
+   * @param type The type of the background.
+   */
+  void setBackgroundType(BackgroundType type);
+  /**
+   * Returns the background type.
+   *
+   * @return The type of background.
+   */
+  GCore::Data::BackgroundType getBackgroundType();
 
-    void setBackgroundType(BackgroundType type);
-    GCore::Data::BackgroundType getBackgroundType();
+  /**
+   * Sets how to show the progress (Adding images).
+   *
+   * @param showOption The option.
+   */
+  void setProgressDialog(ProgressDialog showOption);
+  /**
+   * Gets the progress show option.
+   *
+   * @return The option.
+   */
+  GCore::Data::ProgressDialog getProgressDialog();
 
-    void setProgressDialog(ProgressDialog showOption);
-    GCore::Data::ProgressDialog getProgressDialog();
+  /**
+   * Sets if the PhotoView should use OpenGL instructions.
+   *
+   * @param enable Enable it or not.
+   */
+  void setOpengl(bool enable);
+  /**
+   * Returns the status of OpenGL usement.
+   *
+   * @return Status as a boolean.
+   */
+  bool getOpengl();
 
-    void setOpengl(bool enable);
-    bool getOpengl();
+  /**
+   * Set the photo control (a little widget for controlling photo controls in editing mode).
+   *
+   * @param photoControl The photo control widget.
+   */
+  void setPhotoControl(GWidgets::PhotoControl *photoControl);
+  /**
+   * Returns the photo control.
+   *
+   * @return Reference to the photo control widget.
+   */
+  GWidgets::PhotoControl *getPhotoControl();
 
-    void setPhotoControl(GWidgets::PhotoControl *photoControl);
-    GWidgets::PhotoControl *getPhotoControl();
-
-    /**
-     * Sets the update at startup value.
-     *
-     * @param enable Enable the update feature at startup.
-     */
-    void setUpdateStartup(bool enable);
+  /**
+   * Sets the update at startup value.
+   *
+   * @param enable Enable the update feature at startup.
+   */
+  void setUpdateStartup(bool enable);
 
     /**
      * Returns the status of update at strtup.
@@ -135,7 +213,7 @@ class Data : public QObject
     /**
      * Method for storing photo context menu.
      *
-     * @param contexMenu Context menu of actions for photo editing.
+     * @param contextMenu Context menu of actions for photo editing.
      */
     void setPhotoContextMenu(QMenu *contextMenu);
     /**
@@ -304,7 +382,6 @@ class Data : public QObject
     QSettings *m_settings;
     ErrorHandler *m_errorHandler;
     QStringList m_imageFormats;
-    ViewType m_viewType;
     BackgroundType m_backgroundType;
     ProgressDialog m_progressDialog;
     ImageModel *m_imageModel;

@@ -89,9 +89,10 @@ class PhotoPixmap : public QGraphicsPixmapItem
 /**
  * This class represents a single view item. It can be assigned a pixmap and
  * a name and also a short description.
+ * @short A photo in a PhotoView.
  *
  * @author Jernej Kos <kostko@unimatrix-one.org>
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališ¡nik <gregor@podnapisi.net>
  */
 class PhotoItem : public QObject, public QGraphicsItemGroup
 {

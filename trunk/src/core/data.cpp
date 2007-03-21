@@ -42,7 +42,6 @@ Data *Data::m_self = 0;
 Data::Data(QObject *parent)
     : QObject(parent),
     m_errorHandler(0),
-    m_viewType(Undefined),
     m_backgroundType(NotDefined),
     m_progressDialog(Unknown),
     m_imageModel(0),
@@ -135,22 +134,6 @@ ErrorHandler *Data::getErrorHandler()
 QStringList Data::getImageFormats()
 {
   return m_imageFormats;
-}
-
-void Data::setImageView(ViewType type)
-{
-  m_viewType = type;
-  m_settings->setValue("ViewType", type);
-}
-
-GCore::Data::ViewType Data::getImageView()
-{
-  // If the value hasn't been fetched before, we get it now
-  if (m_viewType == Undefined)
-    m_viewType = static_cast<ViewType>(m_settings->value("ViewType", Icon).toInt());
-
-  // Return the value
-  return m_viewType;
 }
 
 QString Data::getGalleriesPath()

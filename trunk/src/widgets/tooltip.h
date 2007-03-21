@@ -27,8 +27,8 @@ namespace GWidgets
 {
 
 /**
- * A bubble like label. "Floating" of course.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
+ * @short A bubble like label. "Floating" of course.
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class TipLabel : public QLabel
 {
@@ -87,8 +87,8 @@ class TipLabel : public QLabel
 };
 
 /**
- * Class for showing text in a bubble like widget.
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @short Class for showing text in a bubble like widget.
+ * @author Gregor Kališ¡nik <gregor@podnapisi.net>
  */
 class ToolTip
 {

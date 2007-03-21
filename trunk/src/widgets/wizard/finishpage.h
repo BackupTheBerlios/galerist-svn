@@ -28,8 +28,9 @@ namespace GWidgets {
 namespace GWizard {
 
 /**
-	@author Gregor Kalisnik <gregor@podnapisi.net>
-*/
+ * @short Finish page for GDialogs::NewGalleryWizard.
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
 class FinishPage : public QWizardPage
 {
   Q_OBJECT

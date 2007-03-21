@@ -108,8 +108,8 @@ class PhotoControl : public QWidget, private Ui::PhotoControl
 };
 
 /**
- * Dialog for getting zoom level.
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @short Dialog for getting zoom level.
+ * @author Gregor Kališ¡nik <gregor@podnapisi.net>
  */
 class InputZoomDialog : public QDialog
 {

@@ -34,19 +34,15 @@ class QRubberBand;
 namespace GWidgets
 {
 
-/**
- * Class that represents a photo.
- * @short Photo.
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
- */
 class PhotoItem;
 
 /**
  * This class is a custom listview-like widget implemented using
  * the QGraphicsView class.
+ * @short A view for showing photos, using a model.
  *
  * @author Jernej Kos <kostko@unimatrix-one.org>
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class PhotoView : public QGraphicsView
 {

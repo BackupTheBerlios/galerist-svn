@@ -34,32 +34,68 @@ namespace GJobs
 {
 
 /**
- @author Gregor Kalisnik <gregor@podnapisi.net>
-*/
+ * @short Abstract class for various types of jobs.
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
 class AbstractJob : public QThread
 {
     Q_OBJECT
   signals:
+    /**
+     * Signal for reporting progress of the job.
+     *
+     * @param finished How many units are finished.
+     * @param total How many units are to be processed in total.
+     * @param current Current's unit name.
+     * @param image Current's unit image.
+     */
     void signalProgress(int finished, int total, const QString &current, const QImage &image);
+    /**
+     * Signal for reporting an error.
+     *
+     * @param errorMessage Error string to show the user.
+     */
     void signalFailed(const QString &errorMessage, int);
 
   public:
+    /**
+     * A constructor.
+     *
+     * @param parent Parent of this object.
+     */
     AbstractJob(QObject *parent = 0);
 
+    /**
+     * Stops the thread.
+     */
     void stop();
 
     ~AbstractJob();
 
   protected:
+    /**
+     * Pure virtual method for defining the job.
+     */
     virtual void job() = 0;
+    /**
+     * Reimplemented method for running job() method.
+     */
     void run();
 
+    /**
+     * Returns if the thread needs to stop.
+     *
+     * @return state of the stopping sequence.
+     */
     bool getStop();
 
     bool m_stop;
     QMutex m_locker;
 
   private slots:
+    /**
+     * Deletes the thread (used for initiating the delete sequence).
+     */
     void slotDeleteLater();
 
 };

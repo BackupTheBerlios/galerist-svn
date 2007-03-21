@@ -18,44 +18,39 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GWIDGETS_GWIZARDSUMMARYPAGE_H
-#define GWIDGETS_GWIZARDSUMMARYPAGE_H
-
-#include <QtGui/QWizardPage>
-
-#include "ui_summarypage.h"
-
-namespace GWidgets {
-
-namespace GWizard {
 
 /**
- * @short The summary page for GDialogs::NewGalleryWizard.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
+ * @short Core parts of Goya.
  */
-class SummaryPage : public QWizardPage, private Ui::SummaryPage
-{
-  Q_OBJECT
-  public:
-    /**
-     * A default constructor.
-     */
-    SummaryPage();
-
-    /**
-     * A default destructor
-     */
-    ~SummaryPage();
-
-    /**
-     * Reimplemented method for setting the page.
-     */
-    void initializePage();
-
-};
-
+namespace GCore {
+/**
+ * @short "Working" part of Goya (threaded).
+ */
+namespace GJobs {
 }
 
+/**
+ * @short Part of Goya that utilises network.
+ */
+namespace GNetwork {
+}
 }
 
-#endif
+/**
+ * @short Dialogs used by Goya.
+ */
+namespace GDialogs {
+}
+
+/**
+ * @short Widgets used by Goya's dialogs.
+ */
+namespace GWidgets {
+/**
+ * @short Widgets used by wizard.
+ */
+namespace GWizard {
+}
+}
+
+

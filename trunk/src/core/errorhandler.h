@@ -27,29 +27,74 @@ namespace GCore
 {
 
 /**
- @author Gregor Kalisnik <gregor@podnapisi.net>
-*/
+ * @short Handles errors.
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
 class ErrorHandler : public QObject
 {
     Q_OBJECT
   signals:
-    void signalMessage(const QString &message, int);
+    /**
+     * Signals the message to show.
+     *
+     * @param message Message to show.
+     * @param type of the message.
+     *
+     * @see ErrorHandler#reportMessage
+     * @see ErrorHandler#slotReporter
+     */
+    void signalMessage(const QString &message, int type);
 
   public:
     enum ErrorType
     {
+      /**
+       * It's an information.
+       */
       Information,
+      /**
+       * It's a warning.
+       */
       Warning,
+      /**
+       * It's a critical error.
+       */
       Critical
-  };
+    };
 
+    /**
+     * A constructor.
+     *
+     * @param parent Parent of the message widget.
+     */
     ErrorHandler(QObject *parent = 0);
 
+    /**
+     * Method for showing the message.
+     *
+     * @param message String that will be shown to the user.
+     * @param type Type of the message.
+     *
+     * @see ErrorHandler#signalMessage
+     * @see ErrorHandler#slotReporter
+     */
     static void reportMessage(const QString &message, int type);
 
+    /**
+     * A constructor.
+     */
     ~ErrorHandler();
 
   public slots:
+    /**
+     * Slot that shows the message.
+     *
+     * @param message Message that will be shown.
+     * @param type Type of the message.
+     *
+     * @see ErrorHandler#reportMessage
+     * @see ErrorHandler#signalMessage
+     */
     void slotReporter(const QString &message, int type);
 
 };

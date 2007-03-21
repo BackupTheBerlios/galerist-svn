@@ -28,8 +28,8 @@ namespace GWidgets {
 
 namespace GWizard {
 
-WelcomePage::WelcomePage(QWidget *parent)
- : QWizardPage(parent)
+WelcomePage::WelcomePage()
+ : QWizardPage()
 {
   setTitle(tr("Welcome"));
 

@@ -28,14 +28,21 @@ namespace GWidgets {
 namespace GWizard {
 
 /**
-	@author Gregor Kalisnik <gregor@podnapisi.net>
-*/
+ * @short Welcome page for the GDialogs::NewGalleryWizard.
+ * @author Gregor Kalisnik <gregor@podnapisi.net>
+ */
 class WelcomePage : public QWizardPage
 {
 Q_OBJECT
 public:
-    WelcomePage(QWidget *parent = 0);
+    /**
+     * A default constructor.
+     */
+    WelcomePage();
 
+    /**
+     * A destructor.
+     */
     ~WelcomePage();
 
 };
