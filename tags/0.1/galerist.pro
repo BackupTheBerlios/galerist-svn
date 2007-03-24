@@ -15,14 +15,10 @@ unix | win32-g++: {
 MAKE = make
 isEmpty(PREFIX): PREFIX = /usr
 
-executable.path = PREFIX/bin
-executable.files = bin/goya
-
 message(Goya will use $${PREFIX} as its prefix)
 message("To change it, define PREFIX like qmake PREFIX=/path")
 
-INSTALLS += executable
-
+system(cd src && qmake PREFIX=$${PREFIX})
 }
 message(***************************************)
 message("Goya is now configured. To start compiling, run $${MAKE}")

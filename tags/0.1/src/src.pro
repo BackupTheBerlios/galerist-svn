@@ -29,6 +29,8 @@ embed_manifest_exe
 TEMPLATE = app
 
 win32-g++ | unix{
+target.path = $${PREFIX}/bin
+INSTALLS += target
   TARGETDEPS += ../src/dialogs/libdialogs.a \
   ../src/widgets/libwidgets.a \
   ../src/core/jobs/libjobs.a \
