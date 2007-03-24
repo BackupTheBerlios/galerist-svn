@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
   QTranslator translation;
   translation.load(GCore::Data::self()->getTranslationFileName(), GCore::Data::self()->getTranslationPath());
-  QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+  QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
   app.installTranslator(&translation);
 
