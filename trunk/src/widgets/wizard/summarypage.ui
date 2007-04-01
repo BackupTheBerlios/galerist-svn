@@ -49,13 +49,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_4" >
-          <property name="text" >
-           <string>Include images in subdirectories:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QLabel" name="label_5" >
           <property name="text" >
            <string>Parent gallery</string>
@@ -77,13 +70,6 @@
          <widget class="QLabel" name="pathLabel" >
           <property name="text" >
            <string>path</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="recursiveLabel" >
-          <property name="text" >
-           <string>recursive</string>
           </property>
          </widget>
         </item>

@@ -43,7 +43,6 @@ void SummaryPage::initializePage()
 {
   nameLabel->setText(field("GalleryName").toString());
   pathLabel->setText(field("GalleryPath").toString());
-  recursiveLabel->setText("No");
   parentLabel->setText(field("ParentGallery").toString());
 }
 

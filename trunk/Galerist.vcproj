@@ -403,54 +403,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\widgets\newcopypage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newcopypage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newcopypage.ui"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newfinishpage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newfinishpage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newfinishpage.ui"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newselectionpage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newselectionpage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newselectionpage.ui"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newwelcomepage.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newwelcomepage.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\widgets\newwelcomepage.ui"
-					>
-				</File>
-				<File
 					RelativePath=".\src\widgets\photocontrol.cpp"
 					>
 				</File>
@@ -492,6 +444,14 @@
 				</File>
 				<File
 					RelativePath=".\src\widgets\photoview.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\widgets\searchbar.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\widgets\searchbar.h"
 					>
 				</File>
 				<File
