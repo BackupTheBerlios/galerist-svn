@@ -31,6 +31,7 @@ FinishPage::FinishPage()
  : QWizardPage()
 {
   setTitle(tr("Finish"));
+  setSubTitle(tr("Wizard is complete"));
   QLabel *label = new QLabel(this);
   label->setText(tr("<p>The gallery has been created. You can now edit the pictures, remove them or add new pictures to your liking.</p><p>To close this wizard, press <br>Finish</b>.</p>"));
   label->setWordWrap(true);

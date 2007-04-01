@@ -16,4 +16,4 @@ FORMS += selectionpage.ui \
 summarypage.ui \
 copypage.ui
 INCLUDEPATH += ../..
-
+DESTDIR = ./

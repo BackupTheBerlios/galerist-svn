@@ -32,6 +32,7 @@ WelcomePage::WelcomePage()
  : QWizardPage()
 {
   setTitle(tr("Welcome"));
+  setSubTitle(tr("Create a gallery"));
 
   QString welcome = "<p>With this wizard you will select a name of the gallery and designate a folder with picture, you'd like to add to your gallery.</p><p>To proceed, click <b>next</b>.</p>";
 

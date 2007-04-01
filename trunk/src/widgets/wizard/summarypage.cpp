@@ -29,6 +29,7 @@ SummaryPage::SummaryPage()
  : QWizardPage()
 {
   setTitle(tr("Summary"));
+  setSubTitle(tr("Summary of selected options"));
   setupUi(this);
 }
 

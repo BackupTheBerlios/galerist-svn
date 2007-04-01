@@ -36,6 +36,7 @@ CopyPage::CopyPage()
    m_finished(false)
 {
   setTitle(tr("Copy"));
+  setSubTitle(tr("Creation progress"));
   
   setupUi(this);
 }

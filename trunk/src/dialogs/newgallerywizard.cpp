@@ -40,6 +40,8 @@ NewGalleryWizard::NewGalleryWizard(QWidget *parent)
   addPage(new GWidgets::GWizard::SummaryPage);
   addPage(new GWidgets::GWizard::CopyPage);
   addPage(new GWidgets::GWizard::FinishPage);
+
+  setPixmap(QWizard::LogoPixmap, QPixmap(":/images/galerist.png").scaled(55, 55, Qt::KeepAspectRatio));
 }
 
 

@@ -39,6 +39,7 @@ SelectionPage::SelectionPage()
     : QWizardPage()
 {
   setTitle(tr("Gallery settings"));
+  setSubTitle(tr("Main settings of the new gallery"));
   
   setupUi(this);
   

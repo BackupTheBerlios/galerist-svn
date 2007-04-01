@@ -249,27 +249,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\dialogs\gwizard.cpp"
+					RelativePath=".\src\dialogs\newgallerywizard.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\dialogs\gwizard.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\newwizard.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\newwizard.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\wizard.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\dialogs\wizard.h"
+					RelativePath=".\src\dialogs\newgallerywizard.h"
 					>
 				</File>
 			</Filter>
@@ -530,6 +514,66 @@
 					RelativePath=".\src\widgets\widgets.pro"
 					>
 				</File>
+				<Filter
+					Name="wizard"
+					>
+					<File
+						RelativePath=".\src\widgets\wizard\copypage.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\copypage.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\copypage.ui"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\finishpage.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\finishpage.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\selectionpage.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\selectionpage.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\selectionpage.ui"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\summarypage.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\summarypage.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\summarypage.ui"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\welcomepage.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\welcomepage.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\widgets\wizard\wizard.pro"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<File
