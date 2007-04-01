@@ -51,7 +51,9 @@ class CopyJob : public GCore::GJobs::AbstractJob
     void signalProcess(const QString &name);
 
   public:
-    //Types of copy.
+    /**
+     * Defines what kind of copy to use.
+     */
     enum CopyMode
     {
       /**
@@ -96,6 +98,20 @@ class CopyJob : public GCore::GJobs::AbstractJob
      */
     ~CopyJob();
 
+    /**
+     * Pauses the copy. Usable only when using multi copy option.
+     *
+     * @see CopyJob#unpause()
+     */
+    void pause();
+
+    /**
+     * Unpauses the copy process. Usable only when in MultiCopy mode.
+     *
+     * @see CopyJob#pause()
+     */
+    void unpause();
+
   protected:
     //Inherited method.
     /**
@@ -124,6 +140,8 @@ class CopyJob : public GCore::GJobs::AbstractJob
     QStringList m_fileNames;
     QModelIndex m_gallery;
     CopyMode m_mode;
+
+    bool m_paused;
     //QRegExp m_supportedFormats;
 
 };

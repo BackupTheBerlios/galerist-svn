@@ -45,6 +45,14 @@ class NewGalleryWizard : public QWizard
      */
     ~NewGalleryWizard();
 
+    /**
+     * Reimplemented method.
+     */
+    void reject();
+
+  private:
+    int m_copyPage;
+
 };
 
 }

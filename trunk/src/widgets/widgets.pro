@@ -9,7 +9,8 @@ HEADERS += lineedit.h \
            photodescription.h \
            textedit.h \
            photocontrol.h \
-           tooltip.h
+           tooltip.h \
+           searchbar.h
 SOURCES += lineedit.cpp \
            gallerytreeview.cpp \
            imageaddprogress.cpp \
@@ -19,7 +20,8 @@ SOURCES += lineedit.cpp \
            photodescription.cpp \
            textedit.cpp \
            photocontrol.cpp \
-           tooltip.cpp
+           tooltip.cpp \
+           searchbar.cpp
 QT += opengl
 INCLUDEPATH += ../../src
 DESTDIR = ./

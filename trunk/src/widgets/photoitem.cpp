@@ -106,7 +106,8 @@ PhotoItem::PhotoItem(PhotoView *view)
     m_fullsizePixmap(0),
     m_fullsize(false),
     m_editMode(false),
-    m_pendingDoom(false)
+    m_pendingDoom(false),
+    m_hide(false)
 {
   setHandlesChildEvents(false);
   setAcceptsHoverEvents(true);
@@ -459,6 +460,15 @@ void PhotoItem::slotSaveDescription(const QString &description)
 
 void PhotoItem::slotSetFullsizePixmap(qreal step)
 {
+  if (m_hide && step > 0.9) {
+    QGraphicsItem::hide();
+    return;
+  }
+
+  if (!m_hide && step < 0.1) {
+    QGraphicsItem::show();
+  }
+  
   if (!m_editMode) {
     qreal oldScaleMultiplier;
 

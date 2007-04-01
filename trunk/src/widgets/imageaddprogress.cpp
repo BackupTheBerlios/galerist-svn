@@ -39,7 +39,6 @@ void ImageAddProgress::setProgress(int finished, int total, const QString &curre
 
 void ImageAddProgress::setFinish(const QString &msg)
 {
-  imageLabel->setPixmap(QPixmap(":/images/complete.png").scaled(64, 64, Qt::KeepAspectRatio));
   nameLabel->setText(msg);
 }
 

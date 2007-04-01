@@ -84,6 +84,8 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
      */
     bool checkName(const QString &name) const;
 
+    bool m_initialised;
+
   private slots:
     /**
      * Defines the behaviour when browse button is clicked.

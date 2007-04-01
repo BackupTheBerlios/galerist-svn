@@ -35,6 +35,7 @@ typedef QMap<QString, QString> Translations;
 namespace GWidgets
 {
 class PhotoControl;
+class SearchBar;
 }
 
 namespace GCore
@@ -63,7 +64,7 @@ class Data : public QObject
       List,
       Slide,
       Undefined
-  };*/
+    };*/
 
     enum BackgroundType {
       Round,
@@ -77,119 +78,119 @@ class Data : public QObject
       Unknown
   };
 
-  /**
-   * A constructor.
-   *
-   * @param parent Parent of this data class.
-   */
-  Data(QObject *parent = 0);
+    /**
+     * A constructor.
+     *
+     * @param parent Parent of this data class.
+     */
+    Data(QObject *parent = 0);
 
-  /**
-   * Returns a reference to this class and creates it if it doesn't exist.
-   *
-   * @return This object.
-   */
-  static Data *self();
+    /**
+     * Returns a reference to this class and creates it if it doesn't exist.
+     *
+     * @return This object.
+     */
+    static Data *self();
 
-  /**
-   * Returns a refernce to the ErrorHandler.
-   *
-   * @return ErrorHandler object.
-   */
-  ErrorHandler *getErrorHandler();
+    /**
+     * Returns a refernce to the ErrorHandler.
+     *
+     * @return ErrorHandler object.
+     */
+    ErrorHandler *getErrorHandler();
 
-  /**
-   * Returns the list of supported image formats.
-   *
-   * @return List of supported image formats.
-   */
-  QStringList getImageFormats();
+    /**
+     * Returns the list of supported image formats.
+     *
+     * @return List of supported image formats.
+     */
+    QStringList getImageFormats();
 
-  /**
-   * Returns path where galleries resides.
-   *
-   * @return Path of galleries as a string.
-   */
-  QString getGalleriesPath();
-  /**
-   * Returns the path to the settings.
-   *
-   * @return Path of settings as a string.
-   */
-  QString getSettingsPath();
+    /**
+     * Returns path where galleries resides.
+     *
+     * @return Path of galleries as a string.
+     */
+    QString getGalleriesPath();
+    /**
+     * Returns the path to the settings.
+     *
+     * @return Path of settings as a string.
+     */
+    QString getSettingsPath();
 
-  /**
-   * Returns the image model.
-   *
-   * @return Image model.
-   */
-  ImageModel *getImageModel();
+    /**
+     * Returns the image model.
+     *
+     * @return Image model.
+     */
+    ImageModel *getImageModel();
 
-  /**
-   * Returns the completer for the LineEdits.
-   *
-   * @return Completer.
-   */
-  QCompleter *getDirCompleter();
+    /**
+     * Returns the completer for the LineEdits.
+     *
+     * @return Completer.
+     */
+    QCompleter *getDirCompleter();
 
-  /**
-   * Sets the look of image's background in PhotoView.
-   *
-   * @param type The type of the background.
-   */
-  void setBackgroundType(BackgroundType type);
-  /**
-   * Returns the background type.
-   *
-   * @return The type of background.
-   */
-  GCore::Data::BackgroundType getBackgroundType();
+    /**
+     * Sets the look of image's background in PhotoView.
+     *
+     * @param type The type of the background.
+     */
+    void setBackgroundType(BackgroundType type);
+    /**
+     * Returns the background type.
+     *
+     * @return The type of background.
+     */
+    GCore::Data::BackgroundType getBackgroundType();
 
-  /**
-   * Sets how to show the progress (Adding images).
-   *
-   * @param showOption The option.
-   */
-  void setProgressDialog(ProgressDialog showOption);
-  /**
-   * Gets the progress show option.
-   *
-   * @return The option.
-   */
-  GCore::Data::ProgressDialog getProgressDialog();
+    /**
+     * Sets how to show the progress (Adding images).
+     *
+     * @param showOption The option.
+     */
+    void setProgressDialog(ProgressDialog showOption);
+    /**
+     * Gets the progress show option.
+     *
+     * @return The option.
+     */
+    GCore::Data::ProgressDialog getProgressDialog();
 
-  /**
-   * Sets if the PhotoView should use OpenGL instructions.
-   *
-   * @param enable Enable it or not.
-   */
-  void setOpengl(bool enable);
-  /**
-   * Returns the status of OpenGL usement.
-   *
-   * @return Status as a boolean.
-   */
-  bool getOpengl();
+    /**
+     * Sets if the PhotoView should use OpenGL instructions.
+     *
+     * @param enable Enable it or not.
+     */
+    void setOpengl(bool enable);
+    /**
+     * Returns the status of OpenGL usement.
+     *
+     * @return Status as a boolean.
+     */
+    bool getOpengl();
 
-  /**
-   * Set the photo control (a little widget for controlling photo controls in editing mode).
-   *
-   * @param photoControl The photo control widget.
-   */
-  void setPhotoControl(GWidgets::PhotoControl *photoControl);
-  /**
-   * Returns the photo control.
-   *
-   * @return Reference to the photo control widget.
-   */
-  GWidgets::PhotoControl *getPhotoControl();
+    /**
+     * Set the photo control (a little widget for controlling photo controls in editing mode).
+     *
+     * @param photoControl The photo control widget.
+     */
+    void setPhotoControl(GWidgets::PhotoControl *photoControl);
+    /**
+     * Returns the photo control.
+     *
+     * @return Reference to the photo control widget.
+     */
+    GWidgets::PhotoControl *getPhotoControl();
 
-  /**
-   * Sets the update at startup value.
-   *
-   * @param enable Enable the update feature at startup.
-   */
-  void setUpdateStartup(bool enable);
+    /**
+     * Sets the update at startup value.
+     *
+     * @param enable Enable the update feature at startup.
+     */
+    void setUpdateStartup(bool enable);
 
     /**
      * Returns the status of update at strtup.
@@ -376,6 +377,17 @@ class Data : public QObject
 
     ~Data();
 
+    /**
+     * Sets the search bar.
+     */
+    void setSearchBar(GWidgets::SearchBar* searchBar);
+
+    /**
+     * Gets the search bar.
+     */
+    GWidgets::SearchBar* getSearchBar() const;
+
+
   private:
     // Variables.
     static Data *m_self;
@@ -399,6 +411,8 @@ class Data : public QObject
     QWidget *m_mainWindow;
     QSortFilterProxyModel *m_modelProxy;
     QRegExp m_supportedFormats;
+
+    GWidgets::SearchBar *m_searchBar;
 
     // Methods
 

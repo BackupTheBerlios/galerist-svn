@@ -3,7 +3,6 @@
         <file>images/add.png</file>
         <file>images/back.png</file>
         <file>images/cancel.png</file>
-        <file>images/complete.png</file>
         <file>images/configure.png</file>
         <file>images/default-rect.png</file>
         <file>images/describe.png</file>
@@ -23,7 +22,6 @@
         <file>images/input_wrong.png</file>
         <file>images/loading.png</file>
         <file>images/new.png</file>
-        <file>images/qt.png</file>
         <file>images/remove.png</file>
         <file>images/rename.png</file>
         <file>images/round-rect.png</file>

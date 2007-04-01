@@ -56,8 +56,35 @@ class CopyPage : public QWizardPage, private Ui::CopyPage
      */
     bool isComplete() const;
 
+    /**
+     * Pauses the copy.
+     *
+     * @see GCore::GJobs::CopyJob#pause()
+     */
+    void pauseCopy();
+
+    /**
+     * Resumes the copy.
+     *
+     * @see GCore::GJobs::CopyJob#unpause()
+     */
+    void resumeCopy();
+
+    /**
+     * Stops the copy.
+     *
+     * @see GCore::GJobs::AbstractJob#stop()
+     */
+    void stopCopy();
+    
+    /**
+     * Initiates the cancelation process.
+     */
+    void startCancelProcess();
+
   private:
     bool m_finished;
+    QObject *m_copyProcess;
 
   private slots:
     /**

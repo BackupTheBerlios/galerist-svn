@@ -45,6 +45,11 @@ class FinishPage : public QWizardPage
      */
     ~FinishPage();
 
+    /**
+     * Reimplemented function for disabling Cancel button.
+     */
+    void initializePage();
+
 };
 
 }

@@ -35,6 +35,7 @@ namespace GWidgets
 {
 
 class PhotoItem;
+class SearchBar;
 
 /**
  * This class is a custom listview-like widget implemented using
@@ -46,8 +47,8 @@ class PhotoItem;
  */
 class PhotoView : public QGraphicsView
 {
-    Q_OBJECT
-    friend class PhotoItem;
+  Q_OBJECT
+  friend class PhotoItem;
   signals:
     /**
      * Signal that reports that a item has been selected.
@@ -67,6 +68,10 @@ class PhotoView : public QGraphicsView
      * @param edit We are going into editing mode or out of it.
      */
     void signalEditMode(bool edit);
+    /**
+     * Emited when search returns an empty result.
+     */
+    void noPhotosFound();
 
   public:
     /**
@@ -175,6 +180,16 @@ class PhotoView : public QGraphicsView
      */
     void slotInvertSelection();
 
+    /**
+     * Retakes the focus.
+     */
+    void slotRetakeFocus();
+
+    /**
+     * Sets the filter.
+     */
+    void setFilter(const QString &filter);
+
   protected:
     /**
      * Rearrange the items to new positions.
@@ -246,9 +261,8 @@ class PhotoView : public QGraphicsView
     void dropEvent(QDropEvent *event);
 
     /**
+     * Reimplemented method.
      * Implemetation of navigation with keys.
-     *
-     * @param event Event itself.
      */
     void keyPressEvent(QKeyEvent *event);
 
@@ -371,6 +385,8 @@ class PhotoView : public QGraphicsView
     QPoint m_rubberStartPos;
     int m_rubberScrollValue;
     QRubberBand *m_rubberBand;
+
+    QString m_filter;
 
     /**
      * Update and start the updating timer.

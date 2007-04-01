@@ -40,7 +40,8 @@ CopyJob::CopyJob(const QString &source, const QString &destination, const QModel
     m_source(new QDir(source)),
     m_destination(new QDir(destination)),
     m_gallery(gallery),
-    m_mode(MultiMode)
+    m_mode(MultiMode),
+    m_paused(false)
 {}
 
 CopyJob::CopyJob(const QString &source, const QStringList &fileNames, const QString &destination, const QModelIndex &gallery, QObject *parent)
@@ -160,10 +161,14 @@ void CopyJob::multiCopy()
 
   // Copy files.
   for (int count = 0; count <= numberImages; count++) {
-    if (getStop()) {
-      deleteCopied();
-      emit signalProgress(count, numberImages, QString(), QImage());
-      break;
+    while (getStop() || m_paused) {
+      if (getStop()) {
+       // deleteCopied();
+        emit signalProcess(QString());
+        emit signalProgress(count, numberImages, QString(), QImage());
+        break;
+      }
+      usleep(10);
     }
 
     // If the file is 0 in size, it's a fake (need to get a better verification process)
@@ -200,7 +205,7 @@ void CopyJob::multiCopy()
 
 void CopyJob::deleteCopied()
 {
-  QDir galleryPath(*m_destination);
+  /*QDir galleryPath(*m_destination);
   QDir thumbPath(galleryPath);
   thumbPath.cd(".thumbnails");
 
@@ -220,13 +225,27 @@ void CopyJob::deleteCopied()
 
   galleryPath.rmdir(".thumbnails");
   galleryPath.cdUp();
-  galleryPath.rmpath(m_destination->absolutePath());
+  galleryPath.rmpath(m_destination->absolutePath());*/
 }
 
 CopyJob::~CopyJob()
 {
   delete m_destination;
   delete m_source;
+}
+
+void CopyJob::pause()
+{
+  m_locker.lock();
+  m_paused = true;
+  m_locker.unlock();
+}
+
+void CopyJob::unpause()
+{
+  m_locker.lock();
+  m_paused = false;
+  m_locker.unlock();
 }
 
 }

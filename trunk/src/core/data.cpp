@@ -416,4 +416,15 @@ Data::~Data()
   saveChanges();
 }
 
+GWidgets::SearchBar* Data::getSearchBar() const
+{
+  return m_searchBar;
+}
+
+
+void Data::setSearchBar(GWidgets::SearchBar* searchBar)
+{
+  m_searchBar = searchBar;
+}
+
 }

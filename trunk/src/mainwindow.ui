@@ -9,22 +9,19 @@
     <height>605</height>
    </rect>
   </property>
-  <property name="windowIcon" >
+  <property name="icon" stdset="0" >
    <iconset resource="images.qrc" >:/images/galerist.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QGridLayout" >
-    <property name="margin" >
-     <number>9</number>
-    </property>
-    <property name="spacing" >
-     <number>6</number>
-    </property>
-    <item row="1" column="1" >
+    <item row="2" column="1" >
      <widget class="GWidgets::PhotoControl" native="1" name="photoControl" />
     </item>
     <item row="0" column="0" colspan="3" >
      <widget class="GWidgets::PhotoView" name="imageList" />
+    </item>
+    <item row="1" column="1" >
+     <widget class="GWidgets::SearchBar" native="1" name="searchBar" />
     </item>
    </layout>
   </widget>
@@ -103,16 +100,28 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents" >
     <layout class="QGridLayout" >
-     <property name="margin" >
+     <property name="leftMargin" >
       <number>9</number>
      </property>
-     <property name="spacing" >
+     <property name="topMargin" >
+      <number>9</number>
+     </property>
+     <property name="rightMargin" >
+      <number>9</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>9</number>
+     </property>
+     <property name="horizontalSpacing" >
+      <number>6</number>
+     </property>
+     <property name="verticalSpacing" >
       <number>6</number>
      </property>
      <item row="0" column="0" >
       <widget class="GWidgets::GalleryTreeView" name="albumView" >
        <property name="editTriggers" >
-        <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers</set>
+        <set>QAbstractItemView::AllEditTriggers</set>
        </property>
        <property name="alternatingRowColors" >
         <bool>true</bool>
@@ -133,7 +142,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
    <addaction name="actionNew" />
    <addaction name="separator" />
@@ -150,7 +162,7 @@
   </action>
   <action name="actionAboutQt" >
    <property name="icon" >
-    <iconset resource="images.qrc" >:/images/qt.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>About &amp;Qt</string>
@@ -365,6 +377,12 @@
    <class>GWidgets::GalleryTreeView</class>
    <extends>QTreeView</extends>
    <header>widgets/gallerytreeview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GWidgets::SearchBar</class>
+   <extends>QWidget</extends>
+   <header>widgets/searchbar.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

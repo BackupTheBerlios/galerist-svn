@@ -19,34 +19,37 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "photoview.h"
-#include "photoitem.h"
-#include "photocontrol.h"
+
+#include "widgets/photoitem.h"
+#include "widgets/photocontrol.h"
+#include "widgets/searchbar.h"
 
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
+
+#include <QtCore/QModelIndex>
+#include <QtCore/QTimer>
+#include <QtCore/QProcess>
+#include <QtCore/QDir>
+#include <QtCore/QUrl>
 
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QStyleOptionGraphicsItem>
 #include <QtGui/QScrollBar>
-#include <QtCore/QModelIndex>
-#include <QtOpenGL/QGLWidget>
-#include <QtCore/QTimeLine>
 #include <QtGui/QMessageBox>
 #include <QtGui/QPushButton>
-#include <QtCore/QTimer>
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QRubberBand>
 #include <QtGui/QMouseEvent>
-#include <QtCore/QProcess>
 #include <QtGui/QMessageBox>
-#include <QtCore/QDir>
 #include <QtGui/QMenu>
 #include <QtGui/QAction>
-#include <QtCore/QUrl>
 #include <QtGui/QSortFilterProxyModel>
+
+#include <QtOpenGL/QGLWidget>
 
 #include <QtCore/QtDebug>
 
@@ -72,7 +75,6 @@ PhotoView::PhotoView(QWidget *parent)
 
   if (GCore::Data::self()->getOpengl() && QGLFormat::hasOpenGL())
     setViewport(new QGLWidget(QGLFormat(QGL::DirectRendering | QGL::SampleBuffers)));
-  //setDragMode(QGraphicsView::RubberBandDrag);
 
   // Loading item
   m_loading = new QGraphicsPixmapItem(QPixmap(":/images/loading.png"), 0, this->scene());
@@ -172,6 +174,17 @@ void PhotoView::slotInvertSelection()
   QHash<QModelIndex, PhotoItem*>::const_iterator end = m_itemHash.constEnd();
   for (QHash<QModelIndex, PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
     count.value()->setSelected(!(*count)->isSelected());
+}
+
+void PhotoView::slotRetakeFocus()
+{
+  setFocus();
+}
+
+void PhotoView::setFilter(const QString &filter)
+{
+  m_filter = filter;
+  rearrangeItems();
 }
 
 PhotoItem *PhotoView::itemForIndex(const QModelIndex &index)
@@ -333,6 +346,11 @@ int PhotoView::rearrangeItems(bool update)
       continue;
 
     PhotoItem *item = *i;
+
+    if (!item->getText().contains(m_filter)) {
+      item->setPos(1000, -500);
+      continue;
+    }
 
     if (item->getText() == tr("Unavailable")) {
       item->setText(indexForItem(item).data(GCore::ImageModel::ImageNameRole).toString(), indexForItem(item).data(GCore::ImageModel::ImageDescriptionRole).toString());
@@ -538,6 +556,15 @@ void PhotoView::dropEvent(QDropEvent *event)
 
 void PhotoView::keyPressEvent(QKeyEvent *event)
 {
+  // If a normal text has been pressed... Then we start a search
+  if (!event->text().isEmpty() && event->key() != Qt::Key_Escape && event->key() != Qt::Key_Return && !m_editMode && (event->modifiers() == Qt::NoModifier || event->matches(QKeySequence::Find))) {
+    if (event->matches(QKeySequence::Find))
+      GCore::Data::self()->getSearchBar()->addLetter("");
+    else
+      GCore::Data::self()->getSearchBar()->addLetter(event->text());
+    return;
+  }
+  
   if (!scene()->focusItem() && !m_itemHash.isEmpty())
     scene()->setFocusItem(static_cast<QGraphicsItem*>(m_itemVector.at(0)));
 
@@ -598,6 +625,10 @@ void PhotoView::keyPressEvent(QKeyEvent *event)
         }
         break;
       }
+    case(Qt::Key_Escape): {
+      GCore::Data::self()->getSearchBar()->hide();
+      break;
+    }
     default: {
       QGraphicsView::keyPressEvent(event);
     }
@@ -832,6 +863,8 @@ void PhotoView::slotConnectNavButtons()
   connect(GCore::Data::self()->getPhotoControl()->getZoomInputButton(), SIGNAL(clicked()), this, SLOT(slotZoomInputPhoto()));
   connect(GCore::Data::self()->getPhotoControl()->getEditButton(), SIGNAL(clicked()), this, SLOT(slotEditPhoto()));
   connect(GCore::Data::self()->getPhotoControl()->getExitButton(), SIGNAL(clicked()), this, SLOT(slotExitEdit()));
+
+  GCore::Data::self()->getSearchBar()->setListFilter(this);
 }
 
 QModelIndex PhotoView::indexForItem(PhotoItem *item)

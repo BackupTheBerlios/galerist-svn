@@ -31,6 +31,8 @@ SummaryPage::SummaryPage()
   setTitle(tr("Summary"));
   setSubTitle(tr("Summary of selected options"));
   setupUi(this);
+
+  setCommitPage(true);
 }
 
 SummaryPage::~SummaryPage()

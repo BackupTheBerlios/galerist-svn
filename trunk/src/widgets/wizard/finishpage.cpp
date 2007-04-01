@@ -22,6 +22,7 @@
 
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QLabel>
+#include <QtGui/QAbstractButton>
 
 namespace GWidgets {
 
@@ -42,11 +43,14 @@ FinishPage::FinishPage()
   setLayout(layout);
 }
 
-
 FinishPage::~FinishPage()
 {
 }
 
+void FinishPage::initializePage()
+{
+  wizard()->button(QWizard::CancelButton)->setEnabled(false);
+}
 
 }
 

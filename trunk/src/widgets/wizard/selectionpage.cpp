@@ -36,7 +36,8 @@ namespace GWidgets {
 namespace GWizard {
 
 SelectionPage::SelectionPage()
-    : QWizardPage()
+    : QWizardPage(),
+      m_initialised(false)
 {
   setTitle(tr("Gallery settings"));
   setSubTitle(tr("Main settings of the new gallery"));
@@ -45,8 +46,6 @@ SelectionPage::SelectionPage()
   
   registerField("GalleryName*", nameEdit);
   registerField("GalleryPath*", imagesEdit);
-  registerField("RecursiveSearch", recursiveBox);
-  registerField("RecursiveSubGallery", subRadio);
   registerField("ParentGallery", parentBox);
   
   connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowseClicked()));
@@ -59,24 +58,30 @@ void SelectionPage::initializePage()
 {
   // Set focus to the name edit
   nameEdit->setFocus();
-  setField("GalleryName", "");
 
-  // Add all available galleries
-  parentBox->addItems(GCore::Data::self()->getImageModel()->getGalleriesList());
+  if (!m_initialised) {
+    setField("GalleryName", "");
 
-  nameEdit->setType(GWidgets::LineEdit::WithVerify);
-  imagesEdit->setType(GWidgets::LineEdit::FileSelector);
+    // Add all available galleries
+    parentBox->addItems(GCore::Data::self()->getImageModel()->getGalleriesList());
 
-  connect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
-  connect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
+    nameEdit->setType(GWidgets::LineEdit::WithVerify);
+    imagesEdit->setType(GWidgets::LineEdit::FileSelector);
 
-  // Insert the path to the home directory
-  setField("GalleryPath", QDir::homePath());
+    connect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
+    connect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
+
+    // Insert the path to the home directory
+    setField("GalleryPath", QDir::homePath());
+
+    // Lets make sure we won't be initialising twice
+    m_initialised = true;
+  }
 }
 
 void SelectionPage::cleanupPage()
 {
-  disconnect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
+  /*disconnect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
   disconnect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
   
   // Set focus to the name edit
@@ -88,7 +93,7 @@ void SelectionPage::cleanupPage()
   setField("GalleryPath", QDir::homePath());
 
   // Add all available galleries
-  parentBox->clear();
+  parentBox->clear();*/
 }
 
 bool SelectionPage::isComplete() const
@@ -127,7 +132,7 @@ void SelectionPage::slotCheckName(const QString &name)
   if (nameEdit->text().isEmpty()) {
     nameEdit->setValidity(false, tr("Please enter a name."));
     //messageLabel->setText(tr("Please enter a name."));
-  } else if (!nameEdit->text().isEmpty() && !GCore::Data::self()->getImageModel()->checkName(name)) {
+  } else if (!nameEdit->text().isEmpty() && !GCore::Data::self()->getImageModel()->findGallery(name).isValid()) {
     //messageLabel->setText("");
     nameEdit->setValidity(true);
   } else {

@@ -62,7 +62,7 @@ class PhotoRect : public QGraphicsRectItem
 /**
  * Class that represents the thumbnail of the photo.
  * @short Thumbnail of the photo.
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališ¡nik <gregor@podnapisi.net>
  */
 class PhotoPixmap : public QGraphicsPixmapItem
 {
@@ -283,6 +283,8 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     PhotoPixmap *m_pixmap;
     PhotoName *m_text;
     PhotoDescription *m_description;
+
+    bool m_hide;
 
   private slots:
     /**

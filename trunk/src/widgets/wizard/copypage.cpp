@@ -23,6 +23,8 @@
 #include "core/data.h"
 #include "core/imagemodel.h"
 
+#include "core/jobs/copyjob.h"
+
 #include <QtCore/QDir>
 
 #include <QtGui/QPixmap>
@@ -33,7 +35,8 @@ namespace GWizard {
 
 CopyPage::CopyPage()
  : QWizardPage(),
-   m_finished(false)
+   m_finished(false),
+   m_copyProcess(0)
 {
   setTitle(tr("Copy"));
   setSubTitle(tr("Creation progress"));
@@ -53,23 +56,52 @@ void CopyPage::initializePage()
     parentGallery = GCore::Data::self()->getImageModel()->findGallery(field("ParentGallery").toString());
   
   // We copy the images to the right place
-  QObject *copyProcess = GCore::Data::self()->getImageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery);
-
+  m_copyProcess = GCore::Data::self()->getImageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery);
+  
   // We close the wizard if the copy failed
   /*if (!copyProcess) {
   getWizard->reject();
   return;
 }*/
-
+  
   // Connect the gallery handler.
   qRegisterMetaType<QImage>("QImage");
 
-  connect(copyProcess, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(slotProgress(int, int, const QString&, const QImage&)));
+  connect(m_copyProcess, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(slotProgress(int, int, const QString&, const QImage&)));
 }
 
 bool CopyPage::isComplete() const
 {
   return m_finished;
+}
+
+void CopyPage::pauseCopy()
+{
+  if (!m_copyProcess)
+    return;
+
+  GCore::GJobs::CopyJob *copyJob = static_cast<GCore::GJobs::CopyJob*> (m_copyProcess);
+  copyJob->pause();
+}
+
+void CopyPage::resumeCopy()
+{
+  if (!m_copyProcess)
+    return;
+
+  GCore::GJobs::CopyJob *copyJob = static_cast<GCore::GJobs::CopyJob*> (m_copyProcess);
+  copyJob->unpause();
+}
+
+void CopyPage::stopCopy()
+{
+  if (!m_copyProcess)
+    return;
+
+  GCore::GJobs::CopyJob *copyJob = static_cast<GCore::GJobs::CopyJob*> (m_copyProcess);
+  copyJob->stop();
+  m_copyProcess = 0;
+  copyJob = 0;
 }
 
 void CopyPage::slotProgress(int finished, int total, const QString &current, const QImage &image)
@@ -80,39 +112,17 @@ void CopyPage::slotProgress(int finished, int total, const QString &current, con
   if (!image.isNull())
     imageLabel->setPixmap(QPixmap::fromImage(image));
 
-//  getWizard()->enableBack(false);
-
-//   if (current.isEmpty()) {
-//     progressLabel->setText(tr("Copy cancelled."));
-//     setVerification(true);
-//     //wizard->enableButtons(true, true);
-//     return;
-//   }
-
   if (finished != total) {
     //Add the name to the progress label.
     progressLabel->setText(tr("Copying picture %1 ...").arg(current));
-    //wizard->enableButtons(false);
-  } else /*if (current.isEmpty()) {
-    progressLabel->setText(tr("Copy cancelled."));
-        //wizard->enableButtons(true, true);
-    setVerification(true);
-    imageLabel->setPixmap(QPixmap(":/images/cancel.png").scaled(128, 128));
-    return;
-} else if (current == "failed") {
-    progressLabel->setText(tr("Copy failed."));
-        //wizard->enableButtons(true, true);
-    setVerification(true);
-    imageLabel->setPixmap(QPixmap(":/images/failed.png").scaled(128, 128));
-    return;
-} else */ {
+  } else {
     //The copy has finished!
-            progressLabel->setText(tr("Copy finished"));
-            imageLabel->setPixmap(QPixmap(":/images/complete.png"));
-            m_finished = true;
-            emit completeChanged();
-    //wizard->enableButtons(true);
-}
+    progressLabel->setText(tr("Copy finished"));
+    m_finished = true;
+    m_copyProcess = 0;
+    emit completeChanged();
+    wizard()->next();
+  }
 }
 
 }

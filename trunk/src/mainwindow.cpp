@@ -70,6 +70,9 @@ MainWindow::MainWindow()
   position.setX(desktop.right() - 300);
   m_imageProgress->move(position);
 
+  GCore::Data::self()->setSearchBar(searchBar);
+  searchBar->hide();
+
   GCore::Data::self()->setPhotoControl(photoControl);
   setEditMode(false);
 

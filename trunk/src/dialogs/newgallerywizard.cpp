@@ -26,6 +26,8 @@
 #include "widgets/wizard/copypage.h"
 #include "widgets/wizard/finishpage.h"
 
+#include <QtGui/QMessageBox>
+
 namespace GDialogs {
 
 NewGalleryWizard::NewGalleryWizard(QWidget *parent)
@@ -35,19 +37,35 @@ NewGalleryWizard::NewGalleryWizard(QWidget *parent)
 
   setDefaultProperty("QComboBox", "currentText", "currentIndexChanged()");
 
+  setOption(QWizard::DisabledBackButtonOnLastPage);
+
   addPage(new GWidgets::GWizard::WelcomePage);
   addPage(new GWidgets::GWizard::SelectionPage);
   addPage(new GWidgets::GWizard::SummaryPage);
-  addPage(new GWidgets::GWizard::CopyPage);
+  m_copyPage = addPage(new GWidgets::GWizard::CopyPage);
   addPage(new GWidgets::GWizard::FinishPage);
 
   setPixmap(QWizard::LogoPixmap, QPixmap(":/images/galerist.png").scaled(55, 55, Qt::KeepAspectRatio));
 }
 
-
 NewGalleryWizard::~NewGalleryWizard()
 {
 }
 
+void NewGalleryWizard::reject()
+{
+  if (currentId() == m_copyPage)
+    static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->pauseCopy();
+  
+  if (QMessageBox::question(0, tr("Confirm cancel"), tr("Are you sure you want to cancel this wizard?"), tr("Cancel"), tr("Continue"), QString(), 1, 1) == 0) {
+    if (currentId() == m_copyPage) {
+      static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->stopCopy();
+    }
+    QWizard::reject();
+  } else {
+    if (currentId() == m_copyPage)
+      static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->resumeCopy();
+  }
+}
 
 }
