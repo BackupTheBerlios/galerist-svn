@@ -41,6 +41,14 @@ class NewGalleryWizard : public QWizard
     NewGalleryWizard(QWidget *parent = 0);
 
     /**
+     * A constructor used for allready defined images.
+     *
+     * @param path Location of the images.
+     * @param images List of predefined images.
+     */
+    NewGalleryWizard(const QString &path, const QStringList &images, QWidget *parent = 0);
+
+    /**
      * A destructor.
      */
     ~NewGalleryWizard();

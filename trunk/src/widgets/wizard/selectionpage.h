@@ -49,11 +49,14 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
     ~SelectionPage();
 
     /**
-     * Reimplemented method. Sets all values to default.
+     * Reimplemented method.
+     * Sets all values to default.
      */
     void initializePage();
+
     /**
-     * Reimplemented method. Cleans the values.
+     * Reimplemented method.
+     * Making sure we are not going to lose data.
      */
     void cleanupPage();
 
@@ -61,6 +64,14 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
      * Reimplemented method for determening if this page is fully filled up.
      */
     bool isComplete() const;
+
+    /**
+     * Sets predefined images.
+     *
+     * @param path Location of the predefined images.
+     * @param images List of predefined images.
+     */
+    void setPredefinedImages(const QString &path, const QStringList &images = QStringList());
 
   public slots:
 
@@ -84,7 +95,15 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
      */
     bool checkName(const QString &name) const;
 
+    /**
+     * Shows what images will be added.
+     *
+     * @param path Path in where the potential images are stored.
+     */
+    void makePreview(const QString &path, const QStringList &images = QStringList()) const;
+
     bool m_initialised;
+    mutable QObject *m_readJob;
 
   private slots:
     /**
@@ -104,6 +123,11 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
      * @param name Name to verify.
      */
     void slotCheckName(const QString &name);
+
+    /**
+     * Adds images to the preview list.
+     */
+    void addImage(const QString&, const QImage &image, const QString&);
 
 };
 

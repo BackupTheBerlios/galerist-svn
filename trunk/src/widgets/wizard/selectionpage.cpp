@@ -24,12 +24,17 @@
 #include "core/data.h"
 #include "core/imagemodel.h"
 
+#include "core/jobs/readjob.h"
+
 #include "widgets/lineedit.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
 #include <QtGui/QFileDialog>
+#include <QtGui/QListWidgetItem>
+#include <QtGui/QIcon>
+#include <QtGui/QPixmap>
 
 namespace GWidgets {
 
@@ -37,7 +42,8 @@ namespace GWizard {
 
 SelectionPage::SelectionPage()
     : QWizardPage(),
-      m_initialised(false)
+      m_initialised(false),
+      m_readJob(0)
 {
   setTitle(tr("Gallery settings"));
   setSubTitle(tr("Main settings of the new gallery"));
@@ -52,7 +58,13 @@ SelectionPage::SelectionPage()
 }
 
 SelectionPage::~SelectionPage()
-{}
+{
+  imagesEdit->setType(GWidgets::LineEdit::Default);
+}
+
+void SelectionPage::cleanupPage()
+{
+}
 
 void SelectionPage::initializePage()
 {
@@ -79,78 +91,35 @@ void SelectionPage::initializePage()
   }
 }
 
-void SelectionPage::cleanupPage()
-{
-  /*disconnect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
-  disconnect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
-  
-  // Set focus to the name edit
-  nameEdit->setFocus();
-
-  setField("GalleryName", "");
-
-  // Insert the path to the home directory
-  setField("GalleryPath", QDir::homePath());
-
-  // Add all available galleries
-  parentBox->clear();*/
-}
-
 bool SelectionPage::isComplete() const
 {
-  if (checkName(nameEdit->text()) && checkImagesPath(imagesEdit->text()))
+  if (checkImagesPath(imagesEdit->text()) && checkName(nameEdit->text()))
     return QWizardPage::isComplete();
   
   return false;
 }
 
-void SelectionPage::slotCheckImagesPath(const QString &path)
+void SelectionPage::setPredefinedImages(const QString &path, const QStringList &images)
 {
-  if (imagesEdit->text().isEmpty()) {
-    imagesEdit->setValidity(false, tr("Please enter a path to the directory with images."));
-    //messageLabel->setText(tr("Please enter a path to the directory with images."));
-  } else if (!QDir(path).exists()) {
-    imagesEdit->setValidity(false, tr("The entered path doesn't exists. Please select another path."));
-    //messageLabel->setText(tr("The entered path doesn't exists. Please select another path."));
-  } else {
-    messageLabel->setText("");
-    imagesEdit->setValidity(true);
-  }
-
-  //slotTextChanged();
-}
-
-void SelectionPage::slotBrowseClicked()
-{
-  QString directory = QFileDialog::getExistingDirectory(0, tr("Select the directory with images for you gallary."), imagesEdit->text());
-  if (!directory.isEmpty())
-    imagesEdit->setText(directory);
-}
-
-void SelectionPage::slotCheckName(const QString &name)
-{
-  if (nameEdit->text().isEmpty()) {
-    nameEdit->setValidity(false, tr("Please enter a name."));
-    //messageLabel->setText(tr("Please enter a name."));
-  } else if (!nameEdit->text().isEmpty() && !GCore::Data::self()->getImageModel()->findGallery(name).isValid()) {
-    //messageLabel->setText("");
-    nameEdit->setValidity(true);
-  } else {
-    //messageLabel->setText(tr("Gallery allready exists. Please select a different name."));
-    nameEdit->setValidity(false, tr("Gallery allready exists. Please select a different name."));
-  }
-
-  //slotTextChanged();
+  imagesEdit->setText(path);
+  imagesEdit->setEnabled(false);
+  makePreview(path, images);
 }
 
 bool SelectionPage::checkImagesPath(const QString &path) const
 {
-  if (imagesEdit->text().isEmpty())
+  if (imagesEdit->text().isEmpty()) {
+    m_readJob = 0;
+    previewList->clear();
     return false;
-  else if (!QDir(path).exists())
+  } else if (!QDir(path).exists()) {
+    m_readJob = 0;
+    previewList->clear();
     return false;
-  else
+  } else {
+    makePreview(path);
     return true;
+  }
 }
 
 bool SelectionPage::checkName(const QString &name) const
@@ -161,6 +130,53 @@ bool SelectionPage::checkName(const QString &name) const
     return true;
   else
     return false;
+}
+
+void SelectionPage::makePreview(const QString &path, const QStringList &images) const
+{
+  if (!m_readJob) {
+    previewList->clear();
+    GCore::GJobs::ReadJob *read = new GCore::GJobs::ReadJob((QObject*) this, QDir(path), images);
+
+    connect(read, SIGNAL(signalProgress(const QString&, const QImage&, const QString&)), this, SLOT(addImage(const QString&, const QImage&, const QString&)));
+
+    read->start();
+
+    m_readJob = read;
+  }
+}
+
+void SelectionPage::slotBrowseClicked()
+{
+  QString directory = QFileDialog::getExistingDirectory(0, tr("Select the directory with images for you gallary."), imagesEdit->text());
+  if (!directory.isEmpty())
+    imagesEdit->setText(directory);
+}
+
+void SelectionPage::slotCheckImagesPath(const QString &path)
+{
+  if (imagesEdit->text().isEmpty())
+    imagesEdit->setValidity(false, tr("Please enter a path to the directory with images."));
+  else if (!QDir(path).exists())
+    imagesEdit->setValidity(false, tr("The entered path doesn't exists. Please select another path."));
+  else
+    imagesEdit->setValidity(true);
+}
+
+void SelectionPage::slotCheckName(const QString &name)
+{
+  if (nameEdit->text().isEmpty())
+    nameEdit->setValidity(false, tr("Please enter a name."));
+  else if (!nameEdit->text().isEmpty() && !GCore::Data::self()->getImageModel()->findGallery(name).isValid())
+    nameEdit->setValidity(true);
+  else
+    nameEdit->setValidity(false, tr("Gallery allready exists. Please select a different name."));
+}
+
+void SelectionPage::addImage(const QString&, const QImage &image, const QString&)
+{
+  if (!image.isNull())
+    new QListWidgetItem(QIcon(QPixmap::fromImage(image)), "", previewList);
 }
 
 }

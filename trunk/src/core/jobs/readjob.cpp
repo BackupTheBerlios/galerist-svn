@@ -38,15 +38,23 @@ namespace GJobs
 {
 
 ReadJob::ReadJob(const QAbstractItemModel *model)
-  : GCore::GJobs::AbstractJob(const_cast<QAbstractItemModel*>(model)),
+    : GCore::GJobs::AbstractJob(const_cast<QAbstractItemModel*>(model)),
     m_model(model)
 {}
 
 ReadJob::ReadJob(QObject *parent, const QDir &path, bool recursive)
-  : GCore::GJobs::AbstractJob(parent),
+    : GCore::GJobs::AbstractJob(parent),
     m_model(0),
     m_path(path),
     m_recursive(recursive)
+{}
+
+ReadJob::ReadJob(QObject *parent, const QDir &path, const QStringList &images, bool recursive)
+    : GCore::GJobs::AbstractJob(parent),
+    m_model(0),
+    m_path(path),
+    m_recursive(recursive),
+    m_images(images)
 {}
 
 QModelIndex ReadJob::getItem()
@@ -127,6 +135,8 @@ void ReadJob::readPath(const QDir &path)
   }
 
   QStringList images = path.entryList(QDir::Files);
+  if (!m_images.isEmpty())
+    images = m_images;
   foreach (QString image, images) {
     if (getStop())
       return;

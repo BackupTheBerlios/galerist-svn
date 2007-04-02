@@ -63,6 +63,16 @@ class ReadJob : public GCore::GJobs::AbstractJob
     ReadJob(QObject *parent, const QDir &path, bool recursive = false);
 
     /**
+     * Constructor for reading preselected list of images only.
+     *
+     * @param parent Parent of this job.
+     * @param path Path to the gallery.
+     * @param images List of images.
+     * @param recursive Read recursevly.
+     */
+    ReadJob(QObject *parent, const QDir &path, const QStringList &images, bool recursive = false);
+
+    /**
      * Returns the currently processed item.
      */
     QModelIndex getItem();
@@ -89,6 +99,8 @@ class ReadJob : public GCore::GJobs::AbstractJob
 
     QDir m_path;
     bool m_recursive;
+
+    QStringList m_images;
 
 };
 

@@ -48,6 +48,27 @@ NewGalleryWizard::NewGalleryWizard(QWidget *parent)
   setPixmap(QWizard::LogoPixmap, QPixmap(":/images/galerist.png").scaled(55, 55, Qt::KeepAspectRatio));
 }
 
+NewGalleryWizard::NewGalleryWizard(const QString &path, const QStringList &images, QWidget *parent)
+  : QWizard(parent)
+{
+  setWindowTitle(tr("Create a new gallery"));
+
+  setDefaultProperty("QComboBox", "currentText", "currentIndexChanged()");
+
+  setOption(QWizard::DisabledBackButtonOnLastPage);
+
+  addPage(new GWidgets::GWizard::WelcomePage);
+  GWidgets::GWizard::SelectionPage *selectionPage = new GWidgets::GWizard::SelectionPage;
+  addPage(selectionPage);
+  addPage(new GWidgets::GWizard::SummaryPage);
+  m_copyPage = addPage(new GWidgets::GWizard::CopyPage);
+  addPage(new GWidgets::GWizard::FinishPage);
+
+  setPixmap(QWizard::LogoPixmap, QPixmap(":/images/galerist.png").scaled(55, 55, Qt::KeepAspectRatio));
+
+  selectionPage->setPredefinedImages(path, images);
+}
+
 NewGalleryWizard::~NewGalleryWizard()
 {
 }
