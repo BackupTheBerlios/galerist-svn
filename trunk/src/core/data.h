@@ -59,23 +59,11 @@ class Data : public QObject
 {
     Q_OBJECT
   public:
-    /*enum ViewType {
-      Icon,
-      List,
-      Slide,
-      Undefined
-    };*/
 
     enum BackgroundType {
       Round,
       Default,
       NotDefined
-  };
-
-    enum ProgressDialog {
-      Show,
-      Hide,
-      Unknown
   };
 
     /**
@@ -104,20 +92,20 @@ class Data : public QObject
      *
      * @return List of supported image formats.
      */
-    QStringList getImageFormats();
+    QStringList getImageFormats() const;
 
     /**
      * Returns path where galleries resides.
      *
      * @return Path of galleries as a string.
      */
-    QString getGalleriesPath();
+    QString getGalleriesPath() const;
     /**
      * Returns the path to the settings.
      *
      * @return Path of settings as a string.
      */
-    QString getSettingsPath();
+    QString getSettingsPath() const;
 
     /**
      * Returns the image model.
@@ -131,46 +119,33 @@ class Data : public QObject
      *
      * @return Completer.
      */
-    QCompleter *getDirCompleter();
+    QCompleter *getDirCompleter() const;
 
     /**
      * Sets the look of image's background in PhotoView.
      *
      * @param type The type of the background.
      */
-    void setBackgroundType(BackgroundType type);
+    void setBackgroundType(BackgroundType type) const;
     /**
      * Returns the background type.
      *
      * @return The type of background.
      */
-    GCore::Data::BackgroundType getBackgroundType();
-
-    /**
-     * Sets how to show the progress (Adding images).
-     *
-     * @param showOption The option.
-     */
-    void setProgressDialog(ProgressDialog showOption);
-    /**
-     * Gets the progress show option.
-     *
-     * @return The option.
-     */
-    GCore::Data::ProgressDialog getProgressDialog();
+    GCore::Data::BackgroundType getBackgroundType() const;
 
     /**
      * Sets if the PhotoView should use OpenGL instructions.
      *
      * @param enable Enable it or not.
      */
-    void setOpengl(bool enable);
+    void setOpengl(bool enable) const;
     /**
      * Returns the status of OpenGL usement.
      *
      * @return Status as a boolean.
      */
-    bool getOpengl();
+    bool getOpengl() const;
 
     /**
      * Set the photo control (a little widget for controlling photo controls in editing mode).
@@ -183,33 +158,33 @@ class Data : public QObject
      *
      * @return Reference to the photo control widget.
      */
-    GWidgets::PhotoControl *getPhotoControl();
+    GWidgets::PhotoControl *getPhotoControl() const;
 
     /**
      * Sets the update at startup value.
      *
      * @param enable Enable the update feature at startup.
      */
-    void setUpdateStartup(bool enable);
+    void setUpdateStartup(bool enable) const;
 
     /**
      * Returns the status of update at strtup.
      *
      * @return State of update at startup.
      */
-    bool getUpdateStartup();
+    bool getUpdateStartup() const;
 
     /**
      * Method for defining image editor.
      * @param filePath Path to the editor.
      */
-    void setPhotoEditor(const QString &filePath);
+    void setPhotoEditor(const QString &filePath) const;
     /**
      * Method for retrieving file path of the editor.
      *
      * @return Path to the editor.
      */
-    QString getPhotoEditor();
+    QString getPhotoEditor() const;
 
     /**
      * Method for storing photo context menu.
@@ -249,60 +224,46 @@ class Data : public QObject
     QMenu *getGalleryContextMenu();
 
     /**
-     * Sets the configuration for Tool tips.
-     *
-     * @param enable Enables the use of Goya's tool tips.
-     */
-    void setEnableToolTips(bool enable);
-
-    /**
-     * Returns whetever Goya's tool tips are enabled.
-     *
-     * @return State of bubble tooltips.
-     */
-    bool getEnableToolTips();
-
-    /**
      * Returns list of available translations.
      *
      * @return List of translations with full path.
      */
-    QStringList getAvailableTranslations();
+    QStringList getAvailableTranslations() const;
 
     /**
      * Sets the translation to use.
      *
      * @param name Name of the selected translation.
      */
-    void setTranslation(const QString &name);
+    void setTranslation(const QString &name) const;
 
     /**
      * Returns the name of the translation in use.
      *
      * @return Name of the translation in use.
      */
-    QString getTranslationName();
+    QString getTranslationName() const;
 
     /**
      * Returns the full file path to the used translation.
      *
      * @return Full file path to the translation in use. If empty, english is used.
      */
-    QString getTranslationFilePath();
+    QString getTranslationFilePath() const;
 
     /**
      * Returns the file name of the translation in use.
      *
      * @return File name.
      */
-    QString getTranslationFileName();
+    QString getTranslationFileName() const;
 
     /**
      * Returns absolute path to the translation in use.
      *
      * @return Absolute path.
      */
-    QString getTranslationPath();
+    QString getTranslationPath() const;
 
     /**
      * Set the main window reference. Used for accessing main windows function throughout Goya.
@@ -316,7 +277,7 @@ class Data : public QObject
      *
      * @return Reference to the main window.
      */
-    QWidget *getMainWindow();
+    QWidget *getMainWindow() const;
 
     /**
      * Gets the model proxy.
@@ -335,7 +296,7 @@ class Data : public QObject
      *
      * @return The name.
      */
-    QString getAppName();
+    QString getAppName() const;
 
     /**
      * Sets the version (hard-coded just used in main.cpp).
@@ -349,7 +310,7 @@ class Data : public QObject
      *
      * @return Version string.
      */
-    QString getAppVersion();
+    QString getAppVersion() const;
 
     /**
      * Set the list of supported images.
@@ -363,12 +324,12 @@ class Data : public QObject
      *
      * @return Returns the list of supported image formats in a QRegExp.
      */
-    QRegExp getSupportedFormats();
+    QRegExp getSupportedFormats()const ;
 
     /**
      * Saves all the changes.
      */
-    void saveChanges();
+    void saveChanges() const;
 
     /**
      * Frees all dynamically allocated member variables.
@@ -387,6 +348,18 @@ class Data : public QObject
      */
     GWidgets::SearchBar* getSearchBar() const;
 
+    /**
+     * Sets the ImageAddProgress.
+     */
+    void setImageAddProgress(QWidget* imageAddProgress);
+
+
+    /**
+     * Gets and creates if neccesary ImageAddProgress.
+     */
+    QWidget *getImageAddProgress() const;
+
+
 
   private:
     // Variables.
@@ -394,11 +367,8 @@ class Data : public QObject
     QSettings *m_settings;
     ErrorHandler *m_errorHandler;
     QStringList m_imageFormats;
-    BackgroundType m_backgroundType;
-    ProgressDialog m_progressDialog;
     ImageModel *m_imageModel;
     QCompleter *m_dirCompleter;
-    bool m_opengl;
     GWidgets::PhotoControl *m_photoControl;
     QMenu *m_photoContextMenu;
     QMenu *m_photoEditContextMenu;
@@ -413,6 +383,7 @@ class Data : public QObject
     QRegExp m_supportedFormats;
 
     GWidgets::SearchBar *m_searchBar;
+    QWidget *m_imageAddProgress;
 
     // Methods
 

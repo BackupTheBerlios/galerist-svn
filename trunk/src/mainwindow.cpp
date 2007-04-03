@@ -20,21 +20,17 @@
  ***************************************************************************/
 #include "mainwindow.h"
 
+#include <QtCore/QPoint>
+#include <QtCore/QDir>
+
 #include <QtGui/QHeaderView>
-#include <QtCore/QSize>
 #include <QtGui/QAction>
 #include <QtGui/QIcon>
 #include <QtGui/QMessageBox>
-#include <QtCore/QTimer>
 #include <QtGui/QProgressBar>
 #include <QtGui/QFileDialog>
-#include <QtCore/QPoint>
-#include <QtGui/QDesktopWidget>
 #include <QtGui/QPixmap>
-#include <QtCore/QDir>
 #include <QtGui/QSortFilterProxyModel>
-
-#include <QtCore/QtDebug>
 
 #include "core/data.h"
 #include "core/imagemodel.h"
@@ -53,22 +49,10 @@ MainWindow::MainWindow()
 {
   setupUi(this);
 
-  GCore::Data::self()->setMainWindow(this);
-
   setWindowIcon(QIcon(":/images/galerist.png"));
   setWindowTitle(GCore::Data::self()->getAppName());
 
-  statusBar()->showMessage(tr("Ready"));
-  m_progressBar = new QProgressBar();
-  statusBar()->addPermanentWidget(m_progressBar);
-  m_progressBar->hide();
-
-  m_imageProgress = new GWidgets::ImageAddProgress(this);
-  QPoint position;
-  QRect desktop = QApplication::desktop()->screenGeometry();
-  position.setY(desktop.bottom() - 200);
-  position.setX(desktop.right() - 300);
-  m_imageProgress->move(position);
+  startTimer(100);
 
   GCore::Data::self()->setSearchBar(searchBar);
   searchBar->hide();
@@ -127,9 +111,6 @@ void MainWindow::initActionButtons()
   connect(actionDefaultBackground, SIGNAL(toggled(bool)), this, SLOT(slotDefaultBackground(bool)));
   connect(actionRoundBackground, SIGNAL(toggled(bool)), this, SLOT(slotRoundBackground(bool)));
 
-  connect(actionShowProgress, SIGNAL(toggled(bool)), this, SLOT(slotProgressShow(bool)));
-  connect(actionHideProgress, SIGNAL(toggled(bool)), this, SLOT(slotProgressHide(bool)));
-
   viewMenu->addAction(galleryDock->toggleViewAction());
 
   // Connect Help menu
@@ -174,17 +155,6 @@ void MainWindow::initToolbar()
       }
     default: {
       actionDefaultBackground->setChecked(true);
-      break;
-    }
-  }
-
-  switch (GCore::Data::self()->getProgressDialog()) {
-    case (GCore::Data::Hide) : {
-        actionHideProgress->setChecked(true);
-        break;
-      }
-    default: {
-      actionShowProgress->setChecked(true);
       break;
     }
   }
@@ -243,58 +213,9 @@ void MainWindow::slotRoundBackground(bool checked)
   }
 }
 
-void MainWindow::slotProgressShow(bool checked)
-{
-  if (checked) {
-    GCore::Data::self()->setProgressDialog(GCore::Data::Show);
-    actionHideProgress->setChecked(false);
-  } else {
-    initToolbar();
-  }
-}
-
-void MainWindow::slotProgressHide(bool checked)
-{
-  if (checked) {
-    GCore::Data::self()->setProgressDialog(GCore::Data::Hide);
-    actionShowProgress->setChecked(false);
-  } else {
-    initToolbar();
-  }
-}
-
 void MainWindow::slotQuit()
 {
   GCore::Data::self()->clear();
-}
-
-void MainWindow::slotStatusProgress(int finished, int total, const QString &current, const QImage &currentImage)
-{
-  if (GCore::Data::self()->getProgressDialog() == GCore::Data::Show) {
-    m_imageProgress->setProgress(finished, total, current, QPixmap::fromImage(currentImage));
-    m_imageProgress->show();
-  } else {
-    statusBar()->showMessage(tr("Copying picture %1...").arg(current));
-    m_progressBar->setMaximum(total);
-    m_progressBar->setValue(finished);
-    m_progressBar->show();
-  }
-
-  if (finished == total) {
-    if (GCore::Data::self()->getProgressDialog() == GCore::Data::Show)
-      m_imageProgress->setFinish(tr("Copiing of pictures is successful."));
-    else
-      statusBar()->showMessage(tr("Copiing of pictures is successful."));
-
-    QTimer::singleShot(1000, this, SLOT(slotHideProgress()));
-  }
-}
-
-void MainWindow::slotHideProgress()
-{
-  m_imageProgress->hide();
-  m_progressBar->hide();
-  statusBar()->showMessage(tr("Ready"));
 }
 
 void MainWindow::slotUpdateEditButtons(bool selected)
@@ -338,10 +259,15 @@ void MainWindow::slotConfiguration()
 
 MainWindow::~MainWindow()
 {
-  delete m_imageProgress;
 }
 
 void MainWindow::setEditMode(bool edit)
 {
   photoControl->setVisible(edit);
+}
+
+void MainWindow::timerEvent(QTimerEvent*)
+{
+  if (statusBar()->currentMessage().isEmpty())
+    statusBar()->showMessage(tr("Ready"));
 }

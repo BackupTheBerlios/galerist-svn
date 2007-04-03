@@ -37,8 +37,6 @@ Configuration::Configuration(QWidget *parent)
   // Initialises the GUI
   setupUi(this);
 
-  toolTipCheck->setText(toolTipCheck->text().arg(GCore::Data::self()->getAppName()));
-
   // Additional initialisations
   imageEditorEdit->setType(GWidgets::LineEdit::FileSelector);
 
@@ -52,8 +50,6 @@ Configuration::Configuration(QWidget *parent)
     glRadio->setChecked(true);
   else
     nonGlRadio->setChecked(true);
-
-  toolTipCheck->setChecked(GCore::Data::self()->getEnableToolTips());
 
   imageEditorEdit->setText(QString(GCore::Data::self()->getPhotoEditor()).remove("\""));
   slotProcessEdit(imageEditorEdit->text(), true);
@@ -80,8 +76,6 @@ void Configuration::accept()
     GCore::Data::self()->setOpengl(glRadio->isChecked());
     emit signalFailed(tr("You need to restart %1 for changes to take effect.").arg(GCore::Data::self()->getAppName()), GCore::ErrorHandler::Information);
   }
-
-  GCore::Data::self()->setEnableToolTips(toolTipCheck->isChecked());
 
   GCore::Data::self()->setPhotoEditor(imageEditorEdit->text());
 

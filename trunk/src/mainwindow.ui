@@ -9,6 +9,9 @@
     <height>605</height>
    </rect>
   </property>
+  <property name="windowTitle" >
+   <string>Goya</string>
+  </property>
   <property name="icon" stdset="0" >
    <iconset resource="images.qrc" >:/images/galerist.png</iconset>
   </property>
@@ -42,8 +45,6 @@
     <addaction name="actionDefaultBackground" />
     <addaction name="actionRoundBackground" />
     <addaction name="separator" />
-    <addaction name="actionShowProgress" />
-    <addaction name="actionHideProgress" />
     <addaction name="separator" />
    </widget>
    <widget class="QMenu" name="menuFile" >
@@ -148,16 +149,27 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionNew" />
+   <addaction name="actionRemoveGallery" />
    <addaction name="separator" />
    <addaction name="actionAdd" />
    <addaction name="actionRemove" />
    <addaction name="separator" />
-   <addaction name="actionDefaultBackground" />
-   <addaction name="actionRoundBackground" />
   </widget>
   <action name="actionAbout" >
    <property name="icon" >
     <iconset resource="images.qrc" >:/images/galerist.png</iconset>
+   </property>
+   <property name="text" >
+    <string>About &amp;Goya</string>
+   </property>
+   <property name="iconText" >
+    <string>About Goya</string>
+   </property>
+   <property name="toolTip" >
+    <string>About Goya</string>
+   </property>
+   <property name="statusTip" >
+    <string>Shows about Goya dialog.</string>
    </property>
   </action>
   <action name="actionAboutQt" >
@@ -166,6 +178,9 @@
    </property>
    <property name="text" >
     <string>About &amp;Qt</string>
+   </property>
+   <property name="statusTip" >
+    <string>Shows about Qt dialog.</string>
    </property>
   </action>
   <action name="actionQuit" >
@@ -176,7 +191,7 @@
     <string>&amp;Quit</string>
    </property>
    <property name="statusTip" >
-    <string>Quits the Galerist.</string>
+    <string>Quits Goya.</string>
    </property>
   </action>
   <action name="actionNew" >
@@ -252,37 +267,6 @@
     <string/>
    </property>
   </action>
-  <action name="actionShowProgress" >
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <property name="checked" >
-    <bool>false</bool>
-   </property>
-   <property name="enabled" >
-    <bool>true</bool>
-   </property>
-   <property name="icon" >
-    <iconset resource="images.qrc" >:/images/show-progress.png</iconset>
-   </property>
-   <property name="text" >
-    <string>&amp;Show progress dialog</string>
-   </property>
-  </action>
-  <action name="actionHideProgress" >
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <property name="enabled" >
-    <bool>true</bool>
-   </property>
-   <property name="icon" >
-    <iconset resource="images.qrc" >:/images/hide-progress.png</iconset>
-   </property>
-   <property name="text" >
-    <string>&amp;Hide progress dialog</string>
-   </property>
-  </action>
   <action name="actionConfiguration" >
    <property name="icon" >
     <iconset resource="images.qrc" >:/images/configure.png</iconset>
@@ -290,13 +274,19 @@
    <property name="text" >
     <string>&amp;Configuration</string>
    </property>
+   <property name="statusTip" >
+    <string>Shows a configuration dialog.</string>
+   </property>
   </action>
   <action name="actionPreview" >
    <property name="icon" >
     <iconset resource="images.qrc" >:/images/zommselect.png</iconset>
    </property>
    <property name="text" >
-    <string>Preview</string>
+    <string>&amp;Preview</string>
+   </property>
+   <property name="statusTip" >
+    <string>Shows the bigger preview of the selected image.</string>
    </property>
   </action>
   <action name="actionRename" >
@@ -306,6 +296,9 @@
    <property name="text" >
     <string>Rename</string>
    </property>
+   <property name="statusTip" >
+    <string>Lets you rename the selected image.</string>
+   </property>
   </action>
   <action name="actionDescribe" >
    <property name="icon" >
@@ -313,6 +306,9 @@
    </property>
    <property name="text" >
     <string>Describe</string>
+   </property>
+   <property name="statusTip" >
+    <string>Lets you describe the selected image.</string>
    </property>
   </action>
   <action name="actionSelectAll" >
@@ -322,6 +318,9 @@
    <property name="text" >
     <string>Select all</string>
    </property>
+   <property name="statusTip" >
+    <string>Selects all images.</string>
+   </property>
   </action>
   <action name="actionDeselectAll" >
    <property name="enabled" >
@@ -330,6 +329,9 @@
    <property name="text" >
     <string>Deselect all</string>
    </property>
+   <property name="statusTip" >
+    <string>Deselect all images.</string>
+   </property>
   </action>
   <action name="actionInvertSelection" >
    <property name="enabled" >
@@ -337,6 +339,9 @@
    </property>
    <property name="text" >
     <string>Invert selection</string>
+   </property>
+   <property name="statusTip" >
+    <string>Inverts the selection.</string>
    </property>
   </action>
   <action name="actionRemoveGallery" >
@@ -349,6 +354,9 @@
    <property name="text" >
     <string>Remove gallery</string>
    </property>
+   <property name="statusTip" >
+    <string>Removes the selected gallery.</string>
+   </property>
   </action>
   <action name="actionUpdate" >
    <property name="enabled" >
@@ -359,6 +367,9 @@
    </property>
    <property name="text" >
     <string>Check for &amp;updates</string>
+   </property>
+   <property name="statusTip" >
+    <string>Checks for the updates.</string>
    </property>
   </action>
  </widget>

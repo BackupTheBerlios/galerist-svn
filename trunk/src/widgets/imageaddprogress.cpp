@@ -20,29 +20,43 @@
  ***************************************************************************/
 #include "imageaddprogress.h"
 
+#include <QtCore/QTimer>
+
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
+
 namespace GWidgets
 {
 
 ImageAddProgress::ImageAddProgress(QWidget *parent)
-    : QWidget(parent, Qt::ToolTip)
+    : QWidget(parent, Qt::Popup)
 {
   setupUi(this);
-}
 
-void ImageAddProgress::setProgress(int finished, int total, const QString &currentName, const QPixmap &currentPixmap)
-{
-  progressBar->setMaximum(total);
-  progressBar->setValue(finished);
-  nameLabel->setText(currentName);
-  imageLabel->setPixmap(currentPixmap.scaled(64, 64, Qt::KeepAspectRatio));
-}
+  QPoint position;
+  QRect desktop = QApplication::desktop()->screenGeometry();
+  position.setY(desktop.bottom() - 200);
+  position.setX(desktop.right() - 300);
+  move(position);
 
-void ImageAddProgress::setFinish(const QString &msg)
-{
-  nameLabel->setText(msg);
+  hide();
 }
 
 ImageAddProgress::~ImageAddProgress()
 {}
+
+void ImageAddProgress::setProgress(int finished, int total, const QString &currentName, const QImage &currentPixmap)
+{
+  show();
+  progressBar->setMaximum(total);
+  progressBar->setValue(finished);
+  nameLabel->setText(currentName);
+  imageLabel->setPixmap(QPixmap::fromImage(currentPixmap).scaled(64, 64, Qt::KeepAspectRatio));
+
+  if (finished == total) {
+    nameLabel->setText(tr("Copiing of pictures is successful."));
+    QTimer::singleShot(1000, this, SLOT(hide()));
+  }
+}
 
 }

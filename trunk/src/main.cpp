@@ -28,8 +28,11 @@
 #include <QtCore/QTranslator>
 #include <QtCore/QTextCodec>
 
-#include "core/data.h"
 #include "mainwindow.h"
+
+#include "core/data.h"
+
+#include "widgets/imageaddprogress.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +52,9 @@ int main(int argc, char *argv[])
 
   MainWindow *mainWindow = new MainWindow();
   mainWindow->show();
+
+  GCore::Data::self()->setMainWindow(mainWindow);
+  GCore::Data::self()->setImageAddProgress(new GWidgets::ImageAddProgress(mainWindow));
 
   return app.exec();
 }

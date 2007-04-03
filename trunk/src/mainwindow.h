@@ -22,11 +22,9 @@
 #define MAINWINDOW_H
 
 #include <QtGui/QMainWindow>
-#include "widgets/photoview.h"
-#include "widgets/gallerytreeview.h"
+//#include "widgets/photoview.h"
+//#include "widgets/gallerytreeview.h"
 #include "ui_mainwindow.h"
-
-class QProgressBar;
 
 namespace GCore
 {
@@ -36,7 +34,6 @@ class ImageModel;
 
 namespace GWidgets
 {
-class ImageAddProgress;
 }
 
 /**
@@ -68,19 +65,12 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      */
     void setEditMode(bool edit);
 
+  protected:
     /**
-     * Slot that sets the progress bar. Should be in private zone?
-     *
-     * @param finished How many units has finished.
-     * @param total Total number of units.
-     * @param current Name of the current image.
-     * @param currentImage The reference to the current thumbnail image.
-     *
-     * @see MainWindow#slotProgressHide
-     * @see MainWindow#slotProgressShow
-     * @see MainWindow#slotHideProgress
+     * Reimplemented method.
+     * Resets the status text to Ready.
      */
-    void slotStatusProgress(int finished, int total, const QString &current, const QImage &currentImage);
+    void timerEvent(QTimerEvent*);
 
   private:
     /**
@@ -97,9 +87,6 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      * Method for initialising docks.
      */
     void initDocks();
-
-    QProgressBar *m_progressBar;
-    GWidgets::ImageAddProgress *m_imageProgress;
 
   private slots:
     /**
@@ -129,33 +116,6 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      * @see MainWindow#slotDefaultBackground
      */
     void slotRoundBackground(bool checked);
-
-    /**
-     * Slot that sets to show the progress popup.
-     *
-     * @param checked Sets it if true, if false cheks what is selected.
-     *
-     * @see MainWindow#slotProgressHide
-     * @see MainWindow#slotStatusProgress
-     */
-    void slotProgressShow(bool checked);
-
-    /**
-     * Slot that sets to show the progress in the status bar.
-     *
-     * @param checked Sets it if true, if false cheks what is selected.
-     *
-     * @see MainWindow#slotProgressShow
-     * @see MainWindow#slotStatusProgress
-     */
-    void slotProgressHide(bool checked);
-
-    /**
-     * Slot that hides the progress bar/dialog.
-     *
-     * @see MainWindow#slotStatusProgress
-     */
-    void slotHideProgress();
 
     /**
      * Slot that enables or disables buttons.

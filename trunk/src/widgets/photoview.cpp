@@ -563,7 +563,11 @@ void PhotoView::dropEvent(QDropEvent *event)
 
   QMenu dropdownMenu(tr("Dropped images"), this);
   QAction *newDestination = dropdownMenu.addAction(QIcon(":/images/new.png"), tr("New gallery"));
+  newDestination->setStatusTip(tr("Create a new gallery with the dropped in images."));
+  newDestination->setParent(GCore::Data::self()->getMainWindow());
   QAction *existing = dropdownMenu.addAction(QIcon(":/images/add-existing.png"), tr("Existing gallery"));
+  existing->setStatusTip(tr("Insert the dropped in images into the selected gallery."));
+  existing->setParent(GCore::Data::self()->getMainWindow());
 
   if (m_rootIndex.data(GCore::ImageModel::ImageTypeRole).toInt() != GCore::ImageItem::Gallery)
     existing->setEnabled(false);
@@ -575,7 +579,7 @@ void PhotoView::dropEvent(QDropEvent *event)
     wizard->show();
   } else if (choice == existing) {
     qRegisterMetaType<QImage>("QImage");
-    connect(GCore::Data::self()->getImageModel()->addImages(m_rootIndex, path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getMainWindow(), SLOT(slotStatusProgress(int, int, const QString&, const QImage&)));
+    connect(GCore::Data::self()->getImageModel()->addImages(m_rootIndex, path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getImageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
   }
   
   event->acceptProposedAction();

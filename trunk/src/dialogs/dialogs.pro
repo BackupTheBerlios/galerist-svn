@@ -10,3 +10,9 @@ HEADERS += configuration.h \
            newgallerywizard.h
 SOURCES += configuration.cpp \
            newgallerywizard.cpp
+win32{
+    DEFINES += WANT_UPDATER
+
+    INCLUDEPATH += ../../src
+
+}

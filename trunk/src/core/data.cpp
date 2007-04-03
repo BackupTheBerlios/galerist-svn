@@ -20,11 +20,12 @@
  ***************************************************************************/
 #include "data.h"
 
-#include <QtGui/QApplication>
 #include <QtCore/QDir>
+#include <QtCore/QSettings>
+
+#include <QtGui/QApplication>
 #include <QtGui/QDirModel>
 #include <QtGui/QCompleter>
-#include <QtCore/QSettings>
 #include <QtGui/QMenu>
 #include <QtGui/QSortFilterProxyModel>
 
@@ -42,8 +43,6 @@ Data *Data::m_self = 0;
 Data::Data(QObject *parent)
     : QObject(parent),
     m_errorHandler(0),
-    m_backgroundType(NotDefined),
-    m_progressDialog(Unknown),
     m_imageModel(0),
     m_photoControl(0),
     m_photoContextMenu(0),
@@ -53,7 +52,8 @@ Data::Data(QObject *parent)
     m_updater(0),
 #endif
     m_mainWindow(0),
-    m_modelProxy(0)
+    m_modelProxy(0),
+    m_imageAddProgress(0)
 
 {
   m_self = this;
@@ -131,12 +131,12 @@ ErrorHandler *Data::getErrorHandler()
   return m_errorHandler;
 }
 
-QStringList Data::getImageFormats()
+QStringList Data::getImageFormats() const
 {
   return m_imageFormats;
 }
 
-QString Data::getGalleriesPath()
+QString Data::getGalleriesPath() const
 {
   QDir galleriesPath(QDir::homePath() + "/.goya/galleries");
   if (!galleriesPath.exists()) {
@@ -147,7 +147,7 @@ QString Data::getGalleriesPath()
   return QDir::toNativeSeparators(galleriesPath.absolutePath());
 }
 
-QString Data::getSettingsPath()
+QString Data::getSettingsPath() const
 {
   QDir settingsPath(QDir::homePath() + "/.goya");
   if (!settingsPath.exists()) {
@@ -167,58 +167,29 @@ ImageModel *Data::getImageModel()
   return m_imageModel;
 }
 
-QCompleter *Data::getDirCompleter()
+QCompleter *Data::getDirCompleter() const
 {
   return m_dirCompleter;
 }
 
-void Data::setBackgroundType(BackgroundType type)
+void Data::setBackgroundType(BackgroundType type) const
 {
   m_settings->setValue("BackgroundType", type);
-  m_backgroundType = type;
 }
 
-GCore::Data::BackgroundType Data::getBackgroundType()
+GCore::Data::BackgroundType Data::getBackgroundType() const
 {
-  // If the value hasn't been fetched before, we get it now
-  if (m_backgroundType == NotDefined)
-    m_backgroundType = static_cast<BackgroundType>(m_settings->value("BackgroundType", Default).toInt());
-
-  // Return the value
-  return m_backgroundType;
+  return static_cast<BackgroundType>(m_settings->value("BackgroundType", Default).toInt());
 }
 
-void Data::setProgressDialog(ProgressDialog showOption)
-{
-  m_settings->setValue("ProgressDialog", showOption);
-  m_progressDialog = showOption;
-}
-
-GCore::Data::ProgressDialog Data::getProgressDialog()
-{
-  // If the value hasn't been fetched before, we get it now
-  if (m_progressDialog == Unknown)
-    m_progressDialog = static_cast<ProgressDialog>(m_settings->value("ProgressDialog", Show).toInt());
-
-  // Return the value
-  return m_progressDialog;
-}
-
-void Data::setOpengl(bool enable)
+void Data::setOpengl(bool enable) const
 {
   m_settings->setValue("OpenGlRendering", enable);
-  m_opengl = enable;
 }
 
-bool Data::getOpengl()
+bool Data::getOpengl() const
 {
-  QString temp;
-
-  // If the value hasn't been fetched before, we get it now
-  m_opengl = m_settings->value("OpenGlRendering", false).toBool();
-
-  // Return the value
-  return m_opengl;
+  return m_settings->value("OpenGlRendering", false).toBool();
 }
 
 void Data::setPhotoControl(GWidgets::PhotoControl *photoControl)
@@ -226,27 +197,27 @@ void Data::setPhotoControl(GWidgets::PhotoControl *photoControl)
   m_photoControl = photoControl;
 }
 
-GWidgets::PhotoControl *Data::getPhotoControl()
+GWidgets::PhotoControl *Data::getPhotoControl() const
 {
   return m_photoControl;
 }
 
-void Data::setUpdateStartup(bool enable)
+void Data::setUpdateStartup(bool enable) const
 {
   m_settings->setValue("UpdateAtStartup", enable);
 }
 
-bool Data::getUpdateStartup()
+bool Data::getUpdateStartup() const
 {
   return m_settings->value("UpdateAtStartup", true).toBool();
 }
 
-void Data::setPhotoEditor(const QString &filePath)
+void Data::setPhotoEditor(const QString &filePath) const
 {
   m_settings->setValue("EditorPath", filePath);
 }
 
-QString Data::getPhotoEditor()
+QString Data::getPhotoEditor() const
 {
   return QDir::toNativeSeparators(m_settings->value("EditorPath").toString());
 }
@@ -299,43 +270,33 @@ QMenu *Data::getGalleryContextMenu()
   }
 }
 
-void Data::setEnableToolTips(bool enable)
-{
-  m_settings->setValue("ToolTips", enable);
-}
-
-bool Data::getEnableToolTips()
-{
-  return m_settings->value("ToolTips", true).toBool();
-}
-
-QStringList Data::getAvailableTranslations()
+QStringList Data::getAvailableTranslations() const
 {
   return QStringList(m_availableTranslations.keys());
 }
 
-void Data::setTranslation(const QString &name)
+void Data::setTranslation(const QString &name) const
 {
   m_settings->setValue("TranslationName", name);
   m_settings->setValue("TranslationFilepath", m_availableTranslations.value(name));
 }
 
-QString Data::getTranslationName()
+QString Data::getTranslationName() const
 {
   return m_settings->value("TranslationName", "English").toString();
 }
 
-QString Data::getTranslationFilePath()
+QString Data::getTranslationFilePath() const
 {
   return QDir::toNativeSeparators(m_settings->value("TranslationFilepath", QString()).toString());
 }
 
-QString Data::getTranslationFileName()
+QString Data::getTranslationFileName() const
 {
   return getTranslationName().toLower().append(".qm");
 }
 
-QString Data::getTranslationPath()
+QString Data::getTranslationPath() const
 {
   return QDir::toNativeSeparators(getTranslationFilePath().remove(getTranslationName().toLower().append(".qm")));
 }
@@ -346,7 +307,7 @@ void Data::setMainWindow(QWidget *mainWindow)
   //setParent(m_mainWindow);
 }
 
-QWidget *Data::getMainWindow()
+QWidget *Data::getMainWindow() const
 {
   return m_mainWindow;
 }
@@ -373,7 +334,7 @@ GNetwork::Updater *Data::getUpdater()
 }
 #endif
 
-QString Data::getAppName()
+QString Data::getAppName() const
 {
   return qApp->applicationName();
 }
@@ -383,7 +344,7 @@ void Data::setAppVersion(const QString &version)
   m_appVersion = version;
 }
 
-QString Data::getAppVersion()
+QString Data::getAppVersion() const
 {
   return m_appVersion;
 }
@@ -394,12 +355,12 @@ void Data::setSupportedFormats(const QRegExp &supportedFormats)
   m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
 }
 
-QRegExp Data::getSupportedFormats()
+QRegExp Data::getSupportedFormats() const
 {
   return m_supportedFormats;
 }
 
-void Data::saveChanges()
+void Data::saveChanges() const
 {
   m_settings->sync();
 }
@@ -421,10 +382,20 @@ GWidgets::SearchBar* Data::getSearchBar() const
   return m_searchBar;
 }
 
-
 void Data::setSearchBar(GWidgets::SearchBar* searchBar)
 {
   m_searchBar = searchBar;
 }
 
+QWidget* Data::getImageAddProgress() const
+{
+  return m_imageAddProgress;
 }
+
+void Data::setImageAddProgress(QWidget* imageAddProgress)
+{
+  m_imageAddProgress = imageAddProgress;
+}
+
+}
+

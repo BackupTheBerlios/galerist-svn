@@ -30,7 +30,7 @@ namespace GWidgets
 /**
  * Class for showing the progress of the adding photos to the existing gallery.
  * @short Class with a progress bar etc.
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališ¡nik <gregor@podnapisi.net>
  */
 class ImageAddProgress : public QWidget, private Ui::ImageAddProgress
 {
@@ -44,24 +44,23 @@ class ImageAddProgress : public QWidget, private Ui::ImageAddProgress
     ImageAddProgress(QWidget *parent = 0);
 
     /**
+     * Default destructor.
+     */
+    ~ImageAddProgress();
+
+  public slots:
+    /**
      * Method for setting progress.
      *
      * @param finished Number of finished units (unit = photo).
      * @param total Number of total units (unit = photo).
      * @param currentPixmap The thumbnail of the current processed photo.
      */
-    void setProgress(int finished, int total, const QString &currentName, const QPixmap &currentPixmap);
-    /**
-     * Method to finish the progress.
-     *
-     * @param msg Message to show at finish.
-     */
-    void setFinish(const QString &msg);
+    void setProgress(int finished, int total, const QString &currentName, const QImage &currentPixmap);
 
-    /**
-     * Default destructor.
-     */
-    ~ImageAddProgress();
+  private:
+    
+  private slots:
 
 };
 

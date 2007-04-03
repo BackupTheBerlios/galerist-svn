@@ -20,13 +20,12 @@
  ***************************************************************************/
 #include "tooltip.h"
 
-#include "core/data.h"
+#include <QtCore/QTimer>
 
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <QtGui/QRegion>
 #include <QtGui/QPolygon>
-#include <QtCore/QTimer>
 #include <QtGui/QToolTip>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -103,11 +102,6 @@ TipLabel::~TipLabel()
 
 void ToolTip::showMessage(const QString &text, QWidget *parent, const QPoint &pos)
 {
-  if (!GCore::Data::self()->getEnableToolTips()) {
-    QToolTip::showText(pos, text, parent);
-    return;
-  }
-
   if (TipLabel::m_tipLabel) {
     if (TipLabel::m_tipLabel->text() == text)
       return;
