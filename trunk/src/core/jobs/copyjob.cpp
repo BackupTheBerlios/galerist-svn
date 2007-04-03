@@ -126,9 +126,9 @@ void CopyJob::singleCopy()
 
     // Copy the image.
     if (!QFile::copy(m_source->absoluteFilePath(*count), m_destination->absoluteFilePath(fileName))) {
-      //ErrorHandler::reportMessage(tr("Copy failed for %1 .").arg(m_source->absoluteFilePath(*count)), ErrorHandler::Critical);
       emit signalFailed(tr("Copy failed for %1 .").arg(m_source->absoluteFilePath(*count)), ErrorHandler::Critical);
-      break;
+      fileName = "~ERROR~";
+      //break;
     }
 
     // We finished with this picture. Notifying the model class
