@@ -33,38 +33,15 @@ namespace GDialogs {
 NewGalleryWizard::NewGalleryWizard(QWidget *parent)
  : QWizard(parent)
 {
-  setWindowTitle(tr("Create a new gallery"));
-
-  setDefaultProperty("QComboBox", "currentText", "currentIndexChanged()");
-
-  setOption(QWizard::DisabledBackButtonOnLastPage);
-
-  addPage(new GWidgets::GWizard::WelcomePage);
-  addPage(new GWidgets::GWizard::SelectionPage);
-  addPage(new GWidgets::GWizard::SummaryPage);
-  m_copyPage = addPage(new GWidgets::GWizard::CopyPage);
-  addPage(new GWidgets::GWizard::FinishPage);
-
-  setPixmap(QWizard::LogoPixmap, QPixmap(":/images/galerist.png").scaled(55, 55, Qt::KeepAspectRatio));
+  setupUi();
 }
 
 NewGalleryWizard::NewGalleryWizard(const QString &path, const QStringList &images, QWidget *parent)
   : QWizard(parent)
 {
-  setWindowTitle(tr("Create a new gallery"));
-
-  setDefaultProperty("QComboBox", "currentText", "currentIndexChanged()");
-
-  setOption(QWizard::DisabledBackButtonOnLastPage);
-
-  addPage(new GWidgets::GWizard::WelcomePage);
-  GWidgets::GWizard::SelectionPage *selectionPage = new GWidgets::GWizard::SelectionPage;
-  addPage(selectionPage);
-  addPage(new GWidgets::GWizard::SummaryPage);
-  m_copyPage = addPage(new GWidgets::GWizard::CopyPage);
-  addPage(new GWidgets::GWizard::FinishPage);
-
-  setPixmap(QWizard::LogoPixmap, QPixmap(":/images/galerist.png").scaled(55, 55, Qt::KeepAspectRatio));
+  setupUi();
+  
+  GWidgets::GWizard::SelectionPage *selectionPage = static_cast<GWidgets::GWizard::SelectionPage*> (page(m_selectionPage));
 
   selectionPage->setPredefinedImages(path, images);
 }
@@ -87,6 +64,30 @@ void NewGalleryWizard::reject()
     if (currentId() == m_copyPage)
       static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->resumeCopy();
   }
+}
+
+void NewGalleryWizard::setupUi()
+{
+  setWindowTitle(tr("Create a new gallery"));
+
+  setDefaultProperty("QComboBox", "currentText", "currentIndexChanged()");
+
+  setOption(QWizard::DisabledBackButtonOnLastPage);
+
+  addPage(new GWidgets::GWizard::WelcomePage);
+  m_selectionPage = addPage(new GWidgets::GWizard::SelectionPage);
+  addPage(new GWidgets::GWizard::SummaryPage);
+  m_copyPage = addPage(new GWidgets::GWizard::CopyPage);
+  addPage(new GWidgets::GWizard::FinishPage);
+
+  setPixmap(QWizard::LogoPixmap, QPixmap(":/images/galerist.png").scaled(55, 55, Qt::KeepAspectRatio));
+  setPixmap(QWizard::BannerPixmap, QPixmap(":/images/newgallerywizard-banner.png"));
+  setPixmap(QWizard::BackgroundPixmap, QPixmap(":/images/galerist-big.png"));
+
+  if (wizardStyle() == QWizard::MacStyle)
+    setFixedSize(770, 570);
+  else
+    setFixedSize(580, 570);
 }
 
 }

@@ -84,7 +84,9 @@ void SelectionPage::initializePage()
     connect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
 
     // Insert the path to the home directory
-    setField("GalleryPath", QDir::homePath());
+    // Only if there is no predefined images!
+    if (!previewList->count())
+      setField("GalleryPath", QDir::homePath());
 
     // Lets make sure we won't be initialising twice
     m_initialised = true;
@@ -104,6 +106,10 @@ void SelectionPage::setPredefinedImages(const QString &path, const QStringList &
   imagesEdit->setText(path);
   imagesEdit->setEnabled(false);
   makePreview(path, images);
+  setField("GalleryPath", path);
+
+  slotCheckImagesPath(path);
+  browseButton->setEnabled(false);
 }
 
 bool SelectionPage::checkImagesPath(const QString &path) const

@@ -76,15 +76,20 @@ class CopyPage : public QWizardPage, private Ui::CopyPage
      * @see GCore::GJobs::AbstractJob#stop()
      */
     void stopCopy();
-    
+
     /**
-     * Initiates the cancelation process.
+     * Predefines list of images.
+     *
+     * @param path Location of the images.
+     * @param images List of added images.
      */
-    void startCancelProcess();
+    void setPredefinedImages(const QString &path, const QStringList &images);
 
   private:
     bool m_finished;
     QObject *m_copyProcess;
+    QString m_predefinedPath;
+    QStringList m_prefedinedImages;
 
   private slots:
     /**

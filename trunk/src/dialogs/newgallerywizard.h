@@ -55,11 +55,18 @@ class NewGalleryWizard : public QWizard
 
     /**
      * Reimplemented method.
+     * Asks the user if he really wants to stop the wizard. And also reverts the copy.
      */
     void reject();
 
+    /**
+     * Setups the UI.
+     */
+    void setupUi();
+
   private:
     int m_copyPage;
+    int m_selectionPage;
 
 };
 

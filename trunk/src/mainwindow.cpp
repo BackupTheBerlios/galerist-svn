@@ -218,7 +218,6 @@ void MainWindow::slotNew()
 {
   //We create a wizard for creation a new gallery.
   GDialogs::NewGalleryWizard *newWizard = new GDialogs::NewGalleryWizard(this);
-  newWizard->resize(600, 500);
   newWizard->show();
 }
 

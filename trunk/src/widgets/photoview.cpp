@@ -511,6 +511,20 @@ void PhotoView::contextMenuEvent(QContextMenuEvent *event)
 void PhotoView::dragEnterEvent(QDragEnterEvent *event)
 {
   //if (m_rootIndex.data(GCore::ImageModel::ImageTypeRole).toInt() == GCore::ImageItem::Gallery)
+  QList<QUrl> imageUrls = event->mimeData()->urls();
+  QList<QUrl>::const_iterator end = imageUrls.constEnd();
+
+  bool haveImages = false;
+
+  for (QList<QUrl>::const_iterator count = imageUrls.constBegin(); count != end; count++) {
+    QString path = (*count).toLocalFile();
+    if (path.contains(GCore::Data::self()->getSupportedFormats())) {
+      haveImages = true;
+      break;
+    }
+  }
+
+  if (haveImages)
     event->acceptProposedAction();
 }
 
@@ -535,7 +549,7 @@ void PhotoView::dropEvent(QDropEvent *event)
 
   for (QList<QUrl>::const_iterator count = imageUrls.constBegin(); count != end; count++) {
     QString path = (*count).toLocalFile();
-    if (!path.isEmpty())
+    if (!path.isEmpty() && path.contains(GCore::Data::self()->getSupportedFormats()))
       imagePaths << path;
   }
 
@@ -549,13 +563,10 @@ void PhotoView::dropEvent(QDropEvent *event)
 
   QMenu dropdownMenu(tr("Dropped images"), this);
   QAction *newDestination = dropdownMenu.addAction(QIcon(":/images/new.png"), tr("New gallery"));
-  QAction *existing = dropdownMenu.addAction(tr("Existing gallery"));
+  QAction *existing = dropdownMenu.addAction(QIcon(":/images/add-existing.png"), tr("Existing gallery"));
 
   if (m_rootIndex.data(GCore::ImageModel::ImageTypeRole).toInt() != GCore::ImageItem::Gallery)
     existing->setEnabled(false);
-
-  //qRegisterMetaType<QImage>("QImage");
-  //connect(GCore::Data::self()->getImageModel()->addImages(m_rootIndex, path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getMainWindow(), SLOT(slotStatusProgress(int, int, const QString&, const QImage&)));
 
   QAction *choice = dropdownMenu.exec(mapToGlobal(event->pos()));
 
@@ -563,7 +574,8 @@ void PhotoView::dropEvent(QDropEvent *event)
     GDialogs::NewGalleryWizard *wizard = new GDialogs::NewGalleryWizard(path, pictures, this);
     wizard->show();
   } else if (choice == existing) {
-    qDebug("Not implemented!");
+    qRegisterMetaType<QImage>("QImage");
+    connect(GCore::Data::self()->getImageModel()->addImages(m_rootIndex, path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getMainWindow(), SLOT(slotStatusProgress(int, int, const QString&, const QImage&)));
   }
   
   event->acceptProposedAction();

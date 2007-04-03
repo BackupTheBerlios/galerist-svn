@@ -58,12 +58,6 @@ void CopyPage::initializePage()
   // We copy the images to the right place
   m_copyProcess = GCore::Data::self()->getImageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery);
   
-  // We close the wizard if the copy failed
-  /*if (!copyProcess) {
-  getWizard->reject();
-  return;
-}*/
-  
   // Connect the gallery handler.
   qRegisterMetaType<QImage>("QImage");
 
@@ -102,6 +96,12 @@ void CopyPage::stopCopy()
   copyJob->stop();
   m_copyProcess = 0;
   copyJob = 0;
+}
+
+void CopyPage::setPredefinedImages(const QString &path, const QStringList &images)
+{
+  m_predefinedPath = path;
+  m_prefedinedImages = images;
 }
 
 void CopyPage::slotProgress(int finished, int total, const QString &current, const QImage &image)
