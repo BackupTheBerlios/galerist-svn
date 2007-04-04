@@ -72,6 +72,7 @@
     <addaction name="actionPreview" />
     <addaction name="actionRename" />
     <addaction name="actionDescribe" />
+    <addaction name="actionExif" />
     <addaction name="actionRemove" />
     <addaction name="separator" />
     <addaction name="menuSelection" />
@@ -370,6 +371,14 @@
    </property>
    <property name="statusTip" >
     <string>Checks for the updates.</string>
+   </property>
+  </action>
+  <action name="actionExif" >
+   <property name="text" >
+    <string>View &amp;EXIF information</string>
+   </property>
+   <property name="statusTip" >
+    <string>Shows a dialog with EXIF information.</string>
    </property>
   </action>
  </widget>

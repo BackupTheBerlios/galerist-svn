@@ -37,7 +37,7 @@ namespace GWidgets
 }
 
 /**
- * @author Gregor Kalisnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  * @short Main window
  * Main window for Goya.
  */
@@ -138,6 +138,11 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      * Slot that popups the open images dialog.
      */
     void slotAddImages();
+
+    /**
+     * This slot shouldn't exist! It's temporary!
+     */
+    void showEXIF();
 
 };
 

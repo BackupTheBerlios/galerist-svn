@@ -33,8 +33,8 @@ widgets/wizard/libwizard.a \
 dialogs/libdialogs.a \
 translations/libtranslations.a
 }unix{
-target.path = $${PREFIX}/bin
-INSTALLS += target
+    target.path = $${PREFIX}/bin
+    INSTALLS += target
     LIBS += core/libcore.a \
 core/network/libnetwork.a \
 core/jobs/libjobs.a \
@@ -68,3 +68,5 @@ core/jobs/jobs.lib
 win32{
     DEFINES += WANT_UPDATER
 }
+LIBS += -lexif
+

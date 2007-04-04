@@ -10,12 +10,14 @@ HEADERS += data.h \
            errorhandler.h \
            imageitem.h \
            imagemodel.h \
-           metadatamanager.h
+           metadatamanager.h \
+           exifmanager.h
 SOURCES += data.cpp \
            errorhandler.cpp \
            imageitem.cpp \
            imagemodel.cpp \
-           metadatamanager.cpp
+           metadatamanager.cpp \
+           exifmanager.cpp
 win32{
     DEFINES += WANT_UPDATER
 }

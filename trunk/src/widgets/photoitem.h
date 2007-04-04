@@ -37,7 +37,7 @@ class PhotoDescription;
 /**
  * Class that represents the rectangle around the photo.
  * @short Rectangle.
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališ¡nik <gregor@podnapisi.net>
  */
 class PhotoRect : public QGraphicsRectItem
 {

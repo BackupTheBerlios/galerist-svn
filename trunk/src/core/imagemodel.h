@@ -39,7 +39,7 @@ class CopyJob;
 
 /**
  * @short The model with images and all of it's data.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class ImageModel : public QAbstractItemModel
 {
