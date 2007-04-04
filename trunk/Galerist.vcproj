@@ -157,6 +157,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\core\exifmanager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\core\exifmanager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\core\imageitem.cpp"
 					>
 				</File>
