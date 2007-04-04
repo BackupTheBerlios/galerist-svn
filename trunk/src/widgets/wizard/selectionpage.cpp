@@ -155,8 +155,10 @@ void SelectionPage::makePreview(const QString &path, const QStringList &images) 
 void SelectionPage::slotBrowseClicked()
 {
   QString directory = QFileDialog::getExistingDirectory(0, tr("Select the directory with images for you gallary."), imagesEdit->text());
-  if (!directory.isEmpty())
+  if (!directory.isEmpty()) {
+    m_readJob = 0;
     imagesEdit->setText(directory);
+  }
 }
 
 void SelectionPage::slotCheckImagesPath(const QString &path)
