@@ -58,7 +58,7 @@ QDateTime ExifManager::getCreationDate() const
   QDateTime creationDate;
 
   QString date = parse(exif_data_get_entry(m_data, EXIF_TAG_DATE_TIME_ORIGINAL));
-  if (!date.isEmpty()) {
+  if (date != tr("Unavailable")) {
     QStringList datePart = date.split(" ").at(0).split(":");
     QStringList timePart = date.split(" ").at(1).split(":");
 
