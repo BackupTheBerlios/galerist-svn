@@ -41,12 +41,14 @@ core/jobs/libjobs.a \
 dialogs/libdialogs.a \
 widgets/libwidgets.a \
 widgets/wizard/libwizard.a \
+widgets/photowidgets/libphotowidgets.a \
 translations/libtranslations.a
     TARGETDEPS += core/network/libnetwork.a \
 core/jobs/libjobs.a \
 core/libcore.a \
 widgets/libwidgets.a \
 widgets/wizard/libwizard.a \
+widgets/photowidgets/libphotowidgets.a \
 dialogs/libdialogs.a \
 translations/libtranslations.a
 }

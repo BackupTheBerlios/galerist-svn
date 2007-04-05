@@ -51,6 +51,12 @@ namespace GWidgets {
  */
 namespace GWizard {
 }
+/**
+ * A special kind of widgets that are used inside a QGraphicsView and can't be used in normal Qt dialogs.
+ * @short Widgets used in PhotoView.
+ */
+namespace PhotoWidgets {
+}
 }
 
 

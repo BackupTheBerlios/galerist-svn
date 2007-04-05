@@ -53,8 +53,6 @@
 
 #include <QtOpenGL/QGLWidget>
 
-#include <QtCore/QtDebug>
-
 namespace GWidgets
 {
 
