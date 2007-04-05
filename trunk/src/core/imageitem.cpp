@@ -25,6 +25,8 @@
 
 #include "core/metadatamanager.h"
 
+#include <Magick++.h>
+
 namespace GCore
 {
 
@@ -204,6 +206,37 @@ void ImageItem::setDescription(const QString &description)
 bool ImageItem::remove()
 {
   return metadata()->removePicture(m_id);
+}
+
+void ImageItem::rotateCW()
+{
+  Magick::Image image;
+  QDir dir(getFilePath());
+
+  try {
+    image.read(getFilePath().toStdString());
+    image.rotate(270);
+    image.write(getFilePath().toStdString());
+  }
+  catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return;
+  }
+}
+
+void ImageItem::rotateCCW()
+{
+  Magick::Image image;
+
+  try {
+    image.read(getFilePath().toStdString());
+    image.rotate(90);
+    image.write(getFilePath().toStdString());
+  }
+  catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return;
+  }
 }
 
 QString ImageItem::getThumbName()

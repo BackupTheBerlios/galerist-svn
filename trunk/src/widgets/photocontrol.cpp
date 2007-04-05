@@ -20,6 +20,10 @@
  ***************************************************************************/
 #include "photocontrol.h"
 
+#include "widgets/photoview.h"
+
+#include "core/data.h"
+
 #include <QtGui/QComboBox>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
@@ -33,6 +37,8 @@ PhotoControl::PhotoControl(QWidget *parent)
     : QWidget(parent)
 {
   setupUi(this);
+
+
 }
 
 QPushButton *PhotoControl::getBackButton()
@@ -78,6 +84,16 @@ QPushButton *PhotoControl::getEditButton()
 QPushButton *PhotoControl::getExitButton()
 {
   return exitButton;
+}
+
+QPushButton * PhotoControl::getRotateCWButton()
+{
+  return rotateCWButton;
+}
+
+QPushButton * PhotoControl::getRotateCCWButton()
+{
+  return rotateCCWButton;
 }
 
 PhotoControl::~PhotoControl()

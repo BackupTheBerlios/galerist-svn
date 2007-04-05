@@ -33,7 +33,7 @@ class MetaDataManager;
 
 /**
  * @short Class that represends a tree of images.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class ImageItem
 {
@@ -183,6 +183,16 @@ class ImageItem
      * @return @c false Removal was unsuccesful.
      */
     bool remove();
+
+    /**
+     * Rotates for 90 degrees into clock-wise direction.
+     */
+    void rotateCW();
+
+    /**
+     * Rotates for 90 degrees into counter clock-wise direction.
+     */
+    void rotateCCW();
 
   private:
     QList<ImageItem*> m_childItems;

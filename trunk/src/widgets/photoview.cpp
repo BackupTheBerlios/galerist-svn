@@ -187,6 +187,22 @@ void PhotoView::setFilter(const QString &filter)
   rearrangeItems();
 }
 
+void PhotoView::rotateSelectedImageCW()
+{
+  if (!m_editMode)
+    return;
+
+  GCore::Data::self()->getImageModel()->rotate(indexForItem(m_currentEdited), GCore::ImageModel::ClockWise);
+}
+
+void PhotoView::rotateSelectedImageCCW()
+{
+  if (!m_editMode)
+    return;
+
+  GCore::Data::self()->getImageModel()->rotate(indexForItem(m_currentEdited), GCore::ImageModel::CounterClockWise);
+}
+
 PhotoItem *PhotoView::itemForIndex(const QModelIndex &index)
 {
   // !index.isValid() || m_itemVector.count() < index.row()
@@ -892,6 +908,9 @@ void PhotoView::slotConnectNavButtons()
   connect(GCore::Data::self()->getPhotoControl()->getZoomInputButton(), SIGNAL(clicked()), this, SLOT(slotZoomInputPhoto()));
   connect(GCore::Data::self()->getPhotoControl()->getEditButton(), SIGNAL(clicked()), this, SLOT(slotEditPhoto()));
   connect(GCore::Data::self()->getPhotoControl()->getExitButton(), SIGNAL(clicked()), this, SLOT(slotExitEdit()));
+
+  connect(GCore::Data::self()->getPhotoControl()->getRotateCWButton(), SIGNAL(clicked()), this, SLOT(rotateSelectedImageCW()));
+  connect(GCore::Data::self()->getPhotoControl()->getRotateCCWButton(), SIGNAL(clicked()), this, SLOT(rotateSelectedImageCCW()));
 
   GCore::Data::self()->getSearchBar()->setListFilter(this);
 }

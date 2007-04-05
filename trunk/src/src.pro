@@ -70,5 +70,5 @@ core/jobs/jobs.lib
 win32{
     DEFINES += WANT_UPDATER
 }
-LIBS += -lexif
-
+LIBS += -lMagick++ \
+-lexif

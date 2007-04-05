@@ -190,6 +190,16 @@ class PhotoView : public QGraphicsView
      */
     void setFilter(const QString &filter);
 
+    /**
+     * Rotates the current image (edit mode only) clock-wise.
+     */
+    void rotateSelectedImageCW();
+
+    /**
+     * Rotates the current image (edit mode only) counter clock-wise.
+     */
+    void rotateSelectedImageCCW();
+
   protected:
     /**
      * Rearrange the items to new positions.

@@ -707,6 +707,25 @@ void ImageModel::stopCopy()
   }
 }
 
+void ImageModel::rotate(const QModelIndex &index, int direction) const
+{
+  if (!index.isValid())
+    return;
+
+  ImageItem *item = static_cast<ImageItem*> (index.internalPointer());
+
+  switch (direction) {
+    case (ClockWise) : {
+      item->rotateCW();
+      break;
+    }
+    case (CounterClockWise) : {
+      item->rotateCCW();
+      break;
+    }
+  }
+}
+
 void ImageModel::setupModelData(const QString &path) const
 {
   processPath(QDir(QDir::fromNativeSeparators(path)));

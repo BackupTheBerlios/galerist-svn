@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/" >
+        <file>images/add-existing.png</file>
         <file>images/add.png</file>
         <file>images/back.png</file>
         <file>images/cancel.png</file>
@@ -14,6 +15,7 @@
         <file>images/folder-open.png</file>
         <file>images/folder.png</file>
         <file>images/forward.png</file>
+        <file>images/galerist-big.png</file>
         <file>images/galerist.png</file>
         <file>images/hide-progress.png</file>
         <file>images/image-big.png</file>
@@ -22,8 +24,11 @@
         <file>images/input_wrong.png</file>
         <file>images/loading.png</file>
         <file>images/new.png</file>
+        <file>images/newgallerywizard-banner.png</file>
         <file>images/remove.png</file>
         <file>images/rename.png</file>
+        <file>images/rotate_ccw.png</file>
+        <file>images/rotate_cw.png</file>
         <file>images/round-rect.png</file>
         <file>images/show-progress.png</file>
         <file>images/upgrade.png</file>
@@ -32,8 +37,5 @@
         <file>images/zoomin.png</file>
         <file>images/zoomout.png</file>
         <file>images/zoomscreen.png</file>
-        <file>images/add-existing.png</file>
-        <file>images/newgallerywizard-banner.png</file>
-        <file>images/galerist-big.png</file>
     </qresource>
 </RCC>

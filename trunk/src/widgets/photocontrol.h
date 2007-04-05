@@ -34,7 +34,7 @@ namespace GWidgets
 /**
  * Class that represents the control buttons for controlling photos.
  * @short Control buttons.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class PhotoControl : public QWidget, private Ui::PhotoControl
 {
@@ -99,6 +99,9 @@ class PhotoControl : public QWidget, private Ui::PhotoControl
      * @return Reference of the exit button.
      */
     QPushButton *getExitButton();
+
+    QPushButton *getRotateCWButton();
+    QPushButton *getRotateCCWButton();
 
     /**
      * Default destructor.

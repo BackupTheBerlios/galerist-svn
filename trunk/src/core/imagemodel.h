@@ -83,6 +83,17 @@ class ImageModel : public QAbstractItemModel
     };
 
     /**
+     * Directions for rotating images.
+     */
+    enum Rotation
+    {
+      /** Clock-wise direction. */
+      ClockWise,
+      /** Counter clock-wise direction */
+      CounterClockWise
+    };
+
+    /**
      * A constructor.
      *
      * @param path Path of the galleries.
@@ -268,6 +279,11 @@ class ImageModel : public QAbstractItemModel
      * Stops the copy process.
      */
     void stopCopy();
+
+    /**
+     * Rotates the image for 90 degress. Clocl-wise or counter clock-wise.
+     */
+    void rotate(const QModelIndex &index, int direction = ClockWise) const;
 
   protected:
 
