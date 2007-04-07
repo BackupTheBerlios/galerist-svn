@@ -20,6 +20,8 @@
  ***************************************************************************/
 #include "imageitem.h"
 
+#include <QtCore/QTimer>
+
 #include <QtGui/QImage>
 
 #include "core/data.h"
@@ -37,7 +39,9 @@ ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
     m_type(type),
     m_path(path),
     m_metadata(0),
-    m_id(-1)
+    m_id(-1),
+    m_image(0),
+    m_changes(false)
 {
   m_itemData << getFileName();
 
@@ -212,57 +216,110 @@ bool ImageItem::remove()
 
 void ImageItem::rotateCW()
 {
-  Magick::Image image;
-  QDir dir(getFilePath());
-  dir.cdUp();
-
-  try {
-    image.read(getFilePath().toStdString());
-    image.rotate(90);
-    image.write(getFilePath().toStdString());
-
-    Magick::Blob blob;
-    image.write(&blob);
-
-    dir.cd(".thumbnails");
-
-    QImage newThumb(image.rows(), image.columns(), QImage::Format_RGB32);
-    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
-    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(getThumbName()));
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
+  if (!m_image)
     return;
-  }
+
+  m_image->rotate(90);
+  QTimer::singleShot(1000, this, SLOT(saveRotation()));
 }
 
 void ImageItem::rotateCCW()
 {
-  Magick::Image image;
-  QDir dir(getFilePath());
-  dir.cdUp();
-
-  try {
-    image.read(getFilePath().toStdString());
-    image.rotate(270);
-    image.write(getFilePath().toStdString());
-
-    Magick::Blob blob;
-    image.write(&blob);
-
-    dir.cd(".thumbnails");
-
-    QImage newThumb(image.rows(), image.columns(), QImage::Format_RGB32);
-    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
-    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(getThumbName()));
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
+  if (!m_image)
     return;
-  }
+
+  m_image->rotate(270);
+  QTimer::singleShot(1000, this, SLOT(saveRotation()));
 }
 
 QString ImageItem::getThumbName()
 {
   return getFileName().remove(QRegExp("\\..+$")).append(".jpg");
+}
+
+void ImageItem::loadImage()
+{
+  m_image = new Magick::Image();
+
+  try {
+    m_image->read(getFilePath().toStdString());
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return;
+  }
+}
+
+void ImageItem::saveImage()
+{
+  if (!m_image)
+    return;
+
+  QDir dir(getFilePath());
+  dir.cdUp();
+
+  try {
+    m_image->write(getFilePath().toStdString());
+
+    Magick::Blob blob;
+    m_image->write(&blob);
+
+    dir.cd(".thumbnails");
+
+    QImage newThumb(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
+    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
+    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(getThumbName()));
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return;
+  }
+
+  delete m_image;
+  m_image = 0;
+}
+
+void ImageItem::closeImage()
+{
+  if (!m_image)
+    return;
+
+  delete m_image;
+  m_image = 0;
+}
+
+void ImageItem::prepareForEdit(bool open)
+{
+  if (open) {
+    loadImage();
+  } else {
+    if (m_changes)
+      saveImage();
+    closeImage();
+  }
+}
+
+void ImageItem::saveRotation()
+{
+  if (!m_image)
+    return;
+
+  QDir dir(getFilePath());
+  dir.cdUp();
+
+  try {
+    m_image->write(getFilePath().toStdString());
+
+    Magick::Blob blob;
+    m_image->write(&blob);
+
+    dir.cd(".thumbnails");
+
+    QImage newThumb(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
+    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
+    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(getThumbName()));
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return;
+  }
 }
 
 }

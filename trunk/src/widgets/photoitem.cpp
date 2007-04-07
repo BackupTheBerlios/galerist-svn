@@ -316,8 +316,8 @@ QPointF PhotoItem::getScaledSize()
 
 void PhotoItem::fullSizePixmap()
 {
-  if (!m_editMode)
-    return;
+  /*if (!m_editMode)
+    return;*/
 
   if (!m_fullsizePixmap) {
     m_view->showLoading(true);
@@ -505,11 +505,11 @@ void PhotoItem::changeImage(const QImage &image)
 
 void PhotoItem::slotEdit(bool edit)
 {
-  m_editMode = edit;
   m_zooming = true;
+  m_editMode = edit;
 
   // Make changes to go to or out of edit
-  if (m_editMode) {
+  if (edit) {
     // Item isn't selectable nor focusable
     setFlags(0);
 
@@ -571,10 +571,18 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
 
       // We set the scaling if the Item is still in fullsize mode (This creates that eye candish zoom out)
       if (m_fullsize) {
+        // Making sure that we are going to have the picture with changes applied
+        delete m_fullsizePixmap;
+        m_fullsizePixmap = 0;
+        fullSizePixmap();
+        m_view->showLoading(false);
+        m_pixmap->setPixmap(*m_fullsizePixmap);
+        m_animation->setRotationAt(0, 0);
+        m_animation->setRotationAt(1, 0);
+
         m_animation->setScaleAt(0, oldScaleMultiplier, oldScaleMultiplier);
         m_animation->setScaleAt(0.9999, (qreal) 128 / (qreal) m_fullsizePixmap->height(), (qreal) 128 / (qreal) m_fullsizePixmap->width());
         m_fullsize = false;
-
       }
 
       // The default scaling at the end

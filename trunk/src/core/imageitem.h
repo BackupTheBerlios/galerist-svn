@@ -25,6 +25,11 @@
 
 class QImage;
 
+namespace Magick
+{
+class Image;
+}
+
 namespace GCore
 {
 
@@ -203,6 +208,29 @@ class ImageItem : public QObject
      */
     void rotateCCW();
 
+  public slots:
+    /**
+     * Loads the image into ImageMagick.
+     */
+    void loadImage();
+
+    /**
+     * Saves the image.
+     */
+    void saveImage();
+
+    /**
+     * Closes the image.
+     */
+    void closeImage();
+
+    /**
+     * Prepares the item for potential editing.
+     *
+     * @param open Open or close the image.
+     */
+    void prepareForEdit(bool open);
+
   private:
     QList<ImageItem*> m_childItems;
     QList<QVariant> m_itemData;
@@ -214,6 +242,15 @@ class ImageItem : public QObject
     QString m_fileName;
     MetaDataManager *m_metadata;
     int m_id;
+
+    Magick::Image *m_image;
+    bool m_changes;
+
+  private slots:
+    /**
+     * Saves the rotation. This is for making the rotation animation more smooth.
+     */
+    void saveRotation();
 
 };
 

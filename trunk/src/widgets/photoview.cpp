@@ -250,6 +250,9 @@ void PhotoView::readModel()
     // Add to item vector
     m_itemHash.insert(row, item);
     m_itemVector.append(item);
+
+    // Connect the View item with its counterpart in Model
+    connect(this, SIGNAL(signalEditMode(bool)), row.data(GCore::ImageModel::ObjectRole).value<QObject*>(), SLOT(prepareForEdit(bool)));
   }
 
   updateScene();
