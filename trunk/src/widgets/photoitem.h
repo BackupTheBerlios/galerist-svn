@@ -288,11 +288,10 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     bool m_fullsize;
 
     // Animation variables
-    QPointF m_newPos;
     QPointF m_oldPos;
-    QPointF m_oldScale;
     QGraphicsItemAnimation *m_animation;
     bool m_editMode;
+    bool m_zooming;
     QTimeLine *m_itemTimeLine;
     bool m_pendingDoom;
 
@@ -301,11 +300,19 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     PhotoName *m_text;
     PhotoDescription *m_description;
 
-    int m_rotation;
-
     bool m_hide;
 
+    int m_rotation;
+
+    /**
+     * Rotates the image.
+     */
     void rotate(int rotation);
+
+    /**
+     * Initialise timer.
+     */
+    void initialiseTimer();
 
   private slots:
     /**
