@@ -33,7 +33,7 @@
 #include "core/jobs/readjob.h"
 #include "core/jobs/copyjob.h"
 
-#include <QtCore/QtDebug>
+#include <QtGui/QLabel>
 
 namespace GCore
 {
@@ -121,57 +121,55 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
     return QVariant();
 
   switch (role) {
-    case (Qt::DisplayRole) : {
-        switch (index.column()) {
-          case (0) : {
-            return item->name();
-          }
-        }
+    case Qt::DisplayRole : {
+        return item->name();
       }
-    case (Qt::ToolTipRole) : {
+    case Qt::ToolTipRole : {
         if (item->imageType() == ImageItem::Gallery) {
           return item->name();
         } else {
           return item->name() + ": <i>" + item->description().replace('\n', "<br/>") + "</i>";
         }
       }
-    case (Qt::DecorationRole) : {
+    case Qt::DecorationRole : {
         if (index.column() == 0)
           return fileIcon(index);
       }
-    case (ImageModel::ImageDescriptionRole) : {
+    case ImageModel::ImageDescriptionRole : {
         if (item->imageType() != ImageItem::Image)
           return QVariant();
 
         return item->description();
       }
-    case (ImageModel::ImageTypeRole) : {
+    case ImageModel::ImageTypeRole : {
         return item->imageType();
       }
-    case (ImageModel::ImageMetadataRole) : {
+    case ImageModel::ImageMetadataRole : {
         return QVariant::fromValue(static_cast<QObject*>(item->metadata()));
       }
-    case (ImageModel::ImageFilenameRole) : {
+    case ImageModel::ImageFilenameRole : {
         return item->getFileName();
       }
-    case (ImageModel::ImageFilepathRole) : {
+    case ImageModel::ImageFilepathRole : {
         return item->getFilePath();
       }
-    case (ImageModel::ImageDirPathRole) : {
+    case ImageModel::ImageDirPathRole : {
         return item->getFilePath().remove(QDir::fromNativeSeparators(item->getFilePath()).remove(QRegExp("^.+/")));
       }
-    case (ImageModel::ImageThumbnailPathRole) : {
+    case ImageModel::ImageThumbnailPathRole : {
         return item->getThumbName();
       }
-    case (Qt::EditRole) : {
+    case Qt::EditRole : {
         return item->data(index.column());
       }
     case (ImageModel::ImagePictureRole) : {
         return QImage(item->getFilePath());
       }
+    case ImageModel::ObjectRole : {
+        return qVariantFromValue(static_cast<QObject*> (item));
+      }
     default:
       return QVariant();
-
   }
 }
 
@@ -712,7 +710,7 @@ void ImageModel::rotate(const QModelIndex &index, int direction) const
   if (!index.isValid())
     return;
 
-  ImageItem *item = static_cast<ImageItem*> (index.internalPointer());
+  ImageItem *item = static_cast<ImageItem*>(index.internalPointer());
 
   switch (direction) {
     case (ClockWise) : {
@@ -752,9 +750,8 @@ void ImageModel::processPath(const QDir &path, ImageItem *root) const
   QStringList images = path.entryList(QDir::Files);
   images.removeAll(".metadata");
 
-  for (QStringList::const_iterator count = images.begin(); count != images.end(); count++) {
+  for (QStringList::const_iterator count = images.begin(); count != images.end(); count++)
     root->appendChild(new ImageItem(*count, root, ImageItem::Image));
-  }
 }
 
 QStringList ImageModel::processGalleriesList(ImageItem *root)

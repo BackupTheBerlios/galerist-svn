@@ -79,7 +79,9 @@ class ImageModel : public QAbstractItemModel
       /** Path to image's thumbnail. */
       ImageThumbnailPathRole = Qt::UserRole + 7,
       /** Returns the actual image. */
-      ImagePictureRole       = Qt::UserRole + 8
+      ImagePictureRole       = Qt::UserRole + 8,
+      /** Returns the pointer to the object */
+      ObjectRole             = Qt::UserRole + 9
     };
 
     /**

@@ -107,7 +107,8 @@ PhotoItem::PhotoItem(PhotoView *view)
     m_fullsize(false),
     m_editMode(false),
     m_pendingDoom(false),
-    m_hide(false)
+    m_hide(false),
+    m_rotation(0)
 {
   setHandlesChildEvents(false);
   setAcceptsHoverEvents(true);
@@ -178,6 +179,7 @@ void PhotoItem::setPixmap(const QPixmap &pixmap)
 
   qreal width = m_pixmap->pixmap().width();
   qreal height = m_pixmap->pixmap().height();
+  m_rotation = 0;
 
   m_pixmap->setPos(((30 + 128) / 2) - (width / 2), ((5 + 128) / 2) - (height / 2));
 
@@ -236,12 +238,6 @@ void PhotoItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void PhotoItem::keyPressEvent(QKeyEvent *event)
 {
-  //if (event->key() == Qt::Key_F2) {
-  //  rename();
-  //  event->ignore();
-  //  return;
-  //}
-
   QGraphicsItem::keyPressEvent(event);
 }
 
@@ -421,6 +417,79 @@ void PhotoItem::zoomScreen()
   m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
 }
 
+void PhotoItem::rotateCW()
+{
+  rotate(90);
+}
+
+void PhotoItem::rotateCCW()
+{
+  rotate(-90);
+}
+
+void PhotoItem::rotate(int rotation)
+{
+  if (m_itemTimeLine->state() != QTimeLine::Running)
+    m_itemTimeLine->start();
+
+  m_animation->clear();
+
+  m_animation->setScaleAt(0, m_scaleMultiplier, m_scaleMultiplier);
+
+  m_animation->setRotationAt(0, m_rotation);
+  m_rotation += rotation;
+  m_animation->setRotationAt(1, m_rotation);
+
+  if (qAbs(m_rotation) == 360)
+    m_rotation = 0;
+
+  int absoluteRotation = 0;
+
+  if (m_rotation == -90)
+    absoluteRotation = 270;
+  else if (m_rotation == -270)
+    absoluteRotation = 90;
+  else
+    absoluteRotation = qAbs(m_rotation);
+    
+
+  switch (absoluteRotation) {
+    case 0 : {
+      m_animation->setPosAt(0, m_oldPos);
+      m_oldPos.setX(0);
+      m_oldPos.setY(0);
+      m_animation->setPosAt(1, m_oldPos);
+      break;
+    }
+    case 90 : {
+      m_animation->setPosAt(0, m_oldPos);
+      m_oldPos.setX(m_pixmap->pixmap().height() * m_scaleMultiplier);
+      m_oldPos.setY(0);
+      m_animation->setPosAt(1, m_oldPos);
+      break;
+    }
+    case 180 : {
+      m_animation->setPosAt(0, m_oldPos);
+      m_oldPos.setX(m_pixmap->pixmap().width() * m_scaleMultiplier);
+      m_oldPos.setY(m_pixmap->pixmap().height() * m_scaleMultiplier);
+      m_animation->setPosAt(1, m_oldPos);
+      break;
+    }
+    case 270 : {
+      m_animation->setPosAt(0, m_oldPos);
+      m_oldPos.setX(0);
+      m_oldPos.setY(m_pixmap->pixmap().width() * m_scaleMultiplier);
+      m_animation->setPosAt(1, m_oldPos);
+      break;
+    }
+  }
+}
+
+void PhotoItem::changeImage(const QImage &image)
+{
+  m_pixmap->setPixmap(QPixmap::fromImage(image));
+}
+
 void PhotoItem::slotEdit(bool edit)
 {
   m_editMode = edit;
@@ -489,6 +558,7 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
       m_animation->setScaleAt(0, oldScaleMultiplier, oldScaleMultiplier);
       m_animation->setScaleAt(0.9999, (qreal) 128 / (qreal) m_fullsizePixmap->height(), (qreal) 128 / (qreal) m_fullsizePixmap->width());
       m_fullsize = false;
+      
     }
 
     // The default scaling at the end

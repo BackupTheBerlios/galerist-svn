@@ -21,10 +21,9 @@
 #ifndef GCOREIMAGEITEM_H
 #define GCOREIMAGEITEM_H
 
-#include <QtCore/QList>
-#include <QtCore/QVariant>
+#include <QtCore/QObject>
 
-class QString;
+class QImage;
 
 namespace GCore
 {
@@ -35,10 +34,20 @@ class MetaDataManager;
  * @short Class that represends a tree of images.
  * @author Gregor Kališnik <gregor@podnapisi.net>
  */
-class ImageItem
+class ImageItem : public QObject
 {
+    Q_OBJECT
+  signals:
+    /**
+     * Emitted when the image has been changed.
+     *
+     * @param image The changed image.
+     */
+    void imageChanged(const QImage &image);
+
   public:
-    enum Type {
+    enum Type
+    {
       Root,
       Gallery,
       Image

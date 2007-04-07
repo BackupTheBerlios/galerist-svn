@@ -305,7 +305,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="icon" >
-         <iconset resource="../images.qrc" >:/images/rotate_ccw.png</iconset>
+         <iconset resource="../images.qrc" >:/images/rotate_cw.png</iconset>
         </property>
         <property name="flat" >
          <bool>true</bool>
@@ -333,7 +333,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="icon" >
-         <iconset resource="../images.qrc" >:/images/rotate_cw.png</iconset>
+         <iconset resource="../images.qrc" >:/images/rotate_ccw.png</iconset>
         </property>
         <property name="flat" >
          <bool>true</bool>

@@ -178,7 +178,7 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      *
      * @return The tooltip
      */
-    virtual QString toolTip();
+    QString toolTip();
 
     /**
      * Returns the actual scaled size.
@@ -220,6 +220,23 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      * Zoom to fit screen.
      */
     void zoomScreen();
+
+    /**
+     * Rotates clock-wise.
+     */
+    void rotateCW();
+    /**
+     * Rotates counter clock-wise
+     */
+    void rotateCCW();
+
+  public slots:
+    /**
+     * Changes the image.
+     *
+     * @param image The new image.
+     */
+    void changeImage(const QImage &image);
 
   protected:
     /**
@@ -284,7 +301,11 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     PhotoName *m_text;
     PhotoDescription *m_description;
 
+    int m_rotation;
+
     bool m_hide;
+
+    void rotate(int rotation);
 
   private slots:
     /**

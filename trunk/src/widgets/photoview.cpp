@@ -193,6 +193,7 @@ void PhotoView::rotateSelectedImageCW()
     return;
 
   GCore::Data::self()->getImageModel()->rotate(indexForItem(m_currentEdited), GCore::ImageModel::ClockWise);
+  m_currentEdited->rotateCW();
 }
 
 void PhotoView::rotateSelectedImageCCW()
@@ -201,6 +202,7 @@ void PhotoView::rotateSelectedImageCCW()
     return;
 
   GCore::Data::self()->getImageModel()->rotate(indexForItem(m_currentEdited), GCore::ImageModel::CounterClockWise);
+  m_currentEdited->rotateCCW();
 }
 
 PhotoItem *PhotoView::itemForIndex(const QModelIndex &index)
@@ -809,7 +811,11 @@ void PhotoView::slotNextPhoto()
     return;
   }
 
+  disconnect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+
   m_currentEdited = m_itemVector.at(newIndex);
+
+  connect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   checkNavigationEdges();
 
@@ -945,6 +951,8 @@ void PhotoView::setEditMode(bool editMode, GWidgets::PhotoItem *selectedItem)
     viewport()->setCursor(Qt::OpenHandCursor);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    connect(indexForItem(selectedItem).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), selectedItem, SLOT(changeImage(const QImage&)));
   } else {
     // We have our own Rubber band defined!
     setDragMode(QGraphicsView::NoDrag);
@@ -955,6 +963,8 @@ void PhotoView::setEditMode(bool editMode, GWidgets::PhotoItem *selectedItem)
 
     verticalScrollBar()->setValue(0);
     horizontalScrollBar()->setValue(0);
+
+    disconnect(indexForItem(selectedItem).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), selectedItem, SLOT(changeImage(const QImage&)));
   }
 
   updateScene();

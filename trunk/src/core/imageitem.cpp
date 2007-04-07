@@ -20,9 +20,10 @@
  ***************************************************************************/
 #include "imageitem.h"
 
-#include <QtCore/QString>
-#include <QtCore/QtDebug>
+#include <QtGui/QImage>
 
+#include "core/data.h"
+#include "core/imagemodel.h"
 #include "core/metadatamanager.h"
 
 #include <Magick++.h>
@@ -31,7 +32,8 @@ namespace GCore
 {
 
 ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
-    : m_parentItem(parent),
+    : QObject(0),
+    m_parentItem(parent),
     m_type(type),
     m_path(path),
     m_metadata(0),
@@ -78,7 +80,7 @@ int ImageItem::childCount() const
 int ImageItem::row() const
 {
   if (m_parentItem)
-    return m_parentItem->m_childItems.indexOf(const_cast<ImageItem*> (this));
+    return m_parentItem->m_childItems.indexOf(const_cast<ImageItem*>(this));
 
   return 0;
 }
@@ -212,13 +214,22 @@ void ImageItem::rotateCW()
 {
   Magick::Image image;
   QDir dir(getFilePath());
+  dir.cdUp();
 
   try {
     image.read(getFilePath().toStdString());
-    image.rotate(270);
+    image.rotate(90);
     image.write(getFilePath().toStdString());
-  }
-  catch (Magick::Exception &error) {
+
+    Magick::Blob blob;
+    image.write(&blob);
+
+    dir.cd(".thumbnails");
+
+    QImage newThumb(image.rows(), image.columns(), QImage::Format_RGB32);
+    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
+    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(getThumbName()));
+  } catch (Magick::Exception &error) {
     qDebug(QString::fromStdString(error.what()).toAscii().data());
     return;
   }
@@ -227,13 +238,23 @@ void ImageItem::rotateCW()
 void ImageItem::rotateCCW()
 {
   Magick::Image image;
+  QDir dir(getFilePath());
+  dir.cdUp();
 
   try {
     image.read(getFilePath().toStdString());
-    image.rotate(90);
+    image.rotate(270);
     image.write(getFilePath().toStdString());
-  }
-  catch (Magick::Exception &error) {
+
+    Magick::Blob blob;
+    image.write(&blob);
+
+    dir.cd(".thumbnails");
+
+    QImage newThumb(image.rows(), image.columns(), QImage::Format_RGB32);
+    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
+    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(getThumbName()));
+  } catch (Magick::Exception &error) {
     qDebug(QString::fromStdString(error.what()).toAscii().data());
     return;
   }
