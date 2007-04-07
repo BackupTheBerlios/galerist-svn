@@ -87,6 +87,8 @@ PhotoView::PhotoView(QWidget *parent)
   // Connect signals
   connect(scene, SIGNAL(changed(const QList<QRectF>&)), this, SLOT(slotSceneChanged()));
 
+  setDragMode(QGraphicsView::NoDrag);
+
   QTimer::singleShot(1, this, SLOT(slotConnectNavButtons()));
 }
 
@@ -467,7 +469,7 @@ void PhotoView::mousePressEvent(QMouseEvent *event)
 void PhotoView::mouseMoveEvent(QMouseEvent *event)
 {
   // Now we show the rubber band
-  if (dragMode() == QGraphicsView::NoDrag) {
+  if (dragMode() == QGraphicsView::NoDrag && event->buttons() & Qt::LeftButton) {
     if (m_rubberBand) {
       // Define the selection rectangle
       QRect selectionRect = QRect(m_rubberStartPos, event->pos());
@@ -492,6 +494,14 @@ void PhotoView::mouseMoveEvent(QMouseEvent *event)
 
       return;
     }
+  } else if (m_rubberBand) {
+    // Now we hide and delete the rubber band
+    m_rubberBand->hide();
+    delete m_rubberBand;
+    m_rubberBand = 0;
+
+      // Our selection has ended. We can now empty our list
+    m_oldSelectedItems.clear();
   }
 
   // If it's not our call, we pass it to QGraphicsView
@@ -501,17 +511,6 @@ void PhotoView::mouseMoveEvent(QMouseEvent *event)
 
 void PhotoView::mouseReleaseEvent(QMouseEvent *event)
 {
-  // Now we hide and delete the rubber band
-  if (dragMode() == QGraphicsView::NoDrag)
-    if (m_rubberBand) {
-      m_rubberBand->hide();
-      delete m_rubberBand;
-      m_rubberBand = 0;
-    }
-
-  // Our selection has ended. We can now empty our list
-  m_oldSelectedItems.clear();
-
   // If it's not our call, we pass it to QGraphicsView
   QGraphicsView::mouseReleaseEvent(event);
 }
@@ -526,7 +525,6 @@ void PhotoView::contextMenuEvent(QContextMenuEvent *event)
 
 void PhotoView::dragEnterEvent(QDragEnterEvent *event)
 {
-  //if (m_rootIndex.data(GCore::ImageModel::ImageTypeRole).toInt() == GCore::ImageItem::Gallery)
   QList<QUrl> imageUrls = event->mimeData()->urls();
   QList<QUrl>::const_iterator end = imageUrls.constEnd();
 
@@ -546,7 +544,6 @@ void PhotoView::dragEnterEvent(QDragEnterEvent *event)
 
 void PhotoView::dragMoveEvent(QDragMoveEvent *event)
 {
-  //if (m_rootIndex.data(GCore::ImageModel::ImageTypeRole).toInt() == GCore::ImageItem::Gallery)
     event->acceptProposedAction();
 }
 
@@ -835,7 +832,11 @@ void PhotoView::slotPreviousPhoto()
     return;
   }
 
+  disconnect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+
   m_currentEdited = m_itemVector.at(newIndex);
+
+  connect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   checkNavigationEdges();
 
