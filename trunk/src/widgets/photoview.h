@@ -47,8 +47,8 @@ class SearchBar;
  */
 class PhotoView : public QGraphicsView
 {
-  Q_OBJECT
-  friend class PhotoItem;
+    Q_OBJECT
+    friend class PhotoItem;
   signals:
     /**
      * Signal that reports that a item has been selected.
@@ -72,6 +72,10 @@ class PhotoView : public QGraphicsView
      * Emited when search returns an empty result.
      */
     void noPhotosFound();
+    /**
+     * Emited when moving through images at edit mode.
+     */
+    void photoEditSelectionChanged(int newLocation, int totalImages);
 
   public:
     /**
@@ -200,6 +204,43 @@ class PhotoView : public QGraphicsView
      */
     void rotateSelectedImageCCW();
 
+    /**
+     * Slot for switching to the next photo.
+     */
+    void slotNextPhoto();
+    /**
+     * Slot for moving to the previous photo.
+     */
+    void slotPreviousPhoto();
+    /**
+     * Slot for zooming in.
+     */
+    void slotZoomInPhoto();
+    /**
+     * Slot for zooming out.
+     */
+    void slotZoomOutPhoto();
+    /**
+     * Slot for zooming to actual size.
+     */
+    void slotZoomActualPhoto();
+    /**
+     * Slot for zooming to fit screen.
+     */
+    void slotZoomScreenPhoto();
+    /**
+     * Slot for input zoom.
+     */
+    void slotZoomInputPhoto();
+    /**
+     * Slot for editing the photograph.
+     */
+    void slotEditPhoto();
+    /**
+     * Slot for exiting the editing mode.
+     */
+    void slotExitEdit();
+
   protected:
     /**
      * Rearrange the items to new positions.
@@ -325,50 +366,9 @@ class PhotoView : public QGraphicsView
     void slotRemove();
 
     /**
-     * Slot for switching to the next photo.
-     */
-    void slotNextPhoto();
-    /**
-     * Slot for moving to the previous photo.
-     */
-    void slotPreviousPhoto();
-    /**
-     * Slot for zooming in.
-     */
-    void slotZoomInPhoto();
-    /**
-     * Slot for zooming out.
-     */
-    void slotZoomOutPhoto();
-    /**
-     * Slot for zooming to actual size.
-     */
-    void slotZoomActualPhoto();
-    /**
-     * Slot for zooming to fit screen.
-     */
-    void slotZoomScreenPhoto();
-    /**
-     * Slot for input zoom.
-     */
-    void slotZoomInputPhoto();
-    /**
-    * Slot for editing the photograph.
-     */
-    void slotEditPhoto();
-    /**
-     * Slot for exiting the editing mode.
-     */
-    void slotExitEdit();
-    /**
      * Connect the navigation buttons.
      */
     void slotConnectNavButtons();
-
-    /**
-     * Vertical scrollbar changed. 
-     */
-    //void slotScrollChanged();
 
   private:
     int m_spacing;
@@ -402,10 +402,6 @@ class PhotoView : public QGraphicsView
      * Update and start the updating timer.
      */
     void updateScene();
-    /**
-     * Check if we need to disable back or next navigation button.
-     */
-    void checkNavigationEdges();
     /**
      * Updates the scroll bars (resizes the scene rectangle).
      */

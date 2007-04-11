@@ -44,7 +44,6 @@ Data::Data(QObject *parent)
     : QObject(parent),
     m_errorHandler(0),
     m_imageModel(0),
-    m_photoControl(0),
     m_photoContextMenu(0),
     m_photoEditContextMenu(0),
     m_galleryContextMenu(0),
@@ -190,16 +189,6 @@ void Data::setOpengl(bool enable) const
 bool Data::getOpengl() const
 {
   return m_settings->value("OpenGlRendering", false).toBool();
-}
-
-void Data::setPhotoControl(GWidgets::PhotoControl *photoControl)
-{
-  m_photoControl = photoControl;
-}
-
-GWidgets::PhotoControl *Data::getPhotoControl() const
-{
-  return m_photoControl;
 }
 
 void Data::setUpdateStartup(bool enable) const

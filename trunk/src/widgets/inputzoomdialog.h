@@ -18,97 +18,18 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GWIDGETSPHOTOCONTROL_H
-#define GWIDGETSPHOTOCONTROL_H
+#ifndef GWIDGETSINPUTZOOMDIALOG_H
+#define GWIDGETSINPUTZOOMDIALOG_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QDialog>
 #include "ui_photocontrol.h"
+
+#include <QtGui/QDialog>
 
 class QPushButton;
 class QComboBox;
 
 namespace GWidgets
 {
-
-/**
- * Class that represents the control buttons for controlling photos.
- * @short Control buttons.
- * @author Gregor Kališnik <gregor@podnapisi.net>
- */
-class PhotoControl : public QWidget, private Ui::PhotoControl
-{
-    Q_OBJECT
-  public:
-    /**
-     * Default constructor.
-     */
-    PhotoControl(QWidget *parent = 0);
-
-    /**
-     * Gets the reference to the back button.
-     *
-     * @return Reference of the back button.
-     */
-    QPushButton *getBackButton();
-    /**
-     * Gets the reference to the next button.
-     *
-     * @return Reference of the next button.
-     */
-    QPushButton *getNextButton();
-    /**
-     * Gets the reference to the zoom in button.
-     *
-     * @return Reference of the zoom in button.
-     */
-    QPushButton *getZoomInButton();
-    /**
-     * Gets the reference to the zoom out button.
-     *
-     * @return Reference of the zoom out button.
-     */
-    QPushButton *getZoomOutButton();
-    /**
-    * Gets the reference to the zoom input button.
-    *
-    * @return Reference of the zoom input button.
-    */
-    QPushButton *getZoomInputButton();
-    /**
-     * Gets the reference to the actual size button.
-     *
-     * @return Reference of the actual size button.
-     */
-    QPushButton *getActualSizeButton();
-    /**
-     * Gets the reference to the zoom to screen button.
-     *
-     * @return Reference of the zoom to screen button.
-     */
-    QPushButton *getZoomScreenButton();
-    /**
-     * Gets the reference to the edit photo button.
-     *
-     * @return Reference of the edit photo button.
-     */
-    QPushButton *getEditButton();
-    /**
-     * Gets the reference to the exit button.
-     *
-     * @return Reference of the exit button.
-     */
-    QPushButton *getExitButton();
-
-    QPushButton *getRotateCWButton();
-    QPushButton *getRotateCCWButton();
-
-    /**
-     * Default destructor.
-     */
-    ~PhotoControl();
-
-};
 
 /**
  * @short Dialog for getting zoom level.

@@ -45,7 +45,6 @@
 #include "dialogs/configuration.h"
 
 #include "widgets/imageaddprogress.h"
-#include "widgets/photocontrol.h"
 
 MainWindow::MainWindow()
     : QMainWindow(), Ui::MainWindow()
@@ -60,7 +59,6 @@ MainWindow::MainWindow()
   GCore::Data::self()->setSearchBar(searchBar);
   searchBar->hide();
 
-  GCore::Data::self()->setPhotoControl(photoControl);
   setEditMode(false);
 
   connect(imageList, SIGNAL(signalEditMode(bool)), this, SLOT(setEditMode(bool)));
@@ -147,6 +145,24 @@ void MainWindow::initActionButtons()
   contextMenu->addSeparator();
   contextMenu->addMenu(menuSelection);
   GCore::Data::self()->setPhotoContextMenu(contextMenu);
+
+
+
+
+  // Something that shouldn't be here (or should be like an action)
+  connect(rotateCCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCCW()));
+  connect(rotateCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCW()));
+  connect(editButton, SIGNAL(clicked()), imageList, SLOT(slotEditPhoto()));
+  connect(zoomOutButton, SIGNAL(clicked()), imageList, SLOT(slotZoomOutPhoto()));
+  connect(zoomInButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInPhoto()));
+  connect(zoomInputButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInputPhoto()));
+  connect(zoomScreenButton, SIGNAL(clicked()), imageList, SLOT(slotZoomScreenPhoto()));
+  connect(actualSizeButton, SIGNAL(clicked()), imageList, SLOT(slotZoomActualPhoto()));
+  connect(backButton, SIGNAL(clicked()), imageList, SLOT(slotPreviousPhoto()));
+  connect(nextButton, SIGNAL(clicked()), imageList, SLOT(slotNextPhoto()));
+  connect(closeButton, SIGNAL(clicked()), imageList, SLOT(slotExitEdit()));
+
+  connect(imageList, SIGNAL(photoEditSelectionChanged(int, int)), this, SLOT(checkNavigation(int, int)));
 }
 
 void MainWindow::initToolbar()
@@ -270,7 +286,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::setEditMode(bool edit)
 {
-  photoControl->setVisible(edit);
+  imageControlWidget->setVisible(edit);
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
@@ -291,4 +307,21 @@ void MainWindow::showEXIF()
   message += tr("Focal length: ") + exifData.getFocalLength() + "\n";
   message += tr("Flash: ") + exifData.getFlash() + "\n";
   QMessageBox::information(this, tr("EXIF metadata"), message);
+}
+
+void MainWindow::checkNavigation(int newLocation, int totalImages)
+{
+  if (totalImages == 1) {
+    backButton->setEnabled(false);
+    nextButton->setEnabled(false);
+  } else if (totalImages <= newLocation + 1) {
+    backButton->setEnabled(true);
+    nextButton->setEnabled(false);
+  } else if (newLocation == 0) {
+    backButton->setEnabled(false);
+    nextButton->setEnabled(true);
+  } else {
+    backButton->setEnabled(true);
+    nextButton->setEnabled(true);
+  }
 }

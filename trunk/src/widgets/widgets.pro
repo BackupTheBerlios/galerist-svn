@@ -1,5 +1,4 @@
-FORMS += imageaddprogress.ui \
-         photocontrol.ui
+FORMS += imageaddprogress.ui
 HEADERS += lineedit.h \
            gallerytreeview.h \
            imageaddprogress.h \
@@ -8,9 +7,9 @@ HEADERS += lineedit.h \
            photoname.h \
            photodescription.h \
            textedit.h \
-           photocontrol.h \
            tooltip.h \
-           searchbar.h
+           searchbar.h \
+           inputzoomdialog.h
 SOURCES += lineedit.cpp \
            gallerytreeview.cpp \
            imageaddprogress.cpp \
@@ -19,9 +18,9 @@ SOURCES += lineedit.cpp \
            photoname.cpp \
            photodescription.cpp \
            textedit.cpp \
-           photocontrol.cpp \
            tooltip.cpp \
-           searchbar.cpp
+           searchbar.cpp \
+           inputzoomdialog.cpp
 QT += opengl
 INCLUDEPATH += ../../src
 DESTDIR = ./

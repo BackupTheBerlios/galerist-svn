@@ -21,7 +21,7 @@
 #include "photoview.h"
 
 #include "widgets/photoitem.h"
-#include "widgets/photocontrol.h"
+#include "widgets/inputzoomdialog.h"
 #include "widgets/searchbar.h"
 
 #include "core/data.h"
@@ -205,6 +205,115 @@ void PhotoView::rotateSelectedImageCCW()
 
   m_currentEdited->rotateCCW();
   GCore::Data::self()->getImageModel()->rotate(indexForItem(m_currentEdited), GCore::ImageModel::CounterClockWise);
+}
+
+void PhotoView::slotNextPhoto()
+{
+  // !m_editMode || !m_currentEdited
+  if (!(m_editMode && m_currentEdited))
+    return;
+
+  int newIndex = m_itemVector.indexOf(m_currentEdited) + 1;
+
+  if (m_itemVector.count() <= newIndex) {
+    //GCore::Data::self()->getPhotoControl()->getNextButton()->setEnabled(false);
+    return;
+  }
+
+  emit photoEditSelectionChanged(newIndex, m_itemVector.count());
+
+  disconnect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+
+  m_currentEdited = m_itemVector.at(newIndex);
+
+  connect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+
+  updateScene();
+}
+
+void PhotoView::slotPreviousPhoto()
+{
+  // !m_editMode || !m_currentEdited
+  if (!(m_editMode && m_currentEdited))
+    return;
+
+  int newIndex = m_itemVector.indexOf(m_currentEdited) - 1;
+
+  if (newIndex < 0) {
+    //GCore::Data::self()->getPhotoControl()->getBackButton()->setEnabled(false);
+    return;
+  }
+
+  emit photoEditSelectionChanged(newIndex, m_itemVector.count());
+
+  disconnect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+
+  m_currentEdited = m_itemVector.at(newIndex);
+
+  connect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+
+  updateScene();
+}
+
+void PhotoView::slotZoomInPhoto()
+{
+  if (m_currentEdited) {
+    m_currentEdited->zoomIn();
+    updateScrollBars();
+  }
+}
+
+void PhotoView::slotZoomOutPhoto()
+{
+  if (m_currentEdited) {
+    m_currentEdited->zoomOut();
+    updateScrollBars();
+  }
+}
+
+void PhotoView::slotZoomActualPhoto()
+{
+  if (m_currentEdited) {
+    m_currentEdited->zoomActual();
+    updateScrollBars();
+  }
+}
+
+void PhotoView::slotZoomScreenPhoto()
+{
+  if (m_currentEdited) {
+    m_currentEdited->zoomScreen();
+    updateScrollBars();
+  }
+}
+
+void PhotoView::slotZoomInputPhoto()
+{
+  // We ask for the new zoom level
+  float newZoom = InputZoomDialog::getZoomLevel(m_currentEdited->getScaleMultiplier() * 100, this);
+  if (newZoom == m_currentEdited->getScaleMultiplier() * 100)
+    return;
+
+  m_currentEdited->setZoom(newZoom);
+  updateScrollBars();
+}
+
+void PhotoView::slotEditPhoto()
+{
+  QString photo = m_model->data(indexForItem(m_currentEdited), GCore::ImageModel::ImageFilepathRole).toString();
+
+  QStringList arguments;
+  arguments << QDir::toNativeSeparators(photo);
+
+  if (!QProcess::startDetached(GCore::Data::self()->getPhotoEditor(), arguments))
+    QMessageBox::critical(this, tr("External edit failed"), tr("The external editor, which was specified in configuration, couldn't be run."));
+}
+
+void PhotoView::slotExitEdit()
+{
+  if (m_currentEdited) {
+    setEditMode(false, m_currentEdited);
+  }
 }
 
 PhotoItem *PhotoView::itemForIndex(const QModelIndex &index)
@@ -723,25 +832,6 @@ void PhotoView::updateScene()
     m_timerId = startTimer(1000 / 25);
 }
 
-void PhotoView::checkNavigationEdges()
-{
-  int index = m_itemVector.indexOf(m_currentEdited);
-
-  if (m_itemVector.count() == 1) {
-    GCore::Data::self()->getPhotoControl()->getBackButton()->setEnabled(false);
-    GCore::Data::self()->getPhotoControl()->getNextButton()->setEnabled(false);
-  } else if (m_itemVector.count() <= index + 1) {
-    GCore::Data::self()->getPhotoControl()->getBackButton()->setEnabled(true);
-    GCore::Data::self()->getPhotoControl()->getNextButton()->setEnabled(false);
-  } else if (index == 0) {
-    GCore::Data::self()->getPhotoControl()->getBackButton()->setEnabled(false);
-    GCore::Data::self()->getPhotoControl()->getNextButton()->setEnabled(true);
-  } else {
-    GCore::Data::self()->getPhotoControl()->getBackButton()->setEnabled(true);
-    GCore::Data::self()->getPhotoControl()->getNextButton()->setEnabled(true);
-  }
-}
-
 void PhotoView::updateScrollBars()
 {
 
@@ -798,130 +888,8 @@ void PhotoView::slotRemove()
   }
 }
 
-void PhotoView::slotNextPhoto()
-{
-  // !m_editMode || !m_currentEdited
-  if (!(m_editMode && m_currentEdited))
-    return;
-
-  int newIndex = m_itemVector.indexOf(m_currentEdited) + 1;
-
-  if (m_itemVector.count() <= newIndex) {
-    GCore::Data::self()->getPhotoControl()->getNextButton()->setEnabled(false);
-    return;
-  }
-
-  disconnect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
-
-  m_currentEdited = m_itemVector.at(newIndex);
-
-  connect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
-
-  checkNavigationEdges();
-
-  updateScene();
-}
-
-void PhotoView::slotPreviousPhoto()
-{
-  // !m_editMode || !m_currentEdited
-  if (!(m_editMode && m_currentEdited))
-    return;
-
-  int newIndex = m_itemVector.indexOf(m_currentEdited) - 1;
-
-  if (newIndex < 0) {
-    GCore::Data::self()->getPhotoControl()->getBackButton()->setEnabled(false);
-    return;
-  }
-
-  disconnect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
-
-  m_currentEdited = m_itemVector.at(newIndex);
-
-  connect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
-
-  checkNavigationEdges();
-
-  updateScene();
-}
-
-void PhotoView::slotZoomInPhoto()
-{
-  if (m_currentEdited) {
-    m_currentEdited->zoomIn();
-    updateScrollBars();
-  }
-}
-
-void PhotoView::slotZoomOutPhoto()
-{
-  if (m_currentEdited) {
-    m_currentEdited->zoomOut();
-    updateScrollBars();
-  }
-}
-
-void PhotoView::slotZoomActualPhoto()
-{
-  if (m_currentEdited) {
-    m_currentEdited->zoomActual();
-    updateScrollBars();
-  }
-}
-
-void PhotoView::slotZoomScreenPhoto()
-{
-  if (m_currentEdited) {
-    m_currentEdited->zoomScreen();
-    updateScrollBars();
-  }
-}
-
-void PhotoView::slotZoomInputPhoto()
-{
-  // We ask for the new zoom level
-  float newZoom = InputZoomDialog::getZoomLevel(m_currentEdited->getScaleMultiplier() * 100, this);
-  if (newZoom == m_currentEdited->getScaleMultiplier() * 100)
-    return;
-
-  m_currentEdited->setZoom(newZoom);
-  updateScrollBars();
-}
-
-void PhotoView::slotEditPhoto()
-{
-  QString photo = m_model->data(indexForItem(m_currentEdited), GCore::ImageModel::ImageFilepathRole).toString();
-
-  QStringList arguments;
-  arguments << QDir::toNativeSeparators(photo);
-
-  if (!QProcess::startDetached(GCore::Data::self()->getPhotoEditor(), arguments))
-    QMessageBox::critical(this, tr("External edit failed"), tr("The external editor, which was specified in configuration, couldn't be run."));
-}
-
-void PhotoView::slotExitEdit()
-{
-  if (m_currentEdited) {
-    setEditMode(false, m_currentEdited);
-  }
-}
-
 void PhotoView::slotConnectNavButtons()
 {
-  connect(GCore::Data::self()->getPhotoControl()->getNextButton(), SIGNAL(clicked()), this, SLOT(slotNextPhoto()));
-  connect(GCore::Data::self()->getPhotoControl()->getBackButton(), SIGNAL(clicked()), this, SLOT(slotPreviousPhoto()));
-  connect(GCore::Data::self()->getPhotoControl()->getZoomInButton(), SIGNAL(clicked()), this, SLOT(slotZoomInPhoto()));
-  connect(GCore::Data::self()->getPhotoControl()->getZoomOutButton(), SIGNAL(clicked()), this, SLOT(slotZoomOutPhoto()));
-  connect(GCore::Data::self()->getPhotoControl()->getActualSizeButton(), SIGNAL(clicked()), this, SLOT(slotZoomActualPhoto()));
-  connect(GCore::Data::self()->getPhotoControl()->getZoomScreenButton(), SIGNAL(clicked()), this, SLOT(slotZoomScreenPhoto()));
-  connect(GCore::Data::self()->getPhotoControl()->getZoomInputButton(), SIGNAL(clicked()), this, SLOT(slotZoomInputPhoto()));
-  connect(GCore::Data::self()->getPhotoControl()->getEditButton(), SIGNAL(clicked()), this, SLOT(slotEditPhoto()));
-  connect(GCore::Data::self()->getPhotoControl()->getExitButton(), SIGNAL(clicked()), this, SLOT(slotExitEdit()));
-
-  connect(GCore::Data::self()->getPhotoControl()->getRotateCWButton(), SIGNAL(clicked()), this, SLOT(rotateSelectedImageCW()));
-  connect(GCore::Data::self()->getPhotoControl()->getRotateCCWButton(), SIGNAL(clicked()), this, SLOT(rotateSelectedImageCCW()));
-
   GCore::Data::self()->getSearchBar()->setListFilter(this);
 }
 
@@ -950,7 +918,7 @@ void PhotoView::setEditMode(bool editMode, GWidgets::PhotoItem *selectedItem)
   emit signalEditMode(editMode);
 
   if (editMode) {
-    checkNavigationEdges();
+    emit photoEditSelectionChanged(m_itemVector.indexOf(m_currentEdited), m_itemVector.count());
     setDragMode(QGraphicsView::ScrollHandDrag);
     viewport()->setCursor(Qt::OpenHandCursor);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

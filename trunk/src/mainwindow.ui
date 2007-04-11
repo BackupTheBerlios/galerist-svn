@@ -21,16 +21,6 @@
      <widget class="GWidgets::PhotoView" name="imageList" />
     </item>
    </layout>
-   <widget class="GWidgets::PhotoControl" native="1" name="photoControl" >
-    <property name="geometry" >
-     <rect>
-      <x>9</x>
-      <y>500</y>
-      <width>569</width>
-      <height>16</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="GWidgets::SearchBar" native="1" name="searchBar" >
     <property name="geometry" >
      <rect>
@@ -155,7 +145,7 @@
    <addaction name="actionRemove" />
    <addaction name="separator" />
   </widget>
-  <widget class="QDockWidget" name="dockWidget" >
+  <widget class="QDockWidget" name="imageControlWidget" >
    <property name="features" >
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
@@ -213,7 +203,7 @@
          <number>1</number>
         </property>
         <item row="0" column="0" >
-         <widget class="QPushButton" name="pushButton" >
+         <widget class="QPushButton" name="blurButton" >
           <property name="minimumSize" >
            <size>
             <width>25</width>
@@ -232,7 +222,7 @@
          </widget>
         </item>
         <item row="0" column="1" >
-         <widget class="QPushButton" name="pushButton_2" >
+         <widget class="QPushButton" name="sharpButton" >
           <property name="minimumSize" >
            <size>
             <width>25</width>
@@ -631,7 +621,7 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item row="1" column="0" >
-         <widget class="QPushButton" name="pushButton_4" >
+         <widget class="QPushButton" name="closeButton" >
           <property name="minimumSize" >
            <size>
             <width>25</width>
@@ -653,7 +643,10 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item row="1" column="1" >
-         <widget class="QPushButton" name="pushButton_3" >
+         <widget class="QPushButton" name="saveButton" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
           <property name="minimumSize" >
            <size>
             <width>25</width>
@@ -911,11 +904,6 @@ p, li { white-space: pre-wrap; }
    <class>GWidgets::PhotoView</class>
    <extends>QGraphicsView</extends>
    <header>widgets/photoview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>GWidgets::PhotoControl</class>
-   <extends>QWidget</extends>
-   <header>widgets/photocontrol.h</header>
   </customwidget>
   <customwidget>
    <class>GWidgets::GalleryTreeView</class>

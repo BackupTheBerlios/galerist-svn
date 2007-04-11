@@ -18,7 +18,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "photocontrol.h"
+#include "inputzoomdialog.h"
 
 #include "widgets/photoview.h"
 
@@ -30,76 +30,6 @@
 
 namespace GWidgets
 {
-
-// PhotoControl
-
-PhotoControl::PhotoControl(QWidget *parent)
-    : QWidget(parent)
-{
-  setupUi(this);
-
-
-}
-
-QPushButton *PhotoControl::getBackButton()
-{
-  return backButton;
-}
-
-QPushButton *PhotoControl::getNextButton()
-{
-  return nextButton;
-}
-
-QPushButton *PhotoControl::getZoomInButton()
-{
-  return zoomInButton;
-}
-
-QPushButton *PhotoControl::getZoomOutButton()
-{
-  return zoomOutButton;
-}
-
-QPushButton *PhotoControl::getZoomInputButton()
-{
-  return zoomInputButton;
-}
-
-QPushButton *PhotoControl::getActualSizeButton()
-{
-  return actualSizeButton;
-}
-
-QPushButton *PhotoControl::getZoomScreenButton()
-{
-  return zoomScreenButton;
-}
-
-QPushButton *PhotoControl::getEditButton()
-{
-  return editButton;
-}
-
-QPushButton *PhotoControl::getExitButton()
-{
-  return exitButton;
-}
-
-QPushButton * PhotoControl::getRotateCWButton()
-{
-  return rotateCWButton;
-}
-
-QPushButton * PhotoControl::getRotateCCWButton()
-{
-  return rotateCCWButton;
-}
-
-PhotoControl::~PhotoControl()
-{}
-
-// InputZoomDialog
 
 QString InputZoomDialog::m_result = QString();
 

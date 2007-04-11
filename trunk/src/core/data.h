@@ -34,7 +34,6 @@ typedef QMap<QString, QString> Translations;
 
 namespace GWidgets
 {
-class PhotoControl;
 class SearchBar;
 }
 
@@ -146,19 +145,6 @@ class Data : public QObject
      * @return Status as a boolean.
      */
     bool getOpengl() const;
-
-    /**
-     * Set the photo control (a little widget for controlling photo controls in editing mode).
-     *
-     * @param photoControl The photo control widget.
-     */
-    void setPhotoControl(GWidgets::PhotoControl *photoControl);
-    /**
-     * Returns the photo control.
-     *
-     * @return Reference to the photo control widget.
-     */
-    GWidgets::PhotoControl *getPhotoControl() const;
 
     /**
      * Sets the update at startup value.
@@ -369,7 +355,6 @@ class Data : public QObject
     QStringList m_imageFormats;
     ImageModel *m_imageModel;
     QCompleter *m_dirCompleter;
-    GWidgets::PhotoControl *m_photoControl;
     QMenu *m_photoContextMenu;
     QMenu *m_photoEditContextMenu;
     QMenu *m_galleryContextMenu;
