@@ -147,7 +147,7 @@ MetaDataManager *ImageItem::metadata()
 
   if (!m_metadata && m_type == Image) {
     output = parent()->metadata();
-    m_id = output->imageId(m_fileName);
+    m_id = output->imageId(getFileName());
   }
 
   return output;
@@ -155,8 +155,7 @@ MetaDataManager *ImageItem::metadata()
 
 QString ImageItem::name()
 {
-  if (m_type == Image && (m_id == -1 || m_itemData.at(0).toString() == QObject::tr("Unavailable"))) {
-    m_id = metadata()->imageId(getFileName());
+  if (m_type == Image) {
 
     // Update the metadata
     m_itemData.clear();
@@ -170,8 +169,7 @@ QString ImageItem::name()
 
 QString ImageItem::description()
 {
-  if (m_type == Image && (m_id == -1 || m_itemData.at(1).toString() == QObject::tr("No description"))) {
-    m_id = metadata()->imageId(getFileName());
+  if (m_type == Image) {
 
     // Update the metadata
     m_itemData.clear();
@@ -203,6 +201,9 @@ bool ImageItem::setName(const QString &name)
 
 void ImageItem::setDescription(const QString &description)
 {
+  if (m_type != Image)
+    return;
+
   metadata()->setDescription(description, m_id);
 
   m_itemData.removeLast();

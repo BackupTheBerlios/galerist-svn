@@ -112,7 +112,7 @@
      <item row="0" column="0" >
       <widget class="GWidgets::GalleryTreeView" name="albumView" >
        <property name="editTriggers" >
-        <set>QAbstractItemView::AllEditTriggers</set>
+        <set>QAbstractItemView::EditKeyPressed</set>
        </property>
        <property name="alternatingRowColors" >
         <bool>true</bool>
@@ -122,6 +122,9 @@
          <width>22</width>
          <height>22</height>
         </size>
+       </property>
+       <property name="autoExpandDelay" >
+        <number>1</number>
        </property>
       </widget>
      </item>
@@ -202,44 +205,6 @@
         <property name="verticalSpacing" >
          <number>1</number>
         </property>
-        <item row="0" column="0" >
-         <widget class="QPushButton" name="blurButton" >
-          <property name="minimumSize" >
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="maximumSize" >
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="text" >
-           <string>Blur</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" >
-         <widget class="QPushButton" name="sharpButton" >
-          <property name="minimumSize" >
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="maximumSize" >
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="text" >
-           <string>Sharpen</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0" >
          <widget class="QPushButton" name="rotateCCWButton" >
           <property name="minimumSize" >

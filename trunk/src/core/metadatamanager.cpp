@@ -59,44 +59,6 @@ MetaDataManager::MetaDataManager(const QString &galleryPath, QObject *parent)
     m_metadataFile.commit();
   } else
     m_metadataFile.open();
-
-  // Prepared SQL statments.
-  /*m_getMetadata = QSqlQuery(m_metadataFile);
-  m_getMetadata.prepare("SELECT image_name, description, filename FROM image WHERE image_id = :imageId;");
-
-  m_getImageId = QSqlQuery(m_metadataFile);
-  m_getImageId.prepare("SELECT image_id FROM image WHERE filename = :filename;");
-
-  m_getTagId = QSqlQuery(m_metadataFile);
-  m_getTagId.prepare("SELECT tag_id FROM tag WHERE tag_name = :tagName;");
-
-  m_addImage = QSqlQuery(m_metadataFile);
-  m_addImage.prepare("INSERT INTO image (filename) VALUES (:filename);");
-
-  m_addTag = QSqlQuery(m_metadataFile);
-  m_addTag.prepare("BEGIN; INSERT INTO tag (tag_name) VALUES (:tagName); INSERT INTO phototag (tag_id, image_id) VALUES (:tagId, :nameId); COMMIT;");
-
-  m_changeName = QSqlQuery(m_metadataFile);
-  m_changeName.prepare("UPDATE image SET image_name = :imageName WHERE image_id = :imageId;");
-
-  m_changeDescription = QSqlQuery(m_metadataFile);
-  m_changeDescription.prepare("UPDATE image SET description = :imageDescription WHERE image_id = :imageId;");
-
-  m_insertTag = QSqlQuery(m_metadataFile);
-  m_insertTag.prepare("INSERT INTO phototag (tag_id, image_id) VALUES(:tagId, :imageId);");
-
-  m_tagExists = QSqlQuery(m_metadataFile);
-  m_tagExists.prepare("SELECT tag_id FROM tag WHERE tag_id = :tagId;");
-
-  m_removeTag = QSqlQuery(m_metadataFile);
-  m_removeTag.prepare("DELETE FROM phototag WHERE tag_id = :tagId AND image_id = :imageId;");
-
-  m_deleteImage = QSqlQuery(m_metadataFile);
-  m_deleteImage.prepare("DELETE FROM image WHERE image_id = :imageId;");
-
-  m_deleteTag = QSqlQuery(m_metadataFile);
-  m_deleteTag.prepare("DELETE FROM tag WHERE tag_id = :tagId;");*/
-
 }
 
 void MetaDataManager::addImage(const QString &filename)

@@ -21,8 +21,6 @@
 #ifndef GWIDGETSINPUTZOOMDIALOG_H
 #define GWIDGETSINPUTZOOMDIALOG_H
 
-#include "ui_photocontrol.h"
-
 #include <QtGui/QDialog>
 
 class QPushButton;

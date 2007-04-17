@@ -27,6 +27,8 @@
 #include <QtGui/QComboBox>
 #include <QtGui/QLineEdit>
 #include <QtGui/QLabel>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QPushButton>
 
 namespace GWidgets
 {
