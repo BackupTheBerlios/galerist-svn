@@ -56,6 +56,7 @@ Configuration::Configuration(QWidget *parent)
 
 #ifdef WANT_UPDATER
   updateBox->setChecked(GCore::Data::self()->getUpdateStartup());
+  updateBox->setEnabled(true);
 #else
   updateBox->setChecked(false);
   updateBox->setEnabled(false);

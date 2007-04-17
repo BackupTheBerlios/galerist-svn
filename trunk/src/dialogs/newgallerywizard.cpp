@@ -84,6 +84,10 @@ void NewGalleryWizard::setupUi()
   setPixmap(QWizard::BannerPixmap, QPixmap(":/images/newgallerywizard-banner.png"));
   setPixmap(QWizard::BackgroundPixmap, QPixmap(":/images/galerist-big.png"));
 
+#ifdef unix
+  setWizardStyle(QWizard::ModernStyle);
+#endif
+
   if (wizardStyle() == QWizard::MacStyle)
     setFixedSize(770, 570);
   else
