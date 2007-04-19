@@ -52,7 +52,7 @@ class InputZoomDialog : public QDialog
      * @param parent Parent of this dialog.
      *
      * @return The new zoom level.
-     * @return @c currentZoom User canceled the zoom selection.
+     * @return @c -1 User canceled the zoom selection.
      */
     static float getZoomLevel(float currentZoom, QWidget *parent = 0);
 

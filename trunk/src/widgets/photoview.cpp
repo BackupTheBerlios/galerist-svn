@@ -291,7 +291,7 @@ void PhotoView::slotZoomInputPhoto()
 {
   // We ask for the new zoom level
   float newZoom = InputZoomDialog::getZoomLevel(m_currentEdited->getScaleMultiplier() * 100, this);
-  if (newZoom == m_currentEdited->getScaleMultiplier() * 100)
+  if (newZoom == -1)
     return;
 
   m_currentEdited->setZoom(newZoom);

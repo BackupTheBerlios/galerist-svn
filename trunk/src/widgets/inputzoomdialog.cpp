@@ -73,9 +73,6 @@ InputZoomDialog::InputZoomDialog(float currentZoom, QWidget *parent)
   m_reject->setFocusPolicy(Qt::NoFocus);
   buttons->addWidget(m_reject);
 
-  // Again some streachin'
-  //main->addStretch();
-
   // We add the button layout
   main->addLayout(buttons);
 
@@ -108,10 +105,11 @@ float InputZoomDialog::getZoomLevel(float currentZoom, QWidget *parent)
 {
   InputZoomDialog *dialog = new InputZoomDialog(currentZoom, parent);
 
-  if (dialog->exec() == QDialog::Accepted)
+  if (dialog->exec() == QDialog::Accepted) {
     return InputZoomDialog::m_result.remove("%").toFloat() / 100;
+  }
 
-  return currentZoom;
+  return -1;
 }
 
 void InputZoomDialog::accept()
