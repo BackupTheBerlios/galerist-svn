@@ -198,6 +198,27 @@ void PhotoView::rotateSelectedImageCW()
   GCore::Data::self()->getImageModel()->rotate(indexForItem(m_currentEdited), GCore::ImageModel::ClockWise);
 }
 
+void PhotoView::beginCrop(bool enable)
+{
+  if (!m_editMode)
+    return;
+  
+  // We enable rubberband
+  m_needRubberBand = enable;
+
+  // Connect or disconnect the necessary slot
+  if (enable)
+    connect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+  else
+    disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+
+  // Set the cross cursor
+  if (enable)
+    viewport()->setCursor(Qt::CrossCursor);
+  else
+    viewport()->setCursor(Qt::OpenHandCursor);
+}
+
 void PhotoView::rotateSelectedImageCCW()
 {
   if (!m_editMode)
@@ -547,10 +568,11 @@ void PhotoView::mousePressEvent(QMouseEvent *event)
     m_oldSelectedItems = scene()->selectedItems();
 
   // We store the position of this event and create the rubberband
-  if (dragMode() == QGraphicsView::NoDrag) {
+  if (dragMode() == QGraphicsView::NoDrag || m_needRubberBand) {
     m_rubberStartPos = event->pos();
     m_rubberScrollValue = verticalScrollBar()->value();
     m_rubberBand = new QRubberBand(QRubberBand::Rectangle, viewport());
+    return;
     //m_rubberBand->show();
   }
 
@@ -581,7 +603,7 @@ void PhotoView::mousePressEvent(QMouseEvent *event)
 void PhotoView::mouseMoveEvent(QMouseEvent *event)
 {
   // Now we show the rubber band
-  if (dragMode() == QGraphicsView::NoDrag && event->buttons() & Qt::LeftButton) {
+  if ((dragMode() == QGraphicsView::NoDrag || m_needRubberBand) && event->buttons() & Qt::LeftButton) {
     if (m_rubberBand) {
       // Define the selection rectangle
       QRect selectionRect = QRect(m_rubberStartPos, event->pos());
@@ -590,15 +612,20 @@ void PhotoView::mouseMoveEvent(QMouseEvent *event)
       selectionRect.setTop(selectionRect.top() - (verticalScrollBar()->value() - m_rubberScrollValue));
       selectionRect = selectionRect.normalized();
 
-      // Sets the selection area
-      QPainterPath selectionArea;
-      selectionArea.addPolygon(mapToScene(selectionRect));
-      scene()->setSelectionArea(selectionArea);
+      if (!m_needRubberBand) {
+        // We change selection of items only at nonedit mode
 
-      // Now we reselect our previous selection
-      QList<QGraphicsItem*>::const_iterator end = m_oldSelectedItems.constEnd();
-      for (QList<QGraphicsItem*>::const_iterator count = m_oldSelectedItems.constBegin(); count != end; count++)
-        (*count)->setSelected(true);
+        // Sets the selection area
+        QPainterPath selectionArea;
+        selectionArea.addPolygon(mapToScene(selectionRect));
+        scene()->setSelectionArea(selectionArea);
+
+        // Now we reselect our previous selection
+        QList<QGraphicsItem*>::const_iterator end = m_oldSelectedItems.constEnd();
+        for (QList<QGraphicsItem*>::const_iterator count = m_oldSelectedItems.constBegin(); count != end; count++)
+          (*count)->setSelected(true);
+
+      }
 
       // Set rubberbands geometry and show it
       m_rubberBand->setGeometry(selectionRect);
@@ -612,7 +639,7 @@ void PhotoView::mouseMoveEvent(QMouseEvent *event)
     delete m_rubberBand;
     m_rubberBand = 0;
 
-      // Our selection has ended. We can now empty our list
+    // Our selection has ended. We can now empty our list
     m_oldSelectedItems.clear();
   }
 
@@ -623,8 +650,17 @@ void PhotoView::mouseMoveEvent(QMouseEvent *event)
 
 void PhotoView::mouseReleaseEvent(QMouseEvent *event)
 {
+  if (m_rubberBand && m_needRubberBand) {
+    emit areaSelected(m_rubberBand->geometry());
+    emit toolReleased(false);
+    m_needRubberBand = false;
+  }
+
   // If it's not our call, we pass it to QGraphicsView
   QGraphicsView::mouseReleaseEvent(event);
+
+  if (m_editMode)
+    viewport()->setCursor(Qt::OpenHandCursor);
 }
 
 void PhotoView::contextMenuEvent(QContextMenuEvent *event)
@@ -891,6 +927,19 @@ void PhotoView::slotRemove()
 void PhotoView::slotConnectNavButtons()
 {
   GCore::Data::self()->getSearchBar()->setListFilter(this);
+}
+
+void PhotoView::cropSelection(const QRect &area)
+{
+  // Disconnect the slot
+  disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+
+  // Resets the cursor
+  viewport()->setCursor(Qt::ClosedHandCursor);
+
+  // Crops the image
+  m_currentEdited->crop(mapToScene(area).boundingRect().toRect());
+  //static_cast<GCore::ImageModel*> (model())->crop(indexForItem(m_currentEdited), area);
 }
 
 QModelIndex PhotoView::indexForItem(PhotoItem *item)

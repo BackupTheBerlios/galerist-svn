@@ -24,6 +24,7 @@
 #include <QtCore/QObject>
 
 class QImage;
+class QRect;
 
 namespace Magick
 {
@@ -207,6 +208,13 @@ class ImageItem : public QObject
      * Rotates for 90 degrees into counter clock-wise direction.
      */
     void rotateCCW();
+
+    /**
+     * Crops the image.
+     *
+     * @param area Area of the image to be cropped.
+     */
+    void crop(const QRect &area);
 
   public slots:
     /**

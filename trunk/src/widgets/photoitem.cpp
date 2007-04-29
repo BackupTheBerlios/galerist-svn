@@ -395,6 +395,13 @@ void PhotoItem::rotateCCW()
   rotate(-90);
 }
 
+void PhotoItem::crop(const QRect &area)
+{
+  QRect mappedArea(mapToItem(m_pixmap, area.topLeft()).toPoint() / m_scaleMultiplier, area.size() / m_scaleMultiplier);
+
+  static_cast<GCore::ImageModel*>(m_view->model())->crop(m_view->indexForItem(this), mappedArea);
+}
+
 void PhotoItem::rotate(int rotation)
 {
   initialiseTimer();

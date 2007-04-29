@@ -69,13 +69,24 @@ class PhotoView : public QGraphicsView
      */
     void signalEditMode(bool edit);
     /**
-     * Emited when search returns an empty result.
+     * Emitted when search returns an empty result.
      */
     void noPhotosFound();
     /**
-     * Emited when moving through images at edit mode.
+     * Emitted when moving through images at edit mode.
      */
     void photoEditSelectionChanged(int newLocation, int totalImages);
+    /**
+     * Emitted at mouseReleaseEvent and when m_needRuberBand is set to true. You have to manually revert every change that you've
+     * done to the viewport (such as changing mouse cursors etc.).
+     *
+     * @param area Area of selection.
+     */
+    void areaSelected(const QRect &area);
+    /**
+     * Emitted at mouseReleaseEvent. Used for reporting back to the checkable button (to uncheck).
+     */
+    void toolReleased(bool check);
 
   public:
     /**
@@ -205,6 +216,12 @@ class PhotoView : public QGraphicsView
     void rotateSelectedImageCCW();
 
     /**
+     * Initiates the crop action.
+     */
+    void beginCrop(bool enable);
+
+
+    /**
      * Slot for switching to the next photo.
      */
     void slotNextPhoto();
@@ -317,9 +334,55 @@ class PhotoView : public QGraphicsView
      */
     void keyPressEvent(QKeyEvent *event);
 
+  private:
+    int m_spacing;
+    QPointF m_zero;
+    int m_timerId;
+    bool m_editMode;
+
+    PhotoItem *m_currentEdited;
+
+    QAbstractItemModel *m_model;
+    QModelIndex m_rootIndex;
+    QHash<QModelIndex, PhotoItem*> m_itemHash;
+    QVector<PhotoItem*> m_itemVector;
+
+    QList<PhotoItem*> m_removeList;
+
+    QGraphicsPixmapItem *m_loading;
+
+    int m_oldHorizontalScrollMaximum;
+    int m_oldVerticalScrollMaximum;
+
+    QList<QGraphicsItem*> m_oldSelectedItems;
+
+    QPoint m_rubberStartPos;
+    int m_rubberScrollValue;
+    QRubberBand *m_rubberBand;
+    bool m_needRubberBand;
+
+    QString m_filter;
+
+    /**
+     * Update and start the updating timer.
+     */
+    void updateScene();
+    /**
+     * Updates the scroll bars (resizes the scene rectangle).
+     */
+    void updateScrollBars();
+
+    /**
+     * For going into editing mode. Or out of it.
+     *
+     * @param editMode Set or unset editing mode.
+     * @param selectedItem Reference to the selected item (which item did we double clicked?).
+     */
+    void setEditMode(bool editMode, PhotoItem *selectedItem = 0);
+
   private slots:
     /**
-     * Slot to execute when scene changes.
+    * Slot to execute when scene changes.
      */
     void slotSceneChanged();
     /**
@@ -370,50 +433,12 @@ class PhotoView : public QGraphicsView
      */
     void slotConnectNavButtons();
 
-  private:
-    int m_spacing;
-    QPointF m_zero;
-    int m_timerId;
-    bool m_editMode;
-
-    PhotoItem *m_currentEdited;
-
-    QAbstractItemModel *m_model;
-    QModelIndex m_rootIndex;
-    QHash<QModelIndex, PhotoItem*> m_itemHash;
-    QVector<PhotoItem*> m_itemVector;
-
-    QList<PhotoItem*> m_removeList;
-
-    QGraphicsPixmapItem *m_loading;
-
-    int m_oldHorizontalScrollMaximum;
-    int m_oldVerticalScrollMaximum;
-
-    QList<QGraphicsItem*> m_oldSelectedItems;
-
-    QPoint m_rubberStartPos;
-    int m_rubberScrollValue;
-    QRubberBand *m_rubberBand;
-
-    QString m_filter;
-
     /**
-     * Update and start the updating timer.
-     */
-    void updateScene();
-    /**
-     * Updates the scroll bars (resizes the scene rectangle).
-     */
-    void updateScrollBars();
-
-    /**
-     * For going into editing mode. Or out of it.
+     * Does the actual crop operation.
      *
-     * @param editMode Set or unset editing mode.
-     * @param selectedItem Reference to the selected item (which item did we double clicked?).
+     * @param area Area of operation.
      */
-    void setEditMode(bool editMode, PhotoItem *selectedItem = 0);
+    void cropSelection(const QRect &area);
 };
 
 }

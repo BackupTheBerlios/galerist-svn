@@ -230,6 +230,11 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      */
     void rotateCCW();
 
+    /**
+     * Crop image.
+     */
+    void crop(const QRect &area);
+
   public slots:
     /**
      * Changes the image.

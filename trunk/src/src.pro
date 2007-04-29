@@ -1,4 +1,3 @@
-FORMS += mainwindow.ui
 HEADERS += mainwindow.h \
 namespace-def.h
 SOURCES += main.cpp \
@@ -72,3 +71,5 @@ win32{
 }
 LIBS += -lMagick++ \
 -lexif
+FORMS += mainwindow.ui
+

@@ -21,6 +21,7 @@
 #include "imageitem.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QRect>
 
 #include <QtGui/QImage>
 
@@ -231,6 +232,26 @@ void ImageItem::rotateCCW()
 
   m_image->rotate(270);
   QTimer::singleShot(1000, this, SLOT(saveRotation()));
+}
+
+void ImageItem::crop(const QRect &area)
+{
+  if (!m_image)
+    return;
+
+  Magick::Geometry wii(area.width(), area.height(), area.left(), area.top());
+
+  if (!wii.isValid()) {
+    qDebug("AAAAAAAA");
+    return;
+  }
+
+  Magick::Image *uu = new Magick::Image(*m_image);
+  m_image->crop(wii);
+
+  m_image->display();
+
+  m_image = uu;
 }
 
 QString ImageItem::getThumbName()

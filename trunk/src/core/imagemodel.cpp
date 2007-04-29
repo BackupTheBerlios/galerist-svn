@@ -724,6 +724,16 @@ void ImageModel::rotate(const QModelIndex &index, int direction) const
   }
 }
 
+void ImageModel::crop(const QModelIndex &index, const QRect &area) const
+{
+  if (!index.isValid())
+    return;
+
+  ImageItem *item = static_cast<ImageItem*>(index.internalPointer());
+
+  item->crop(area);
+}
+
 void ImageModel::setupModelData(const QString &path) const
 {
   processPath(QDir(QDir::fromNativeSeparators(path)));

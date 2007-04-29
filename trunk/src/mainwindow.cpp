@@ -153,6 +153,11 @@ void MainWindow::initActionButtons()
   connect(rotateCCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCCW()));
   connect(rotateCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCW()));
   connect(editButton, SIGNAL(clicked()), imageList, SLOT(slotEditPhoto()));
+
+  // New buttons! <-- Need to remove this comment!!!!
+  connect(cropButton, SIGNAL(clicked(bool)), imageList, SLOT(beginCrop(bool)));
+  connect(imageList, SIGNAL(toolReleased(bool)), cropButton, SLOT(setChecked(bool)));
+
   connect(zoomOutButton, SIGNAL(clicked()), imageList, SLOT(slotZoomOutPhoto()));
   connect(zoomInButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInPhoto()));
   connect(zoomInputButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInputPhoto()));

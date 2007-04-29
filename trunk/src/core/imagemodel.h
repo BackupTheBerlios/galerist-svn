@@ -287,6 +287,11 @@ class ImageModel : public QAbstractItemModel
      */
     void rotate(const QModelIndex &index, int direction = ClockWise) const;
 
+    /**
+     * Crops the image.
+     */
+    void crop(const QModelIndex &crop, const QRect &area) const;
+
   protected:
 
   private:
