@@ -302,6 +302,7 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
 
     PhotoRect *m_rect;
     PhotoPixmap *m_pixmap;
+    PhotoPixmap *m_new;
     PhotoName *m_text;
     PhotoDescription *m_description;
 

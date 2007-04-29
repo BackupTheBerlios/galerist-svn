@@ -246,12 +246,6 @@ void ImageItem::crop(const QRect &area)
     return;
   }
 
-  Magick::Image *uu = new Magick::Image(*m_image);
-  m_image->crop(wii);
-
-  m_image->display();
-
-  m_image = uu;
 }
 
 QString ImageItem::getThumbName()

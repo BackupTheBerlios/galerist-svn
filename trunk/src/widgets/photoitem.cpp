@@ -108,6 +108,7 @@ PhotoItem::PhotoItem(PhotoView *view)
     m_editMode(false),
     m_zooming(false),
     m_pendingDoom(false),
+    m_new(0),
     m_hide(false),
     m_rotation(0)
 {
@@ -400,6 +401,20 @@ void PhotoItem::crop(const QRect &area)
   QRect mappedArea(mapToItem(m_pixmap, area.topLeft()).toPoint() / m_scaleMultiplier, area.size() / m_scaleMultiplier);
 
   static_cast<GCore::ImageModel*>(m_view->model())->crop(m_view->indexForItem(this), mappedArea);
+
+  if (m_new) {
+    m_pixmap->setPixmap(QPixmap::fromImage(m_view->model()->data(m_view->indexForItem(this), GCore::ImageModel::ImagePictureRole).value<QImage>()));
+    delete m_new;
+  } else {
+    //m_pixmap = m_new;
+  }
+  m_new = new PhotoPixmap(this, m_view->scene());
+  m_new->setPixmap(m_pixmap->pixmap().copy(mappedArea));
+  m_new->setPos(mappedArea.topLeft());
+  m_new->setZValue(2);
+  //m_pixmap->setZValue(1);
+
+  m_pixmap->setPixmap(QPixmap::fromImage(m_pixmap->pixmap().toImage().convertToFormat(QImage::Format_Mono)));
 }
 
 void PhotoItem::rotate(int rotation)
@@ -530,6 +545,11 @@ void PhotoItem::slotEdit(bool edit)
   } else {
     // Item is selectable and focusable again
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
+
+    if (m_new) {
+      delete m_new;
+      m_new = 0;
+    }
 
     // Go back to default value
     setZValue(1);
