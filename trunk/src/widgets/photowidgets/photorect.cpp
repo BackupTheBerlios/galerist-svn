@@ -18,68 +18,51 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "photorect.h"
 
-#ifndef GWIDGETSTEXTEDIT_H_
-#define GWIDGETSTEXTEDIT_H_
+#include <QtGui/QPainter>
 
-#include <QtGui/QTextEdit>
+#include "core/data.h"
 
 namespace GWidgets
 {
 
-/**
- * Class for text edits used in PhotoView.
- * @short Text edit just for PhotoView.
- * @author Gregor Kališnik <gregor@podnapisi.net>
- */
-class TextEdit : public QTextEdit
+namespace GPhotoWidgets
 {
-    Q_OBJECT
-  signals:
-    /**
-     * Signals taht the editing has been finished.
-     *
-     * @param text The new text.
-     */
-    void editingFinished(const QString &text);
-    /**
-     * Signals that the editing has been canceled.
-     */
-    void editingCanceled();
 
-  public:
-    /**
-     * Default constructor.
-     */
-    TextEdit(QWidget *parent = 0);
+PhotoRect::PhotoRect(QGraphicsItem *parent, QGraphicsScene *scene)
+    : QGraphicsRectItem(parent, scene)
+{}
 
-    /**
-     * Default destructor.
-     */
-    ~TextEdit();
+void PhotoRect::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
+{
+  painter->save();
+  painter->setPen(pen());
+  painter->setBrush(brush());
 
-  protected:
-    /**
-     * Overloaded method for defining what to do when it gets pressed.
-     *
-     * @param event The event :).
-     */
-    void keyPressEvent(QKeyEvent *event);
-    /**
-     * Overloaded method for defining what to do when focus goes away.
-     */
-    void focusOutEvent(QFocusEvent*);
+  switch (GCore::Data::self()->getBackgroundType()) {
+    case (GCore::Data::Round) : {
+        painter->drawRoundRect(rect());
 
-  private:
-    //QTextEdit *m_textEdit;
-    //QPushButton *m_submit;
-    //QPushButton *m_cancel;
-    QString m_previous;
+        if (isSelected()) {
+          painter->setBrush(QColor(0, 0, 250, 50));
+          painter->drawRoundRect(rect());
+        }
+        break;
+      }
+    default: {
+      painter->drawRect(rect());
 
-  private slots:
-    //void slotAccept();
-};
+      if (isSelected()) {
+        painter->setBrush(QColor(0, 0, 250, 50));
+        painter->drawRect(rect());
+      }
+      break;
+    }
+  }
+  painter->restore();
+}
 
 }
 
-#endif
+}

@@ -44,10 +44,13 @@ ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
     m_image(0),
     m_changes(false)
 {
-  m_itemData << getFileName();
-
-  if (type == Image)
-    m_itemData << "Description";
+  if (m_type == Image)
+    m_id = metadata()->imageId(getFileName());
+  else
+    m_metadata = new MetaDataManager(getFilePath());
+  
+  // We setup the metadata entry
+  //metadata();
 }
 
 ImageItem::~ImageItem()
@@ -72,7 +75,7 @@ void ImageItem::removeChild(ImageItem *child)
   delete child;
 }
 
-ImageItem *ImageItem::child(int row)
+ImageItem *ImageItem::child(int row) const
 {
   return m_childItems.value(row);
 }
@@ -92,20 +95,25 @@ int ImageItem::row() const
 
 int ImageItem::columnCount() const
 {
-  return m_itemData.count();
+  // We have a fixed number of data
+  return 1;
 }
 
 QVariant ImageItem::data(int column) const
 {
-  return m_itemData.value(column);
+  // We (I) don't like columns :)
+  if (!column)
+    return name();
+  else
+    return description();
 }
 
-ImageItem *ImageItem::parent()
+ImageItem *ImageItem::parent() const
 {
   return m_parentItem;
 }
 
-ImageItem::Type ImageItem::imageType()
+ImageItem::Type ImageItem::imageType() const
 {
   return m_type;
 }
@@ -113,9 +121,10 @@ ImageItem::Type ImageItem::imageType()
 void ImageItem::setFilePath(const QString &path)
 {
   m_path = path;
+  emit valuesChanged();
 }
 
-QString ImageItem::getFilePath()
+QString ImageItem::getFilePath() const
 {
   if (!m_parentItem) {
     return m_path;
@@ -125,7 +134,7 @@ QString ImageItem::getFilePath()
   }
 }
 
-QString ImageItem::getFileName()
+QString ImageItem::getFileName() const
 {
   if (!m_parentItem) {
     // There is no parent item, so path contains the full path
@@ -137,63 +146,50 @@ QString ImageItem::getFileName()
   }
 }
 
-MetaDataManager *ImageItem::metadata()
+MetaDataManager *ImageItem::metadata() const
 {
   MetaDataManager *output = 0;
   if (!m_metadata && m_type == Gallery)
-    output = m_metadata = new MetaDataManager(getFilePath());
+    qFatal("Error! MetadataManager not initialised! But should be. BUG!");
+    //output = m_metadata = new MetaDataManager(getFilePath());
 
   if (m_type == Gallery)
     output = m_metadata;
 
   if (!m_metadata && m_type == Image) {
     output = parent()->metadata();
-    m_id = output->imageId(getFileName());
+    //m_id = output->imageId(getFileName());
   }
 
   return output;
 }
 
-QString ImageItem::name()
+QString ImageItem::name() const
 {
-  if (m_type == Image) {
-
-    // Update the metadata
-    m_itemData.clear();
-    m_itemData << metadata()->name(m_id);
-    m_itemData << metadata()->description(m_id);
-  }
-
-  // We return the name
-  return m_itemData.at(0).toString();
+  if (m_type == Image)
+    return metadata()->name(m_id);
+  else
+    return getFileName();
 }
 
-QString ImageItem::description()
+QString ImageItem::description() const
 {
-  if (m_type == Image) {
-
-    // Update the metadata
-    m_itemData.clear();
-    m_itemData << metadata()->name(m_id);
-    m_itemData << metadata()->description(m_id);
-  }
-
-  // We return the description
-  return m_itemData.at(1).toString();
+  if (m_type == Image)
+    return metadata()->description(m_id);
+  else
+    return QString();
 }
 
 bool ImageItem::setName(const QString &name)
 {
+  bool output;
   if (imageType() == Image) {
-    if (metadata()->setName(name, m_id)) {
-      m_itemData.removeFirst();
-      m_itemData.prepend(name);
-      return true;
-    }
+    output = metadata()->setName(name, m_id);
+    emit valuesChanged();
+    return output;
   } else if (imageType() == Gallery) {
-    m_itemData.removeFirst();
-    m_itemData.prepend(name);
     setFilePath(name);
+    emit valuesChanged();
     return true;
   }
 
@@ -207,8 +203,7 @@ void ImageItem::setDescription(const QString &description)
 
   metadata()->setDescription(description, m_id);
 
-  m_itemData.removeLast();
-  m_itemData.append(description);
+  emit valuesChanged();
 }
 
 bool ImageItem::remove()
@@ -239,16 +234,16 @@ void ImageItem::crop(const QRect &area)
   if (!m_image)
     return;
 
-  Magick::Geometry wii(area.width(), area.height(), area.left(), area.top());
-
-  if (!wii.isValid()) {
-    qDebug("AAAAAAAA");
+  try {
+    m_image->crop(Magick::Geometry(area.width(), area.height(), area.left(), area.top()));
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
     return;
   }
 
 }
 
-QString ImageItem::getThumbName()
+QString ImageItem::getThumbName() const
 {
   return getFileName().remove(QRegExp("\\..+$")).append(".jpg");
 }

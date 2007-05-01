@@ -20,19 +20,25 @@
  ***************************************************************************/
 
 #include "photodescription.h"
-#include "photoitem.h"
-#include "photoview.h"
+
+#include <QtCore/QPointF>
 
 #include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsScene>
-#include <QtCore/QPointF>
 #include <QtGui/QTextDocument>
 #include <QtGui/QPainter>
 
 #include "core/imagemodel.h"
+
+#include "widgets/photoview.h"
 #include "widgets/textedit.h"
 
+#include "widgets/photowidgets/photoitem.h"
+
 namespace GWidgets
+{
+
+namespace GPhotoWidgets
 {
 
 PhotoDescription::PhotoDescription(QGraphicsItem *parent, QGraphicsScene *scene, QGraphicsView *view)
@@ -98,6 +104,8 @@ void PhotoDescription::slotCancelEditing()
 PhotoDescription::~PhotoDescription()
 {
   delete m_editor;
+}
+
 }
 
 }

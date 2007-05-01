@@ -21,70 +21,31 @@
 #ifndef GWIDGETSPHOTOITEM_H
 #define GWIDGETSPHOTOITEM_H
 
-#include <QtGui/QGraphicsItem>
 #include <QtCore/QObject>
+#include <QtCore/QModelIndex>
+
+#include <QtGui/QGraphicsItem>
+
 
 class QGraphicsItemAnimation;
 class QTimeLine;
+
+namespace GCore {
+class ImageItem;
+}
 
 namespace GWidgets
 {
 
 class PhotoView;
+
+namespace GPhotoWidgets
+{
+
 class PhotoName;
 class PhotoDescription;
-
-/**
- * Class that represents the rectangle around the photo.
- * @short Rectangle.
- * @author Gregor Kališ¡nik <gregor@podnapisi.net>
- */
-class PhotoRect : public QGraphicsRectItem
-{
-  public:
-    /**
-     * Default constructor.
-     *
-     * @param parent Parent of this item.
-     * @param scene The scene in which this item is.
-     */
-    PhotoRect(QGraphicsItem *parent, QGraphicsScene *scene);
-
-  protected:
-    /**
-     * Overloaded method for defining its own painting operation.
-     *
-     * @param painter Reference to the used painter.
-     */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*);
-};
-
-/**
- * Class that represents the thumbnail of the photo.
- * @short Thumbnail of the photo.
- * @author Gregor Kališ¡nik <gregor@podnapisi.net>
- */
-class PhotoPixmap : public QGraphicsPixmapItem
-{
-  public:
-    /**
-     * Default constructor.
-     *
-     * @param parent Parent of this item.
-     * @param scene The scene in which this item is.
-     */
-    PhotoPixmap(QGraphicsItem *parent, QGraphicsScene *scene);
-
-  protected:
-    /**
-     * Overloaded method for defining its own painting operation.
-     *
-     * @param painter Reference to the used painter.
-     * @param option Option of this item.
-     */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*);
-
-};
+class PhotoRect;
+class PhotoPixmap;
 
 /**
  * This class represents a single view item. It can be assigned a pixmap and
@@ -92,7 +53,7 @@ class PhotoPixmap : public QGraphicsPixmapItem
  * @short A photo in a PhotoView.
  *
  * @author Jernej Kos <kostko@unimatrix-one.org>
- * @author Gregor Kališ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class PhotoItem : public QObject, public QGraphicsItemGroup
 {
@@ -119,7 +80,7 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      * @param view The parent view
      * @param timeline The QTimeLine for animations
      */
-    PhotoItem(PhotoView *view);
+    PhotoItem(PhotoView *view, const QModelIndex &index);
 
     /**
      * Default destructor.
@@ -179,6 +140,11 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      * @return The tooltip
      */
     QString toolTip();
+
+    /**
+     * Gets the index of this item.
+     */
+    QModelIndex getIndex();
 
     /**
      * Returns the actual scaled size.
@@ -310,6 +276,10 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
 
     int m_rotation;
 
+    // Connection with the model
+    GCore::ImageItem *m_item;
+    QModelIndex m_index;
+
     /**
      * Rotates the image.
      */
@@ -347,6 +317,8 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      */
     void slotEdit(bool edit);
 };
+
+}
 
 }
 

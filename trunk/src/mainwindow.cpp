@@ -46,6 +46,9 @@
 
 #include "widgets/imageaddprogress.h"
 
+
+#include "widgets/textedit.h"
+
 MainWindow::MainWindow()
     : QMainWindow(), Ui::MainWindow()
 {
@@ -53,6 +56,9 @@ MainWindow::MainWindow()
 
   setWindowIcon(QIcon(":/images/galerist.png"));
   setWindowTitle(GCore::Data::self()->getAppName());
+
+  // FIXME This ugly, quick-fixing HACK needs to get OUT! pronto!
+  GWidgets::TextEdit(this);
 
   startTimer(100);
 

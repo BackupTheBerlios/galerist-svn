@@ -34,8 +34,12 @@ class QRubberBand;
 namespace GWidgets
 {
 
-class PhotoItem;
 class SearchBar;
+
+namespace GPhotoWidgets
+{
+class PhotoItem;
+}
 
 /**
  * This class is a custom listview-like widget implemented using
@@ -48,7 +52,7 @@ class SearchBar;
 class PhotoView : public QGraphicsView
 {
     Q_OBJECT
-    friend class PhotoItem;
+    friend class GPhotoWidgets::PhotoItem;
   signals:
     /**
      * Signal that reports that a item has been selected.
@@ -124,7 +128,7 @@ class PhotoView : public QGraphicsView
      *
      * @return Reference to the item.
      */
-    PhotoItem *itemForIndex(const QModelIndex &index);
+    GPhotoWidgets::PhotoItem *itemForIndex(const QModelIndex &index);
     /**
      * Converts an item into an index.
      *
@@ -132,7 +136,7 @@ class PhotoView : public QGraphicsView
      *
      * @return Returns the index.
      */
-    QModelIndex indexForItem(PhotoItem *item);
+    QModelIndex indexForItem(GPhotoWidgets::PhotoItem *item);
 
     /**
      * Method to get reference to the model that PhotoView is using.
@@ -154,7 +158,7 @@ class PhotoView : public QGraphicsView
      * @return Reference to the selected item.
      * @return @c null More than one or none items selected.
      */
-    PhotoItem *getSelectedPhoto();
+    GPhotoWidgets::PhotoItem *getSelectedPhoto();
 
     /**
      * Default destructor.
@@ -340,14 +344,14 @@ class PhotoView : public QGraphicsView
     int m_timerId;
     bool m_editMode;
 
-    PhotoItem *m_currentEdited;
+    GPhotoWidgets::PhotoItem *m_currentEdited;
 
     QAbstractItemModel *m_model;
     QModelIndex m_rootIndex;
-    QHash<QModelIndex, PhotoItem*> m_itemHash;
-    QVector<PhotoItem*> m_itemVector;
+    QHash<QModelIndex, GPhotoWidgets::PhotoItem*> m_itemHash;
+    QVector<GPhotoWidgets::PhotoItem*> m_itemVector;
 
-    QList<PhotoItem*> m_removeList;
+    QList<GPhotoWidgets::PhotoItem*> m_removeList;
 
     QGraphicsPixmapItem *m_loading;
 
@@ -378,7 +382,7 @@ class PhotoView : public QGraphicsView
      * @param editMode Set or unset editing mode.
      * @param selectedItem Reference to the selected item (which item did we double clicked?).
      */
-    void setEditMode(bool editMode, PhotoItem *selectedItem = 0);
+    void setEditMode(bool editMode, GPhotoWidgets::PhotoItem *selectedItem = 0);
 
   private slots:
     /**

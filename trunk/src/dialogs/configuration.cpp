@@ -139,10 +139,10 @@ void Configuration::slotProcessEdit(const QString &filePath, bool firstRun)
         QString pathString = *count;
 
         // Remove PATH= and split it
-#ifdef _WIN32
+#ifdef Q_WS_WIN
         QStringList path = pathString.remove("PATH=").split(';');
 #endif
-#ifdef unix
+#ifdef Q_WS_X11
         QStringList path = pathString.remove("PATH=").split(':');
 #endif
 
@@ -157,7 +157,7 @@ void Configuration::slotProcessEdit(const QString &filePath, bool firstRun)
             // We found the asumed (test button is there for futher testing) editor and we leave this function
             return;
           }
-#ifdef _WIN32
+#ifdef Q_WS_WIN
           // Windows ignores extensions in DOS (idiotic?)
           QFileInfo fileInfoExtension((*countPath) + "/" + filePath + ".exe");
           if (fileInfoExtension.isFile() && fileInfoExtension.isExecutable()) {
@@ -177,7 +177,7 @@ void Configuration::slotProcessEdit(const QString &filePath, bool firstRun)
 
 void Configuration::slotBrowse()
 {
-#ifdef _WIN32
+#ifdef Q_WS_WIN
   QString editorPath = QFileDialog::getOpenFileName(this, tr("Select image editor"), "/", tr("Executables (*.exe)"));
 #else
   QString editorPath = QFileDialog::getOpenFileName(this, tr("Select image editor"), "/");

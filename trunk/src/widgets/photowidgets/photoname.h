@@ -38,10 +38,13 @@ namespace GWidgets
 
 class LineEdit;
 
+namespace GPhotoWidgets
+{
+
 /**
  * Class that represents the name of the Photo.
  * @short Name of the photo.
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class PhotoName : public QObject, public QGraphicsSimpleTextItem
 {
@@ -113,6 +116,8 @@ class PhotoName : public QObject, public QGraphicsSimpleTextItem
      */
     void slotCancel();
 };
+
+}
 
 }
 

@@ -19,66 +19,95 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef GWIDGETSTEXTEDIT_H_
-#define GWIDGETSTEXTEDIT_H_
+#ifndef GWIDGETSPHOTODESCRIPTION_H
+#define GWIDGETSPHOTODESCRIPTION_H
 
-#include <QtGui/QTextEdit>
+#include <QtGui/QGraphicsItem>
+
+class QGraphicsScene;
+class QGraphicsView;
+class QStyleOptionGraphicsItem;
+class QGraphicsSceneMouseEvent;
+class QWidget;
+class QPainter;
 
 namespace GWidgets
 {
 
+class TextEdit;
+
+namespace GPhotoWidgets
+{
+
 /**
- * Class for text edits used in PhotoView.
- * @short Text edit just for PhotoView.
+ * Class that represents the description of the photo.
+ * @short Photos description.
  * @author Gregor Kališnik <gregor@podnapisi.net>
  */
-class TextEdit : public QTextEdit
+class PhotoDescription : public QGraphicsTextItem
 {
     Q_OBJECT
   signals:
     /**
-     * Signals taht the editing has been finished.
+     * Signals finish of edit.
      *
      * @param text The new text.
      */
     void editingFinished(const QString &text);
-    /**
-     * Signals that the editing has been canceled.
-     */
-    void editingCanceled();
 
   public:
     /**
      * Default constructor.
      */
-    TextEdit(QWidget *parent = 0);
+    PhotoDescription(QGraphicsItem *parent, QGraphicsScene *scene, QGraphicsView *view);
+
+    /**
+     * Set the text to show.
+     *
+     * @param text Text to be shown.
+     */
+    void setText(const QString &text);
+    /**
+     * Go to editing mode.
+     */
+    void setEdit();
 
     /**
      * Default destructor.
      */
-    ~TextEdit();
+    ~PhotoDescription();
 
   protected:
     /**
-     * Overloaded method for defining what to do when it gets pressed.
+     * Overloaded method for defining its own painting operation.
      *
-     * @param event The event :).
+     * @param painter Reference to the painter.
      */
-    void keyPressEvent(QKeyEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*);
     /**
-     * Overloaded method for defining what to do when focus goes away.
+     * Overloaded method for defining the behaviour on mouse press event.
      */
-    void focusOutEvent(QFocusEvent*);
+    void mousePressEvent(QGraphicsSceneMouseEvent*);
 
   private:
-    //QTextEdit *m_textEdit;
-    //QPushButton *m_submit;
-    //QPushButton *m_cancel;
-    QString m_previous;
+    QString m_text;
+    TextEdit *m_editor;
+    QGraphicsView *m_view;
 
   private slots:
-    //void slotAccept();
+    /**
+     * Stops the editing mode.
+     *
+     * @param description The new description which must be updated.
+     */
+    void slotHide(const QString &description);
+    /**
+     * Cancels the editing mode.
+     */
+    void slotCancelEditing();
 };
+
+}
 
 }
 

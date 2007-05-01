@@ -20,16 +20,6 @@
  ***************************************************************************/
 #include "photoview.h"
 
-#include "widgets/photoitem.h"
-#include "widgets/inputzoomdialog.h"
-#include "widgets/searchbar.h"
-
-#include "core/data.h"
-#include "core/imagemodel.h"
-#include "core/imageitem.h"
-
-#include "dialogs/newgallerywizard.h"
-
 #include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
 #include <QtCore/QProcess>
@@ -52,6 +42,17 @@
 #include <QtGui/QSortFilterProxyModel>
 
 #include <QtOpenGL/QGLWidget>
+
+#include "core/data.h"
+#include "core/imagemodel.h"
+#include "core/imageitem.h"
+
+#include "widgets/inputzoomdialog.h"
+#include "widgets/searchbar.h"
+
+#include "widgets/photowidgets/photoitem.h"
+
+#include "dialogs/newgallerywizard.h"
 
 namespace GWidgets
 {
@@ -145,36 +146,36 @@ void PhotoView::slotEdit()
 
 void PhotoView::slotRename()
 {
-  PhotoItem *selectedPhoto = getSelectedPhoto();
+  GPhotoWidgets::PhotoItem *selectedPhoto = getSelectedPhoto();
   if (selectedPhoto)
     selectedPhoto->rename();
 }
 
 void PhotoView::slotDescribe()
 {
-  PhotoItem *selectedPhoto = getSelectedPhoto();
+  GPhotoWidgets::PhotoItem *selectedPhoto = getSelectedPhoto();
   if (selectedPhoto)
     selectedPhoto->describe();
 }
 
 void PhotoView::slotSelectAll()
 {
-  QHash<QModelIndex, PhotoItem*>::const_iterator end = m_itemHash.constEnd();
-  for (QHash<QModelIndex, PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
+  QHash<QModelIndex, GPhotoWidgets::PhotoItem*>::const_iterator end = m_itemHash.constEnd();
+  for (QHash<QModelIndex, GPhotoWidgets::PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
     count.value()->setSelected(true);
 }
 
 void PhotoView::slotDeselectAll()
 {
-  QHash<QModelIndex, PhotoItem*>::const_iterator end = m_itemHash.constEnd();
-  for (QHash<QModelIndex, PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
+  QHash<QModelIndex, GPhotoWidgets::PhotoItem*>::const_iterator end = m_itemHash.constEnd();
+  for (QHash<QModelIndex, GPhotoWidgets::PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
     count.value()->setSelected(false);
 }
 
 void PhotoView::slotInvertSelection()
 {
-  QHash<QModelIndex, PhotoItem*>::const_iterator end = m_itemHash.constEnd();
-  for (QHash<QModelIndex, PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
+  QHash<QModelIndex, GPhotoWidgets::PhotoItem*>::const_iterator end = m_itemHash.constEnd();
+  for (QHash<QModelIndex, GPhotoWidgets::PhotoItem*>::const_iterator count = m_itemHash.constBegin(); count != end; count++)
     count.value()->setSelected(!(*count)->isSelected());
 }
 
@@ -337,7 +338,7 @@ void PhotoView::slotExitEdit()
   }
 }
 
-PhotoItem *PhotoView::itemForIndex(const QModelIndex &index)
+GPhotoWidgets::PhotoItem *PhotoView::itemForIndex(const QModelIndex &index)
 {
   // !index.isValid() || m_itemVector.count() < index.row()
   if (index.isValid())
@@ -353,7 +354,7 @@ void PhotoView::readModel()
   scene()->clearSelection();
 
   // Remove all current items
-  foreach(PhotoItem *item, m_itemHash) {
+  foreach(GPhotoWidgets::PhotoItem *item, m_itemHash) {
     if (!item->deleteItself())
       m_removeList << item;
     //scene()->removeItem(item);
@@ -372,17 +373,17 @@ void PhotoView::readModel()
     if (row.data(GCore::ImageModel::ImageTypeRole).toInt() == GCore::ImageItem::Gallery)
       continue;
 
-    PhotoItem *item = new PhotoItem(this);
-    item->setText(row.data(Qt::DisplayRole).toString(), row.data(GCore::ImageModel::ImageDescriptionRole).toString());
+    GPhotoWidgets::PhotoItem *item = new GPhotoWidgets::PhotoItem(this, row);
+    /*item->setText(row.data(Qt::DisplayRole).toString(), row.data(GCore::ImageModel::ImageDescriptionRole).toString());
     item->setPixmap(row.data(Qt::DecorationRole).value<QIcon>().pixmap(128, 128));
-    item->setToolTip(row.data(Qt::ToolTipRole).toString());
+    item->setToolTip(row.data(Qt::ToolTipRole).toString());*/
 
     // Add to item vector
     m_itemHash.insert(row, item);
     m_itemVector.append(item);
 
     // Connect the View item with its counterpart in Model
-    connect(this, SIGNAL(signalEditMode(bool)), row.data(GCore::ImageModel::ObjectRole).value<QObject*>(), SLOT(prepareForEdit(bool)));
+    //connect(this, SIGNAL(signalEditMode(bool)), row.data(GCore::ImageModel::ObjectRole).value<QObject*>(), SLOT(prepareForEdit(bool)));
   }
 
   updateScene();
@@ -411,10 +412,10 @@ void PhotoView::slotModelRowsInserted(const QModelIndex &parent, int start, int 
     if (row.data(GCore::ImageModel::ImageTypeRole) != GCore::ImageItem::Image)
       continue;
 
-    PhotoItem *item = new PhotoItem(this);
-    item->setText(row.data(Qt::DisplayRole).toString(), row.data(GCore::ImageModel::ImageDescriptionRole).toString());
-    item->setPixmap(row.data(Qt::DecorationRole).value<QIcon>().pixmap(128, 128));
-    item->setToolTip(row.data(Qt::ToolTipRole).toString());
+    GPhotoWidgets::PhotoItem *item = new GPhotoWidgets::PhotoItem(this, row);
+    //item->setText(row.data(Qt::DisplayRole).toString(), row.data(GCore::ImageModel::ImageDescriptionRole).toString());
+    //item->setPixmap(row.data(Qt::DecorationRole).value<QIcon>().pixmap(128, 128));
+    //item->setToolTip(row.data(Qt::ToolTipRole).toString());
 
     // Add to item vector
     m_itemHash.insert(row, item);
@@ -431,8 +432,8 @@ void PhotoView::slotModelRowsRemoved(const QModelIndex &parent, int start, int e
     return;
 
   for (int count = end; count >= start; count--) {
-    PhotoItem *picture = m_itemVector.value(count);
-    QModelIndex index = indexForItem(picture);
+    GPhotoWidgets::PhotoItem *picture = m_itemVector.value(count);
+    QModelIndex index = picture->getIndex();
     if (picture) {
       m_removeList << picture;
       m_itemHash.remove(index);
@@ -457,7 +458,7 @@ void PhotoView::slotModelDataChanged(const QModelIndex &start, const QModelIndex
       QModelIndex picture = start.sibling(count, 0);
       if (!picture.isValid())
         continue;
-      PhotoItem *item;
+      GPhotoWidgets::PhotoItem *item;
       int scrollbarPosition = verticalScrollBar()->value();
       if ((item = itemForIndex(picture))) {
         item->setText(picture.data(GCore::ImageModel::ImageNameRole).toString(), picture.data(GCore::ImageModel::ImageDescriptionRole).toString());
@@ -489,27 +490,27 @@ int PhotoView::rearrangeItems(bool update)
     x = - (10000) * m_itemVector.indexOf(m_currentEdited);
   }
 
-  int itemsPerRow = width() / (PhotoItem::ItemWidth + m_spacing);
+  int itemsPerRow = width() / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing);
 
-  QList<PhotoItem*> items = m_itemVector.toList();
-  QList<PhotoItem*>::iterator end = items.end();
-  for (QList<PhotoItem*>::iterator i = items.begin(); i != end; i++) {
+  QList<GPhotoWidgets::PhotoItem*> items = m_itemVector.toList();
+  QList<GPhotoWidgets::PhotoItem*>::iterator end = items.end();
+  for (QList<GPhotoWidgets::PhotoItem*>::iterator i = items.begin(); i != end; i++) {
 
     if (m_removeList.contains(*i))
       continue;
 
-    PhotoItem *item = *i;
+    GPhotoWidgets::PhotoItem *item = *i;
 
     if (!item->getText().contains(m_filter)) {
       item->setPos(1000, -500);
       continue;
     }
-
+/*
     if (item->getText() == tr("Unavailable")) {
-      item->setText(indexForItem(item).data(GCore::ImageModel::ImageNameRole).toString(), indexForItem(item).data(GCore::ImageModel::ImageDescriptionRole).toString());
+      item->setText(item->getIndex().data(GCore::ImageModel::ImageNameRole).toString(), item->getIndex().data(GCore::ImageModel::ImageDescriptionRole).toString());
       m_timerId = startTimer(500);
     }
-
+*/
     if (!item->group()) {
       if (item->pos() != QPointF(x, y))
         change = true;
@@ -522,11 +523,11 @@ int PhotoView::rearrangeItems(bool update)
       if (m_editMode)
         x += 10000;
       else
-        x += PhotoItem::ItemWidth + m_spacing;
+        x += GPhotoWidgets::PhotoItem::ItemWidth + m_spacing;
 
       if (++count >= itemsPerRow && !m_editMode) {
         x = m_zero.x() + m_spacing;
-        y += PhotoItem::ItemHeight + m_spacing;
+        y += GPhotoWidgets::PhotoItem::ItemHeight + m_spacing;
         count = 0;
         rows++;
       }
@@ -539,7 +540,7 @@ int PhotoView::rearrangeItems(bool update)
   if (update)
     QGraphicsView::update();
 
-  foreach(PhotoItem *picture, m_removeList) {
+  foreach(GPhotoWidgets::PhotoItem *picture, m_removeList) {
     picture->deleteItself();
     if (!scene()->items().contains(picture)) {
       //m_itemVector.remove(m_itemVector.indexOf(picture));
@@ -572,7 +573,7 @@ void PhotoView::mousePressEvent(QMouseEvent *event)
     m_rubberStartPos = event->pos();
     m_rubberScrollValue = verticalScrollBar()->value();
     m_rubberBand = new QRubberBand(QRubberBand::Rectangle, viewport());
-    return;
+    //return;
     //m_rubberBand->show();
   }
 
@@ -760,9 +761,9 @@ void PhotoView::keyPressEvent(QKeyEvent *event)
   if (!scene()->focusItem() && !m_itemHash.isEmpty())
     scene()->setFocusItem(static_cast<QGraphicsItem*>(m_itemVector.at(0)));
 
-  PhotoItem *focusedItem = static_cast<PhotoItem*>(scene()->focusItem());
+  GPhotoWidgets::PhotoItem *focusedItem = static_cast<GPhotoWidgets::PhotoItem*>(scene()->focusItem());
 
-  int itemsPerRow = width() / (PhotoItem::ItemWidth + m_spacing);
+  int itemsPerRow = width() / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing);
 
   switch (event->key()) {
     case(Qt::Key_Left): {
@@ -848,14 +849,14 @@ void PhotoView::slotSceneChanged()
 void PhotoView::updateScene()
 {
   if (!m_editMode) {
-    int rows = (m_itemVector.count() / (width() / (PhotoItem::ItemWidth + m_spacing))) + 1;
+    int rows = (m_itemVector.count() / (width() / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing))) + 1;
 
     // Properly resize the scene
     int scrollbarWidth = verticalScrollBar()->width() * 2;
     qreal sceneWidth = width() - scrollbarWidth;
 
     int scrollbarHeight = horizontalScrollBar()->height() * 2;
-    qreal sceneHeight = rows * (PhotoItem::ItemHeight + m_spacing);
+    qreal sceneHeight = rows * (GPhotoWidgets::PhotoItem::ItemHeight + m_spacing);
 
     if (sceneHeight < height())
       sceneHeight = height() - scrollbarHeight;
@@ -909,10 +910,10 @@ void PhotoView::slotRemove()
   scene()->clearSelection();
 
   for (QList<QGraphicsItem*>::const_iterator count = selectedPictures.constBegin(); count != end; count++) {
-    PhotoItem *picture = static_cast<PhotoItem*>(*count);
+    GPhotoWidgets::PhotoItem *picture = static_cast<GPhotoWidgets::PhotoItem*>(*count);
 
     if (!picture->group()) {
-      QModelIndex index = indexForItem(picture);
+      QModelIndex index = picture->getIndex();
       if (index.isValid()) {
         selectedIndexes << index;
 
@@ -942,9 +943,11 @@ void PhotoView::cropSelection(const QRect &area)
   //static_cast<GCore::ImageModel*> (model())->crop(indexForItem(m_currentEdited), area);
 }
 
-QModelIndex PhotoView::indexForItem(PhotoItem *item)
+QModelIndex PhotoView::indexForItem(GPhotoWidgets::PhotoItem *item)
 {
-  return m_itemHash.key(item);
+  // This is old => return m_itemHash.key(item);
+  // And new
+  return item->getIndex();
 }
 
 QAbstractItemModel *PhotoView::model()
@@ -952,7 +955,7 @@ QAbstractItemModel *PhotoView::model()
   return m_model;
 }
 
-void PhotoView::setEditMode(bool editMode, GWidgets::PhotoItem *selectedItem)
+void PhotoView::setEditMode(bool editMode, GWidgets::GPhotoWidgets::PhotoItem *selectedItem)
 {
   if (editMode && !selectedItem) {
     qDebug("Illeagal entry into edit mode, without selected item!");
@@ -973,7 +976,7 @@ void PhotoView::setEditMode(bool editMode, GWidgets::PhotoItem *selectedItem)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    connect(indexForItem(selectedItem).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), selectedItem, SLOT(changeImage(const QImage&)));
+    //connect(indexForItem(selectedItem).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), selectedItem, SLOT(changeImage(const QImage&)));
   } else if (m_currentEdited) {
     // We have our own Rubber band defined!
     setDragMode(QGraphicsView::NoDrag);
@@ -985,7 +988,7 @@ void PhotoView::setEditMode(bool editMode, GWidgets::PhotoItem *selectedItem)
     verticalScrollBar()->setValue(0);
     horizontalScrollBar()->setValue(0);
 
-    disconnect(indexForItem(selectedItem).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), selectedItem, SLOT(changeImage(const QImage&)));
+    //disconnect(indexForItem(selectedItem).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), selectedItem, SLOT(changeImage(const QImage&)));
   }
 
   updateScene();
@@ -997,10 +1000,10 @@ void PhotoView::showLoading(bool show)
   m_loading->setVisible(show);
 }
 
-PhotoItem *PhotoView::getSelectedPhoto()
+GPhotoWidgets::PhotoItem *PhotoView::getSelectedPhoto()
 {
   if (scene()->selectedItems().count() == 1) {
-    return static_cast<PhotoItem*>(scene()->selectedItems().at(0));
+    return static_cast<GPhotoWidgets::PhotoItem*>(scene()->selectedItems().at(0));
   } else {
     qDebug("Wrong entry to editing mode! None or too many items selected!");
     return 0;

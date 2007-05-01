@@ -18,67 +18,46 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef GWIDGETS_GPHOTOWIDGETSPHOTORECT_H
+#define GWIDGETS_GPHOTOWIDGETSPHOTORECT_H
 
-#ifndef GWIDGETSTEXTEDIT_H_
-#define GWIDGETSTEXTEDIT_H_
+#include <QtGui/QGraphicsRectItem>
 
-#include <QtGui/QTextEdit>
+
 
 namespace GWidgets
 {
 
+namespace GPhotoWidgets
+{
+
 /**
- * Class for text edits used in PhotoView.
- * @short Text edit just for PhotoView.
+ * Class that represents the rectangle around the photo.
+ * @short Rectangle.
  * @author Gregor Kališnik <gregor@podnapisi.net>
  */
-class TextEdit : public QTextEdit
+class PhotoRect : public QGraphicsRectItem
 {
-    Q_OBJECT
-  signals:
-    /**
-     * Signals taht the editing has been finished.
-     *
-     * @param text The new text.
-     */
-    void editingFinished(const QString &text);
-    /**
-     * Signals that the editing has been canceled.
-     */
-    void editingCanceled();
-
   public:
     /**
      * Default constructor.
+     *
+     * @param parent Parent of this item.
+     * @param scene The scene in which this item is.
      */
-    TextEdit(QWidget *parent = 0);
-
-    /**
-     * Default destructor.
-     */
-    ~TextEdit();
+    PhotoRect(QGraphicsItem *parent, QGraphicsScene *scene);
 
   protected:
     /**
-     * Overloaded method for defining what to do when it gets pressed.
+     * Overloaded method for defining its own painting operation.
      *
-     * @param event The event :).
+     * @param painter Reference to the used painter.
      */
-    void keyPressEvent(QKeyEvent *event);
-    /**
-     * Overloaded method for defining what to do when focus goes away.
-     */
-    void focusOutEvent(QFocusEvent*);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*);
 
-  private:
-    //QTextEdit *m_textEdit;
-    //QPushButton *m_submit;
-    //QPushButton *m_cancel;
-    QString m_previous;
-
-  private slots:
-    //void slotAccept();
 };
+
+}
 
 }
 

@@ -20,17 +20,23 @@
  ***************************************************************************/
 
 #include "photoname.h"
-#include "photoitem.h"
-#include "photoview.h"
+
+#include <QtCore/QPointF>
 
 #include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsScene>
-#include <QtCore/QPointF>
 
-#include "widgets/lineedit.h"
 #include "core/imagemodel.h"
 
+#include "widgets/photoview.h"
+#include "widgets/lineedit.h"
+
+#include "widgets/photowidgets/photoitem.h"
+
 namespace GWidgets
+{
+
+namespace GPhotoWidgets
 {
 
 PhotoName::PhotoName(QGraphicsItem *parent, QGraphicsScene *scene, QGraphicsView *view)
@@ -153,6 +159,8 @@ void PhotoName::slotCancel()
 PhotoName::~PhotoName()
 {
   delete m_editor;
+}
+
 }
 
 }

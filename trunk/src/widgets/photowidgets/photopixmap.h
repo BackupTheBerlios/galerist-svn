@@ -18,91 +18,44 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#ifndef GWIDGETS_GPHOTOWIDGETSPHOTOPIXMAP_H
+#define GWIDGETS_GPHOTOWIDGETSPHOTOPIXMAP_H
 
-#ifndef GWIDGETSPHOTODESCRIPTION_H
-#define GWIDGETSPHOTODESCRIPTION_H
-
-#include <QtGui/QGraphicsItem>
-
-class QGraphicsScene;
-class QGraphicsView;
-class QStyleOptionGraphicsItem;
-class QGraphicsSceneMouseEvent;
-class QWidget;
-class QPainter;
+#include <QtGui/QGraphicsPixmapItem>
 
 namespace GWidgets
 {
 
-class TextEdit;
+namespace GPhotoWidgets
+{
 
 /**
- * Class that represents the description of the photo.
- * @short Photos description.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
+ * Class that represents the thumbnail of the photo.
+ * @short Thumbnail of the photo.
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
-class PhotoDescription : public QGraphicsTextItem
+class PhotoPixmap : public QGraphicsPixmapItem
 {
-    Q_OBJECT
-  signals:
-    /**
-     * Signals finish of edit.
-     *
-     * @param text The new text.
-     */
-    void editingFinished(const QString &text);
-
   public:
     /**
      * Default constructor.
-     */
-    PhotoDescription(QGraphicsItem *parent, QGraphicsScene *scene, QGraphicsView *view);
-
-    /**
-     * Set the text to show.
      *
-     * @param text Text to be shown.
+     * @param parent Parent of this item.
+     * @param scene The scene in which this item is.
      */
-    void setText(const QString &text);
-    /**
-     * Go to editing mode.
-     */
-    void setEdit();
-
-    /**
-     * Default destructor.
-     */
-    ~PhotoDescription();
+    PhotoPixmap(QGraphicsItem *parent, QGraphicsScene *scene);
 
   protected:
     /**
      * Overloaded method for defining its own painting operation.
      *
-     * @param painter Reference to the painter.
+     * @param painter Reference to the used painter.
+     * @param option Option of this item.
      */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*);
-    /**
-     * Overloaded method for defining the behaviour on mouse press event.
-     */
-    void mousePressEvent(QGraphicsSceneMouseEvent*);
-
-  private:
-    QString m_text;
-    TextEdit *m_editor;
-    QGraphicsView *m_view;
-
-  private slots:
-    /**
-     * Stops the editing mode.
-     *
-     * @param description The new description which must be updated.
-     */
-    void slotHide(const QString &description);
-    /**
-     * Cancels the editing mode.
-     */
-    void slotCancelEditing();
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*);
 };
+
+}
 
 }
 

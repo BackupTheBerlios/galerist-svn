@@ -18,68 +18,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "photopixmap.h"
 
-#ifndef GWIDGETSTEXTEDIT_H_
-#define GWIDGETSTEXTEDIT_H_
-
-#include <QtGui/QTextEdit>
+#include <QtGui/QPainter>
+#include <QtGui/QStyleOptionGraphicsItem>
 
 namespace GWidgets
 {
 
-/**
- * Class for text edits used in PhotoView.
- * @short Text edit just for PhotoView.
- * @author Gregor Kališnik <gregor@podnapisi.net>
- */
-class TextEdit : public QTextEdit
+namespace GPhotoWidgets
 {
-    Q_OBJECT
-  signals:
-    /**
-     * Signals taht the editing has been finished.
-     *
-     * @param text The new text.
-     */
-    void editingFinished(const QString &text);
-    /**
-     * Signals that the editing has been canceled.
-     */
-    void editingCanceled();
 
-  public:
-    /**
-     * Default constructor.
-     */
-    TextEdit(QWidget *parent = 0);
+PhotoPixmap::PhotoPixmap(QGraphicsItem *parent, QGraphicsScene *scene)
+    : QGraphicsPixmapItem(parent, scene)
+{}
 
-    /**
-     * Default destructor.
-     */
-    ~TextEdit();
+void PhotoPixmap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*)
+{
+  painter->setRenderHint(QPainter::SmoothPixmapTransform, (transformationMode() == Qt::SmoothTransformation));
 
-  protected:
-    /**
-     * Overloaded method for defining what to do when it gets pressed.
-     *
-     * @param event The event :).
-     */
-    void keyPressEvent(QKeyEvent *event);
-    /**
-     * Overloaded method for defining what to do when focus goes away.
-     */
-    void focusOutEvent(QFocusEvent*);
+  QRectF exposed = option->exposedRect.adjusted(-1, -1, 1, 1);
+  exposed &= QRectF(offset().x(), offset().y(), pixmap().width(), pixmap().height());
+  exposed.translate(offset());
+  painter->drawPixmap(exposed, pixmap(), exposed);
 
-  private:
-    //QTextEdit *m_textEdit;
-    //QPushButton *m_submit;
-    //QPushButton *m_cancel;
-    QString m_previous;
-
-  private slots:
-    //void slotAccept();
-};
+  if (isSelected()) {
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(QColor(0, 0, 250, 100));
+    painter->drawRect(exposed);
+  }
+}
 
 }
 
-#endif
+}

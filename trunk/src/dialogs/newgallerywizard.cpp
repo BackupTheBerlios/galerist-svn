@@ -84,7 +84,7 @@ void NewGalleryWizard::setupUi()
   setPixmap(QWizard::BannerPixmap, QPixmap(":/images/newgallerywizard-banner.png"));
   setPixmap(QWizard::BackgroundPixmap, QPixmap(":/images/galerist-big.png"));
 
-#ifdef unix
+#ifdef Q_WS_X11
   setWizardStyle(QWizard::ModernStyle);
 #endif
 

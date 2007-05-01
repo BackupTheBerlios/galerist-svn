@@ -30,7 +30,7 @@ namespace GWidgets
 /**
  * Class that represents a line edit with validation capabilities.
  * @short Line edit.
- * @author Gregor KaliÅ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class LineEdit : public QLineEdit
 {

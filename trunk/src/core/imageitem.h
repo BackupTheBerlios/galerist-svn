@@ -50,6 +50,10 @@ class ImageItem : public QObject
      * @param image The changed image.
      */
     void imageChanged(const QImage &image);
+    /**
+     * Emitted when a value changes.
+     */
+    void valuesChanged();
 
   public:
     enum Type
@@ -93,7 +97,7 @@ class ImageItem : public QObject
      *
      * @return A child.
      */
-    ImageItem *child(int row);
+    ImageItem *child(int row) const;
     /**
      * Returns the number of childs that resides in this item.
      *
@@ -125,12 +129,12 @@ class ImageItem : public QObject
      *
      * @return The reference.
      */
-    ImageItem *parent();
+    ImageItem *parent() const;
 
     /**
      * Additional methods, for gathering additional information.
      */
-    Type imageType();
+    Type imageType() const;
 
     /**
      * Change the file path.
@@ -144,37 +148,37 @@ class ImageItem : public QObject
      *
      * @return A full path comprised of this item's path and the parent's path
      */
-    QString getFilePath();
+    QString getFilePath() const;
 
     /**
      * Get only the filename associated with this item.
      *
      * @return Item's filename
      */
-    QString getFileName();
+    QString getFileName() const;
 
     /**
      * Get the thumbnail name (diference betwen fileName and thumbName is in the extension!).
      *
      * @return Name of the thumbnail image
      */
-    QString getThumbName();
+    QString getThumbName() const;
 
     /**
      * Returns the MetaData manager.
      *
      * @return Reference to the MetaData manager.
      */
-    MetaDataManager *metadata();
+    MetaDataManager *metadata() const;
 
     /**
      * Returns item's name.
      */
-    QString name();
+    QString name() const;
     /**
      * Returns item's description.
      */
-    QString description();
+    QString description() const;
 
     /**
      * Sets the item's name.
@@ -241,7 +245,6 @@ class ImageItem : public QObject
 
   private:
     QList<ImageItem*> m_childItems;
-    QList<QVariant> m_itemData;
 
     // Additional information
     ImageItem *m_parentItem;

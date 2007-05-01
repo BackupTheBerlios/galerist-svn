@@ -13,43 +13,27 @@ DESTDIR = ../bin
 CONFIG += warn_on \
 qt \
 opengl \
-thread \
-embed_manifest_exe
+thread
 TEMPLATE = app
-win32-g++{
-    LIBS += core/libcore.a \
-core/network/libnetwork.a \
-core/jobs/libjobs.a \
-dialogs/libdialogs.a \
-widgets/libwidgets.a \
-widgets/wizard/libwizard.a \
-translations/libtranslations.a
-    TARGETDEPS += core/network/libnetwork.a \
-core/jobs/libjobs.a \
-core/libcore.a \
-widgets/libwidgets.a \
-widgets/wizard/libwizard.a \
-dialogs/libdialogs.a \
-translations/libtranslations.a
-}unix{
+unix{
     target.path = $${PREFIX}/bin
     INSTALLS += target
     LIBS += core/libcore.a \
-core/network/libnetwork.a \
 core/jobs/libjobs.a \
+core/network/libnetwork.a \
 dialogs/libdialogs.a \
 widgets/libwidgets.a \
-widgets/wizard/libwizard.a \
 widgets/photowidgets/libphotowidgets.a \
-translations/libtranslations.a
+widgets/wizard/libwizard.a \
+translations/libtranslations.a 
     TARGETDEPS += core/network/libnetwork.a \
 core/jobs/libjobs.a \
 core/libcore.a \
 widgets/libwidgets.a \
 widgets/wizard/libwizard.a \
-widgets/photowidgets/libphotowidgets.a \
 dialogs/libdialogs.a \
-translations/libtranslations.a
+translations/libtranslations.a \
+widgets/photowidgets/libphotowidgets.a
 }
 win32-msvc*{
     LIBS += core/core.lib \
@@ -69,7 +53,7 @@ core/jobs/jobs.lib
 win32{
     DEFINES += WANT_UPDATER
 }
-LIBS += -lMagick++ \
--lexif
 FORMS += mainwindow.ui
 
+LIBS += -lMagick++ \
+-lexif

@@ -19,13 +19,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "photoitem.h"
-#include "photoview.h"
-#include "photoname.h"
-#include "photodescription.h"
+
+#include <QtCore/QTimeLine>
 
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsItemAnimation>
-#include <QtCore/QTimeLine>
 #include <QtGui/QTextDocument>
 #include <QtGui/QPainter>
 #include <QtGui/QStyleOptionGraphicsItem>
@@ -33,72 +31,24 @@
 #include <QtGui/QGraphicsSceneMouseEvent>
 #include <QtGui/QScrollBar>
 
-#include <QtCore/QtDebug>
-
 #include "core/imagemodel.h"
+#include "core/imageitem.h"
 #include "core/data.h"
+
+#include "widgets/photoview.h"
+
+#include "widgets/photowidgets/photoname.h"
+#include "widgets/photowidgets/photodescription.h"
+#include "widgets/photowidgets/photorect.h"
+#include "widgets/photowidgets/photopixmap.h"
 
 namespace GWidgets
 {
 
-// PhotoRect
-PhotoRect::PhotoRect(QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsRectItem(parent, scene)
-{}
-
-void PhotoRect::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
+namespace GPhotoWidgets
 {
-  painter->save();
-  painter->setPen(pen());
-  painter->setBrush(brush());
 
-  switch (GCore::Data::self()->getBackgroundType()) {
-    case (GCore::Data::Round) : {
-        painter->drawRoundRect(rect());
-
-        if (isSelected()) {
-          painter->setBrush(QColor(0, 0, 250, 50));
-          painter->drawRoundRect(rect());
-        }
-        break;
-      }
-    default: {
-      painter->drawRect(rect());
-
-      if (isSelected()) {
-        painter->setBrush(QColor(0, 0, 250, 50));
-        painter->drawRect(rect());
-      }
-      break;
-    }
-  }
-  painter->restore();
-}
-
-// PhotoPixmap
-PhotoPixmap::PhotoPixmap(QGraphicsItem *parent, QGraphicsScene *scene)
-    : QGraphicsPixmapItem(parent, scene)
-{}
-
-void PhotoPixmap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*)
-{
-  painter->setRenderHint(QPainter::SmoothPixmapTransform, (transformationMode() == Qt::SmoothTransformation));
-
-  QRectF exposed = option->exposedRect.adjusted(-1, -1, 1, 1);
-  exposed &= QRectF(offset().x(), offset().y(), pixmap().width(), pixmap().height());
-  exposed.translate(offset());
-  painter->drawPixmap(exposed, pixmap(), exposed);
-
-  if (isSelected()) {
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(QColor(0, 0, 250, 100));
-    painter->drawRect(exposed);
-  }
-}
-
-// PhotoItem
-
-PhotoItem::PhotoItem(PhotoView *view)
+PhotoItem::PhotoItem(PhotoView *view, const QModelIndex &index)
     : QObject(0),
     QGraphicsItemGroup(0, view->scene()),
     m_view(view),
@@ -110,11 +60,17 @@ PhotoItem::PhotoItem(PhotoView *view)
     m_pendingDoom(false),
     m_new(0),
     m_hide(false),
-    m_rotation(0)
+    m_rotation(0),
+    m_index(index)
 {
+  if (!index.isValid())
+    return;
+
   setHandlesChildEvents(false);
   setAcceptsHoverEvents(true);
   setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
+
+  m_item = static_cast<GCore::ImageItem*>(index.internalPointer());
 
   m_itemTimeLine = new QTimeLine(1000, this);
   m_itemTimeLine->setUpdateInterval(10);
@@ -128,8 +84,12 @@ PhotoItem::PhotoItem(PhotoView *view)
   // Setup other items in the group
   setupUi();
 
+  // Connect the elements
   connect(m_itemTimeLine, SIGNAL(valueChanged(qreal)), this, SLOT(slotSetFullsizePixmap(qreal)));
   connect(view, SIGNAL(signalEditMode(bool)), this, SLOT(slotEdit(bool)));
+  connect(view, SIGNAL(signalEditMode(bool)), m_item, SLOT(prepareForEdit(bool)));
+  connect(m_text, SIGNAL(editingFinished(const QString&)), this, SLOT(slotSaveName(const QString&)));
+  connect(m_description, SIGNAL(editingFinished(const QString&)), this, SLOT(slotSaveDescription(const QString&)));
 }
 
 PhotoItem::~PhotoItem()
@@ -155,15 +115,25 @@ void PhotoItem::setupUi()
   m_pixmap->setTransformationMode(Qt::SmoothTransformation);
   m_pixmap->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
 
-
+  // Get the thumbnail
+  m_pixmap->setPixmap(m_index.data(GCore::ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(128, 128));
 
   m_text = new PhotoName(this, m_view->scene(), m_view);
   m_text->setPos(15, 140);
   m_text->setZValue(2);
 
+  // Get the name
+  m_text->setText(m_index.data(GCore::ImageModel::ImageNameRole).toString());
+
   m_description = new PhotoDescription(this, m_view->scene(), m_view);
   m_description->setPos(15, 160);
   m_description->setZValue(2);
+
+  // Get the description
+  m_description->setText(m_index.data(GCore::ImageModel::ImageDescriptionRole).toString());
+
+  // Get the tooltip
+  setToolTip(m_index.data(GCore::ImageModel::ImageTooltipRole).toString());
 
   // Add items to this group
   addToGroup(m_rect);
@@ -286,7 +256,12 @@ QString PhotoItem::getText()
 
 QString PhotoItem::toolTip()
 {
-  return m_view->model()->data(m_view->indexForItem(const_cast<PhotoItem*>(this)), GCore::ImageModel::ImageTooltipRole).toString();
+  return m_index.data(GCore::ImageModel::ImageTooltipRole).toString();
+}
+
+QModelIndex PhotoItem::getIndex()
+{
+  return m_index;
 }
 
 QPointF PhotoItem::getScaledSize()
@@ -322,7 +297,7 @@ void PhotoItem::fullSizePixmap()
 
   if (!m_fullsizePixmap) {
     m_view->showLoading(true);
-    QPixmap pixmap = QPixmap::fromImage(m_view->model()->data(m_view->indexForItem(this), GCore::ImageModel::ImagePictureRole).value<QImage>());
+    QPixmap pixmap = QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>());
 
     m_fullsizePixmap = new QPixmap(pixmap);
   }
@@ -400,10 +375,10 @@ void PhotoItem::crop(const QRect &area)
 {
   QRect mappedArea(mapToItem(m_pixmap, area.topLeft()).toPoint() / m_scaleMultiplier, area.size() / m_scaleMultiplier);
 
-  static_cast<GCore::ImageModel*>(m_view->model())->crop(m_view->indexForItem(this), mappedArea);
+  //static_cast<GCore::ImageModel*>(m_view->model())->crop(m_view->indexForItem(this), mappedArea);
 
   if (m_new) {
-    m_pixmap->setPixmap(QPixmap::fromImage(m_view->model()->data(m_view->indexForItem(this), GCore::ImageModel::ImagePictureRole).value<QImage>()));
+    m_pixmap->setPixmap(QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>()));
     delete m_new;
   } else {
     //m_pixmap = m_new;
@@ -542,6 +517,8 @@ void PhotoItem::slotEdit(bool edit)
     m_text->hide();
     m_description->hide();
     m_rect->hide();
+
+    connect(m_item, SIGNAL(imageChanged(const QImage&)), this, SLOT(changeImage(const QImage&)));
   } else {
     // Item is selectable and focusable again
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
@@ -553,19 +530,21 @@ void PhotoItem::slotEdit(bool edit)
 
     // Go back to default value
     setZValue(1);
+
+    disconnect(m_item, SIGNAL(imageChanged(const QImage&)), this, SLOT(changeImage(const QImage&)));
   }
 }
 
 void PhotoItem::slotSaveName(const QString &name)
 {
-  static_cast<GCore::ImageModel*>(m_view->model())->setName(name, m_view->indexForItem(this));
-  setToolTip(m_view->model()->data(m_view->indexForItem(this), GCore::ImageModel::ImageTooltipRole).toString());
+  m_item->setName(name);
+  setToolTip(m_index.data(GCore::ImageModel::ImageTooltipRole).toString());
 }
 
 void PhotoItem::slotSaveDescription(const QString &description)
 {
-  static_cast<GCore::ImageModel*>(m_view->model())->setDescription(description, m_view->indexForItem(this));
-  setToolTip(m_view->model()->data(m_view->indexForItem(this), GCore::ImageModel::ImageTooltipRole).toString());
+  m_item->setDescription(description);
+  setToolTip(m_index.data(GCore::ImageModel::ImageTooltipRole).toString());
 }
 
 void PhotoItem::slotSetFullsizePixmap(qreal step)
@@ -587,7 +566,7 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
 
       // At the last step we change the thumbnail and show the borders
       if (step > 0.9999) {
-        setPixmap(m_view->model()->data(m_view->indexForItem(this), GCore::ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(128, 128));
+        setPixmap(m_index.data(GCore::ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(128, 128));
 
         // Show the borders and other elements
         m_text->show();
@@ -663,6 +642,8 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
     m_pixmap->setPixmap(*m_fullsizePixmap);
     m_zooming = false;
   }
+}
+
 }
 
 }
