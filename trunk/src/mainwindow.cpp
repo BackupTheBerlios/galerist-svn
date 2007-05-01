@@ -45,6 +45,7 @@
 #include "dialogs/configuration.h"
 
 #include "widgets/imageaddprogress.h"
+#include "widgets/photocontrol.h"
 
 
 #include "widgets/textedit.h"
@@ -156,22 +157,22 @@ void MainWindow::initActionButtons()
 
 
   // Something that shouldn't be here (or should be like an action)
-  connect(rotateCCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCCW()));
-  connect(rotateCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCW()));
-  connect(editButton, SIGNAL(clicked()), imageList, SLOT(slotEditPhoto()));
+  connect(photoControl->rotateCCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCCW()));
+  connect(photoControl->rotateCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCW()));
+  connect(photoControl->editButton, SIGNAL(clicked()), imageList, SLOT(slotEditPhoto()));
 
   // New buttons! <-- Need to remove this comment!!!!
-  connect(cropButton, SIGNAL(clicked(bool)), imageList, SLOT(beginCrop(bool)));
-  connect(imageList, SIGNAL(toolReleased(bool)), cropButton, SLOT(setChecked(bool)));
+  connect(photoControl->cropButton, SIGNAL(clicked(bool)), imageList, SLOT(beginCrop(bool)));
+  connect(imageList, SIGNAL(toolReleased(bool)), photoControl->cropButton, SLOT(setChecked(bool)));
 
-  connect(zoomOutButton, SIGNAL(clicked()), imageList, SLOT(slotZoomOutPhoto()));
-  connect(zoomInButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInPhoto()));
-  connect(zoomInputButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInputPhoto()));
-  connect(zoomScreenButton, SIGNAL(clicked()), imageList, SLOT(slotZoomScreenPhoto()));
-  connect(actualSizeButton, SIGNAL(clicked()), imageList, SLOT(slotZoomActualPhoto()));
-  connect(backButton, SIGNAL(clicked()), imageList, SLOT(slotPreviousPhoto()));
-  connect(nextButton, SIGNAL(clicked()), imageList, SLOT(slotNextPhoto()));
-  connect(closeButton, SIGNAL(clicked()), imageList, SLOT(slotExitEdit()));
+  connect(photoControl->zoomOutButton, SIGNAL(clicked()), imageList, SLOT(slotZoomOutPhoto()));
+  connect(photoControl->zoomInButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInPhoto()));
+  connect(photoControl->zoomInputButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInputPhoto()));
+  connect(photoControl->zoomScreenButton, SIGNAL(clicked()), imageList, SLOT(slotZoomScreenPhoto()));
+  connect(photoControl->actualSizeButton, SIGNAL(clicked()), imageList, SLOT(slotZoomActualPhoto()));
+  connect(photoControl->backButton, SIGNAL(clicked()), imageList, SLOT(slotPreviousPhoto()));
+  connect(photoControl->nextButton, SIGNAL(clicked()), imageList, SLOT(slotNextPhoto()));
+  connect(photoControl->closeButton, SIGNAL(clicked()), imageList, SLOT(slotExitEdit()));
 
   connect(imageList, SIGNAL(photoEditSelectionChanged(int, int)), this, SLOT(checkNavigation(int, int)));
 }
@@ -298,6 +299,8 @@ MainWindow::~MainWindow()
 void MainWindow::setEditMode(bool edit)
 {
   imageControlWidget->setVisible(edit);
+  galleryDock->setVisible(!edit);
+  galleryDock->toggleViewAction()->setEnabled(!edit);
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
@@ -323,16 +326,16 @@ void MainWindow::showEXIF()
 void MainWindow::checkNavigation(int newLocation, int totalImages)
 {
   if (totalImages == 1) {
-    backButton->setEnabled(false);
-    nextButton->setEnabled(false);
+    photoControl->backButton->setEnabled(false);
+    photoControl->nextButton->setEnabled(false);
   } else if (totalImages <= newLocation + 1) {
-    backButton->setEnabled(true);
-    nextButton->setEnabled(false);
+    photoControl->backButton->setEnabled(true);
+    photoControl->nextButton->setEnabled(false);
   } else if (newLocation == 0) {
-    backButton->setEnabled(false);
-    nextButton->setEnabled(true);
+    photoControl->backButton->setEnabled(false);
+    photoControl->nextButton->setEnabled(true);
   } else {
-    backButton->setEnabled(true);
-    nextButton->setEnabled(true);
+    photoControl->backButton->setEnabled(true);
+    photoControl->nextButton->setEnabled(true);
   }
 }

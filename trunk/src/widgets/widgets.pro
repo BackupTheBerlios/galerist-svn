@@ -1,4 +1,5 @@
-FORMS += imageaddprogress.ui
+FORMS += imageaddprogress.ui \
+photocontrol-main.ui
 HEADERS += lineedit.h \
            gallerytreeview.h \
            imageaddprogress.h \
@@ -6,7 +7,8 @@ HEADERS += lineedit.h \
            textedit.h \
            tooltip.h \
            searchbar.h \
-           inputzoomdialog.h
+           inputzoomdialog.h \
+           photocontrol.h
 SOURCES += lineedit.cpp \
            gallerytreeview.cpp \
            imageaddprogress.cpp \
@@ -14,7 +16,8 @@ SOURCES += lineedit.cpp \
            textedit.cpp \
            tooltip.cpp \
            searchbar.cpp \
-           inputzoomdialog.cpp
+           inputzoomdialog.cpp \
+           photocontrol.cpp
 QT += opengl
 DESTDIR = ./
 CONFIG += warn_on \
