@@ -144,11 +144,6 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      */
     void showEXIF();
 
-    /**
-     * Enables or enables the next/back button. Depends on the signal.
-     */
-    void checkNavigation(int newLocation, int totalImages);
-
 };
 
 #endif

@@ -155,26 +155,6 @@ void MainWindow::initActionButtons()
 
 
   photoControl->connectView(imageList);
-
-  // Something that shouldn't be here (or should be like an action)
-  connect(photoControl->rotateCCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCCW()));
-  connect(photoControl->rotateCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCW()));
-  connect(photoControl->editButton, SIGNAL(clicked()), imageList, SLOT(slotEditPhoto()));
-
-  // New buttons! <-- Need to remove this comment!!!!
-//  connect(photoControl->cropButton, SIGNAL(clicked(bool)), imageList, SLOT(beginCrop(bool)));
-//  connect(imageList, SIGNAL(toolReleased(bool)), photoControl->cropButton, SLOT(setChecked(bool)));
-
-  connect(photoControl->zoomOutButton, SIGNAL(clicked()), imageList, SLOT(slotZoomOutPhoto()));
-  connect(photoControl->zoomInButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInPhoto()));
-  connect(photoControl->zoomInputButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInputPhoto()));
-  connect(photoControl->zoomScreenButton, SIGNAL(clicked()), imageList, SLOT(slotZoomScreenPhoto()));
-  connect(photoControl->actualSizeButton, SIGNAL(clicked()), imageList, SLOT(slotZoomActualPhoto()));
-  connect(photoControl->backButton, SIGNAL(clicked()), imageList, SLOT(slotPreviousPhoto()));
-  connect(photoControl->nextButton, SIGNAL(clicked()), imageList, SLOT(slotNextPhoto()));
-  connect(photoControl->closeButton, SIGNAL(clicked()), imageList, SLOT(slotExitEdit()));
-
-  connect(imageList, SIGNAL(photoEditSelectionChanged(int, int)), this, SLOT(checkNavigation(int, int)));
 }
 
 void MainWindow::initToolbar()
@@ -321,21 +301,4 @@ void MainWindow::showEXIF()
   message += tr("Focal length: ") + exifData.getFocalLength() + "\n";
   message += tr("Flash: ") + exifData.getFlash() + "\n";
   QMessageBox::information(this, tr("EXIF metadata"), message);
-}
-
-void MainWindow::checkNavigation(int newLocation, int totalImages)
-{
-  if (totalImages == 1) {
-    photoControl->backButton->setEnabled(false);
-    photoControl->nextButton->setEnabled(false);
-  } else if (totalImages <= newLocation + 1) {
-    photoControl->backButton->setEnabled(true);
-    photoControl->nextButton->setEnabled(false);
-  } else if (newLocation == 0) {
-    photoControl->backButton->setEnabled(false);
-    photoControl->nextButton->setEnabled(true);
-  } else {
-    photoControl->backButton->setEnabled(true);
-    photoControl->nextButton->setEnabled(true);
-  }
 }

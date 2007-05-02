@@ -20,9 +20,6 @@
  ***************************************************************************/
 #include "photocontrol.h"
 
-#include "ui_photocontrol-main.h"
-#include "ui_photocontrol-crop.h"
-
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QStackedWidget>
@@ -57,35 +54,50 @@ PhotoControl::~PhotoControl()
 
 void PhotoControl::connectView(PhotoView *view)
 {
+  // Generic commands
+  connect(m_mainPage.rotateCCWButton, SIGNAL(clicked()), view, SLOT(rotateSelectedImageCCW()));
+  connect(m_mainPage.rotateCWButton, SIGNAL(clicked()), view, SLOT(rotateSelectedImageCW()));
+  connect(m_mainPage.editButton, SIGNAL(clicked()), view, SLOT(slotEditPhoto()));
+  
+  connect(m_mainPage.zoomOutButton, SIGNAL(clicked()), view, SLOT(slotZoomOutPhoto()));
+  connect(m_mainPage.zoomInButton, SIGNAL(clicked()), view, SLOT(slotZoomInPhoto()));
+  connect(m_mainPage.zoomInputButton, SIGNAL(clicked()), view, SLOT(slotZoomInputPhoto()));
+  connect(m_mainPage.zoomScreenButton, SIGNAL(clicked()), view, SLOT(slotZoomScreenPhoto()));
+  connect(m_mainPage.actualSizeButton, SIGNAL(clicked()), view, SLOT(slotZoomActualPhoto()));
+  connect(m_mainPage.backButton, SIGNAL(clicked()), view, SLOT(slotPreviousPhoto()));
+  connect(m_mainPage.nextButton, SIGNAL(clicked()), view, SLOT(slotNextPhoto()));
+  connect(m_mainPage.closeButton, SIGNAL(clicked()), view, SLOT(slotExitEdit()));
+
   connect(this, SIGNAL(operationSelected(int)), view, SLOT(initiateOperation(int)));
   connect(this, SIGNAL(cancelOperation(int)), view, SLOT(cancelOperation(int)));
+
+  connect(view, SIGNAL(photoEditSelectionChanged(int, int)), this, SLOT(checkNavigation(int, int)));
+}
+
+void PhotoControl::checkNavigation(int newLocation, int totalImages)
+{
+  if (totalImages == 1) {
+    m_mainPage.backButton->setEnabled(false);
+    m_mainPage.nextButton->setEnabled(false);
+  } else if (totalImages <= newLocation + 1) {
+    m_mainPage.backButton->setEnabled(true);
+    m_mainPage.nextButton->setEnabled(false);
+  } else if (newLocation == 0) {
+    m_mainPage.backButton->setEnabled(false);
+    m_mainPage.nextButton->setEnabled(true);
+  } else {
+    m_mainPage.backButton->setEnabled(true);
+    m_mainPage.nextButton->setEnabled(true);
+  }
 }
 
 QWidget *PhotoControl::setupMainPage()
 {
   QWidget *mainPage = new QWidget(m_controlPanel);
-  Ui::PhotoControlMain mainPageLayout;
-  mainPageLayout.setupUi(mainPage);
-
-  // Make buttons more accessible
-
-  rotateCCWButton = mainPageLayout.rotateCCWButton;
-  rotateCWButton = mainPageLayout.rotateCWButton;
-  editButton = mainPageLayout.editButton;
-  //cropButton = mainPageLayout.cropButton;
-
-  zoomOutButton = mainPageLayout.zoomOutButton;
-  zoomInButton = mainPageLayout.zoomInButton;
-  zoomInputButton = mainPageLayout.zoomInputButton;
-  zoomScreenButton = mainPageLayout.zoomScreenButton;
-  actualSizeButton = mainPageLayout.actualSizeButton;
-
-  nextButton = mainPageLayout.nextButton;
-  backButton = mainPageLayout.backButton;
-  closeButton = mainPageLayout.closeButton;
+  m_mainPage.setupUi(mainPage);
 
   // Connect the buttons
-  connect(mainPageLayout.cropButton, SIGNAL(clicked()), this, SLOT(selectCrop()));
+  connect(m_mainPage.cropButton, SIGNAL(clicked()), this, SLOT(selectCrop()));
 
   return mainPage;
 }
@@ -93,12 +105,10 @@ QWidget *PhotoControl::setupMainPage()
 QWidget *PhotoControl::setupCropControl()
 {
   QWidget *page = new QWidget(m_controlPanel);
-
-  Ui::PhotoControlCrop layout;
-  layout.setupUi(page);
+  m_cropPage.setupUi(page);
 
   // Connect the buttons
-  connect(layout.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
+  connect(m_cropPage.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
 
   return page;
 }

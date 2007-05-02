@@ -23,6 +23,9 @@
 
 #include <QtGui/QWidget>
 
+#include "ui_photocontrol-main.h"
+#include "ui_photocontrol-crop.h"
+
 class QStackedWidget;
 class QPushButton;
 
@@ -61,20 +64,22 @@ class PhotoControl : public QWidget
     /**
      * List of operations that this PhotoControl can do.
      */
-    enum Operation {
+    enum Operation
+    {
       /** Used for defining operationless state. */
       NoOperation,
       /** Cropping */
       Crop
-    };
+  };
 
     /**
      * List of possible parameter types.
      */
-    enum ParameterType {
+    enum ParameterType
+    {
       /** Parameter describing an area. */
       Area
-    };
+  };
 
     /**
      * Just a constructor.
@@ -91,35 +96,20 @@ class PhotoControl : public QWidget
      */
     void connectView(PhotoView *view);
 
-    // Buttons for the MainWindow
-
-    // The main page
-    // First group box
-    QPushButton *rotateCCWButton;
-    QPushButton *rotateCWButton;
-    QPushButton *editButton;
-
-    //Second group box
-    QPushButton *zoomOutButton;
-    QPushButton *zoomInButton;
-    QPushButton *zoomInputButton;
-    QPushButton *zoomScreenButton;
-    QPushButton *actualSizeButton;
-
-    // Control button group
-    QPushButton *nextButton;
-    QPushButton *backButton;
-    QPushButton *closeButton;
-    QPushButton *saveButton;
+  public slots:
+    /**
+     * Enables or enables the next/back button. Depends on the signal.
+     */
+    void checkNavigation(int newLocation, int totalImages);
 
   private:
     QStackedWidget *m_controlPanel;
     Operation m_currentOperation;
     bool m_saved;
 
-    // Crop control buttons
-    QPushButton *m_cancelCrop;
-    QPushButton *m_saveCrop;
+    // Layouts for pages
+    Ui::PhotoControlMain m_mainPage;
+    Ui::PhotoControlCrop m_cropPage;
 
     /**
      * Setups and returns the main control page.
