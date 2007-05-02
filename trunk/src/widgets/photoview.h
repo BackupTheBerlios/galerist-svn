@@ -220,6 +220,11 @@ class PhotoView : public QGraphicsView
     void cancelOperation(int operation);
 
     /**
+     * Saves the operation results.
+     */
+    void saveOperation(int operation, const QMap<int, QVariant> &params);
+
+    /**
      * Rotates the current image (edit mode only) clock-wise.
      */
     void rotateSelectedImageCW();

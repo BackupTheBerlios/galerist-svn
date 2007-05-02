@@ -70,8 +70,11 @@ void PhotoControl::connectView(PhotoView *view)
 
   connect(this, SIGNAL(operationSelected(int)), view, SLOT(initiateOperation(int)));
   connect(this, SIGNAL(cancelOperation(int)), view, SLOT(cancelOperation(int)));
+  connect(this, SIGNAL(saveChange(int, const QMap<int, QVariant>&)), view, SLOT(saveOperation(int, const QMap<int, QVariant>&)));
 
   connect(view, SIGNAL(photoEditSelectionChanged(int, int)), this, SLOT(checkNavigation(int, int)));
+
+  connect(view, SIGNAL(areaSelected(const QRect&)), this, SLOT(valuesChanged()));
 }
 
 void PhotoControl::checkNavigation(int newLocation, int totalImages)
@@ -109,6 +112,7 @@ QWidget *PhotoControl::setupCropControl()
 
   // Connect the buttons
   connect(m_cropPage.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
+  connect(m_cropPage.saveButton, SIGNAL(clicked()), this, SLOT(saveChanges()));
 
   return page;
 }
@@ -117,12 +121,54 @@ void PhotoControl::restore()
 {
   m_controlPanel->setCurrentIndex(0);
 
-  if (!m_saved) {
+  if (!m_saved)
     emit cancelOperation(m_currentOperation);
+  else
     m_saved = false;
+
+  switch (m_currentOperation) {
+    case (Crop) : {
+      m_cropPage.saveButton->setEnabled(false);
+      break;
+    }
+    default : {
+      break;
+    }
   }
 
   m_currentOperation = NoOperation;
+}
+
+void PhotoControl::saveChanges()
+{
+  QMap<int, QVariant> params;
+  switch (m_currentOperation) {
+    case (Crop) : {
+      emit saveChange(Crop, params);
+      break;
+    }
+    default : {
+      qDebug("This option is unknown!");
+      break;
+    }
+  }
+
+  m_saved = true;
+  restore();
+}
+
+void PhotoControl::valuesChanged()
+{
+  switch (m_currentOperation) {
+    case (Crop) : {
+      m_cropPage.saveButton->setEnabled(true);
+      break;
+    }
+    default : {
+      qDebug("This option is unknown.");
+      break;
+    }
+  }
 }
 
 void PhotoControl::selectCrop()

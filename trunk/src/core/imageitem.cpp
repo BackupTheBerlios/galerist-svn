@@ -241,6 +241,8 @@ void ImageItem::crop(const QRect &area)
     return;
   }
 
+  saveImage();
+
 }
 
 QString ImageItem::getThumbName() const

@@ -381,7 +381,7 @@ void PhotoItem::crop(const QRect &area)
     m_pixmap->setPixmap(QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>()));
     delete m_new;
   }
-  mappedArea = m_pixmap->pixmap().rect().intersected(mappedArea);
+  //mappedArea = m_pixmap->pixmap().rect().intersected(mappedArea);
 
   m_new = new PhotoPixmap(this, m_view->scene());
   m_new->setPixmap(m_pixmap->pixmap().copy(mappedArea));
@@ -399,6 +399,23 @@ void PhotoItem::cancelCrop()
     delete m_new;
     m_new = 0;
   }
+}
+
+void PhotoItem::saveCrop()
+{
+  if (!m_new) {
+    qDebug("BUG! m_new premeturely deleted!");
+    return;
+  }
+
+  QRect area(m_new->pos().toPoint(), m_new->pixmap().rect().size());
+
+  m_item->crop(area);
+
+  cancelCrop();
+
+  m_fullsizePixmap = new QPixmap(QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>()));
+  m_pixmap->setPixmap(*m_fullsizePixmap);
 }
 
 void PhotoItem::rotate(int rotation)

@@ -220,6 +220,21 @@ void PhotoView::cancelOperation(int operation)
   }
 }
 
+void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
+{
+  switch (operation) {
+    case (PhotoControl::Crop) : {
+      m_currentEdited->saveCrop();
+      beginCrop(false);
+      break;
+    }
+    default : {
+      qDebug("Operation not supported.");
+      break;
+    }
+  }
+}
+
 void PhotoView::rotateSelectedImageCW()
 {
   if (!m_editMode)
@@ -967,6 +982,8 @@ void PhotoView::slotConnectNavButtons()
 
 void PhotoView::cropSelection(const QRect &area)
 {
+  if (!m_editMode)
+    return;
   // Disconnect the slot
   //disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
 

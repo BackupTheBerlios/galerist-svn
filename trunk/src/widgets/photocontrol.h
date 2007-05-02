@@ -22,6 +22,7 @@
 #define GWIDGETSPHOTOCONTROL_H
 
 #include <QtGui/QWidget>
+#include <QtCore/QVariant>
 
 #include "ui_photocontrol-main.h"
 #include "ui_photocontrol-crop.h"
@@ -126,6 +127,16 @@ class PhotoControl : public QWidget
      * Goes back to operationless existence :D.
      */
     void restore();
+
+    /**
+     * Saves the change (or better, notifies other to save the change).
+     */
+    void saveChanges();
+
+    /**
+     * Enables the save button.
+     */
+    void valuesChanged();
 
     /**
      * Executed when the crop tool is selected.
