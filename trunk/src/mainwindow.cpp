@@ -154,7 +154,7 @@ void MainWindow::initActionButtons()
   GCore::Data::self()->setPhotoContextMenu(contextMenu);
 
 
-
+  photoControl->connectView(imageList);
 
   // Something that shouldn't be here (or should be like an action)
   connect(photoControl->rotateCCWButton, SIGNAL(clicked()), imageList, SLOT(rotateSelectedImageCCW()));
@@ -162,8 +162,8 @@ void MainWindow::initActionButtons()
   connect(photoControl->editButton, SIGNAL(clicked()), imageList, SLOT(slotEditPhoto()));
 
   // New buttons! <-- Need to remove this comment!!!!
-  connect(photoControl->cropButton, SIGNAL(clicked(bool)), imageList, SLOT(beginCrop(bool)));
-  connect(imageList, SIGNAL(toolReleased(bool)), photoControl->cropButton, SLOT(setChecked(bool)));
+//  connect(photoControl->cropButton, SIGNAL(clicked(bool)), imageList, SLOT(beginCrop(bool)));
+//  connect(imageList, SIGNAL(toolReleased(bool)), photoControl->cropButton, SLOT(setChecked(bool)));
 
   connect(photoControl->zoomOutButton, SIGNAL(clicked()), imageList, SLOT(slotZoomOutPhoto()));
   connect(photoControl->zoomInButton, SIGNAL(clicked()), imageList, SLOT(slotZoomInPhoto()));

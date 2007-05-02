@@ -210,10 +210,19 @@ class PhotoView : public QGraphicsView
     void setFilter(const QString &filter);
 
     /**
+     * Initiates the operation.
+     */
+    void initiateOperation(int operation);
+
+    /**
+     * Cancels the operation.
+     */
+    void cancelOperation(int operation);
+
+    /**
      * Rotates the current image (edit mode only) clock-wise.
      */
     void rotateSelectedImageCW();
-
     /**
      * Rotates the current image (edit mode only) counter clock-wise.
      */

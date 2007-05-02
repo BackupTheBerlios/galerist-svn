@@ -1,5 +1,6 @@
 FORMS += imageaddprogress.ui \
-photocontrol-main.ui
+photocontrol-main.ui \
+photocontrol-crop.ui
 HEADERS += lineedit.h \
            gallerytreeview.h \
            imageaddprogress.h \

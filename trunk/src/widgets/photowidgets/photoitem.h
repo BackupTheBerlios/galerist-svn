@@ -201,6 +201,11 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      */
     void crop(const QRect &area);
 
+    /**
+     * Cancel the crop.
+     */
+    void cancelCrop();
+
   public slots:
     /**
      * Changes the image.

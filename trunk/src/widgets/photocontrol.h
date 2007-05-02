@@ -29,6 +29,8 @@ class QPushButton;
 namespace GWidgets
 {
 
+class PhotoView;
+
 /**
  * @short A control panel for PhotoView.
  * @author Gregor Kališnik <gregor@podnapisi.net>
@@ -36,7 +38,44 @@ namespace GWidgets
 class PhotoControl : public QWidget
 {
     Q_OBJECT
+  signals:
+    /**
+     * Emitted when Save button of the operation is pressed.
+     *
+     * @param operation Which operation has been saved (or need to be saved).
+     * @param params Parameters for the selected operation.
+     */
+    void saveChange(int operation, const QMap<int, QVariant> &params);
+
+    /**
+     * Emitted when an operation has been selected.
+     */
+    void operationSelected(int operation);
+
+    /**
+     * Emitted whenn operation has been canceled.
+     */
+    void cancelOperation(int operation);
+
   public:
+    /**
+     * List of operations that this PhotoControl can do.
+     */
+    enum Operation {
+      /** Used for defining operationless state. */
+      NoOperation,
+      /** Cropping */
+      Crop
+    };
+
+    /**
+     * List of possible parameter types.
+     */
+    enum ParameterType {
+      /** Parameter describing an area. */
+      Area
+    };
+
     /**
      * Just a constructor.
      */
@@ -47,14 +86,18 @@ class PhotoControl : public QWidget
      */
     ~PhotoControl();
 
+    /**
+     * Connects to the PhotoView.
+     */
+    void connectView(PhotoView *view);
+
     // Buttons for the MainWindow
-    
+
     // The main page
     // First group box
     QPushButton *rotateCCWButton;
     QPushButton *rotateCWButton;
     QPushButton *editButton;
-    QPushButton *cropButton;
 
     //Second group box
     QPushButton *zoomOutButton;
@@ -63,7 +106,7 @@ class PhotoControl : public QWidget
     QPushButton *zoomScreenButton;
     QPushButton *actualSizeButton;
 
-    // Control button
+    // Control button group
     QPushButton *nextButton;
     QPushButton *backButton;
     QPushButton *closeButton;
@@ -71,8 +114,33 @@ class PhotoControl : public QWidget
 
   private:
     QStackedWidget *m_controlPanel;
+    Operation m_currentOperation;
+    bool m_saved;
 
+    // Crop control buttons
+    QPushButton *m_cancelCrop;
+    QPushButton *m_saveCrop;
 
+    /**
+     * Setups and returns the main control page.
+     */
+    QWidget *setupMainPage();
+
+    /**
+     * Setups and returns the control page for cropping tool.
+     */
+    QWidget *setupCropControl();
+
+  private slots:
+    /**
+     * Goes back to operationless existence :D.
+     */
+    void restore();
+
+    /**
+     * Executed when the crop tool is selected.
+     */
+    void selectCrop();
 };
 
 }

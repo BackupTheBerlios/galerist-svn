@@ -49,6 +49,7 @@
 
 #include "widgets/inputzoomdialog.h"
 #include "widgets/searchbar.h"
+#include "widgets/photocontrol.h"
 
 #include "widgets/photowidgets/photoitem.h"
 
@@ -63,7 +64,8 @@ PhotoView::PhotoView(QWidget *parent)
     m_editMode(false),
     m_currentEdited(0),
     m_model(0),
-    m_rubberBand(0)
+    m_rubberBand(0),
+    m_needRubberBand(false)
 {
   QGraphicsScene *scene = new QGraphicsScene(this);
   scene->setBackgroundBrush(Qt::white);
@@ -190,6 +192,34 @@ void PhotoView::setFilter(const QString &filter)
   rearrangeItems();
 }
 
+void PhotoView::initiateOperation(int operation)
+{
+  switch (operation) {
+    case (PhotoControl::Crop) : {
+      beginCrop(true);
+      break;
+    }
+    default : {
+      qDebug("Operation not supported.");
+      break;
+    }
+  }
+}
+
+void PhotoView::cancelOperation(int operation)
+{
+  switch (operation) {
+    case (PhotoControl::Crop) : {
+      beginCrop(false);
+      break;
+    }
+    default : {
+      qDebug("Operation not supported.");
+      break;
+    }
+  }
+}
+
 void PhotoView::rotateSelectedImageCW()
 {
   if (!m_editMode)
@@ -216,8 +246,10 @@ void PhotoView::beginCrop(bool enable)
   // Set the cross cursor
   if (enable)
     viewport()->setCursor(Qt::CrossCursor);
-  else
+  else {
     viewport()->setCursor(Qt::OpenHandCursor);
+    m_currentEdited->cancelCrop();
+  }
 }
 
 void PhotoView::rotateSelectedImageCCW()
@@ -573,7 +605,9 @@ void PhotoView::mousePressEvent(QMouseEvent *event)
     m_rubberStartPos = event->pos();
     m_rubberScrollValue = verticalScrollBar()->value();
     m_rubberBand = new QRubberBand(QRubberBand::Rectangle, viewport());
-    //return;
+
+    if (m_needRubberBand)
+    return;
     //m_rubberBand->show();
   }
 
@@ -653,8 +687,9 @@ void PhotoView::mouseReleaseEvent(QMouseEvent *event)
 {
   if (m_rubberBand && m_needRubberBand) {
     emit areaSelected(m_rubberBand->geometry());
-    emit toolReleased(false);
-    m_needRubberBand = false;
+    return;
+    //emit toolReleased(false);
+    //m_needRubberBand = false;
   }
 
   // If it's not our call, we pass it to QGraphicsView
@@ -933,14 +968,13 @@ void PhotoView::slotConnectNavButtons()
 void PhotoView::cropSelection(const QRect &area)
 {
   // Disconnect the slot
-  disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+  //disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
 
   // Resets the cursor
-  viewport()->setCursor(Qt::ClosedHandCursor);
+  //viewport()->setCursor(Qt::ClosedHandCursor);
 
   // Crops the image
   m_currentEdited->crop(mapToScene(area).boundingRect().toRect());
-  //static_cast<GCore::ImageModel*> (model())->crop(indexForItem(m_currentEdited), area);
 }
 
 QModelIndex PhotoView::indexForItem(GPhotoWidgets::PhotoItem *item)

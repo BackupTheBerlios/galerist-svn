@@ -20,6 +20,9 @@
  ***************************************************************************/
 #include "photocontrol.h"
 
+#include "ui_photocontrol-main.h"
+#include "ui_photocontrol-crop.h"
+
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QStackedWidget>
@@ -27,28 +30,49 @@
 #include <QtGui/QGroupBox>
 #include <QtGui/QIcon>
 
-#include "ui_photocontrol-main.h"
+#include "widgets/photoview.h"
 
 namespace GWidgets
 {
 
 PhotoControl::PhotoControl(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent),
+      m_currentOperation(NoOperation),
+      m_saved(false)
 {
   QHBoxLayout *mainLayout = new QHBoxLayout(this);
 
   m_controlPanel = new QStackedWidget(this);
   mainLayout->addWidget(m_controlPanel);
 
-  // Setup main page
+  m_controlPanel->addWidget(setupMainPage());
+  m_controlPanel->addWidget(setupCropControl());
+
+  setLayout(mainLayout);
+}
+
+
+PhotoControl::~PhotoControl()
+{}
+
+void PhotoControl::connectView(PhotoView *view)
+{
+  connect(this, SIGNAL(operationSelected(int)), view, SLOT(initiateOperation(int)));
+  connect(this, SIGNAL(cancelOperation(int)), view, SLOT(cancelOperation(int)));
+}
+
+QWidget *PhotoControl::setupMainPage()
+{
   QWidget *mainPage = new QWidget(m_controlPanel);
   Ui::PhotoControlMain mainPageLayout;
   mainPageLayout.setupUi(mainPage);
 
+  // Make buttons more accessible
+
   rotateCCWButton = mainPageLayout.rotateCCWButton;
   rotateCWButton = mainPageLayout.rotateCWButton;
   editButton = mainPageLayout.editButton;
-  cropButton = mainPageLayout.cropButton;
+  //cropButton = mainPageLayout.cropButton;
 
   zoomOutButton = mainPageLayout.zoomOutButton;
   zoomInButton = mainPageLayout.zoomInButton;
@@ -59,16 +83,44 @@ PhotoControl::PhotoControl(QWidget *parent)
   nextButton = mainPageLayout.nextButton;
   backButton = mainPageLayout.backButton;
   closeButton = mainPageLayout.closeButton;
-  saveButton = mainPageLayout.saveButton;
 
-  m_controlPanel->addWidget(mainPage);
+  // Connect the buttons
+  connect(mainPageLayout.cropButton, SIGNAL(clicked()), this, SLOT(selectCrop()));
 
-  setLayout(mainLayout);
+  return mainPage;
 }
 
+QWidget *PhotoControl::setupCropControl()
+{
+  QWidget *page = new QWidget(m_controlPanel);
 
-PhotoControl::~PhotoControl()
-{}
+  Ui::PhotoControlCrop layout;
+  layout.setupUi(page);
 
+  // Connect the buttons
+  connect(layout.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
+
+  return page;
+}
+
+void PhotoControl::restore()
+{
+  m_controlPanel->setCurrentIndex(0);
+
+  if (!m_saved) {
+    emit cancelOperation(m_currentOperation);
+    m_saved = false;
+  }
+
+  m_currentOperation = NoOperation;
+}
+
+void PhotoControl::selectCrop()
+{
+  m_controlPanel->setCurrentIndex(1);
+
+  m_currentOperation = Crop;
+  emit operationSelected(m_currentOperation);
+}
 
 }
