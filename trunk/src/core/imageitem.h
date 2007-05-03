@@ -220,6 +220,32 @@ class ImageItem : public QObject
      */
     void crop(const QRect &area);
 
+    /**
+     * Creates a blur preview.
+     *
+     * @param blurFilters Number of blur filters.
+     */
+    QImage createBlurPreview(int blurFilters);
+    /**
+     * Saves the blur effects.
+     *
+     * @param blurFilters Number of blur filters.
+     */
+    void saveBlur(int blurFilters);
+
+    /**
+     * Creates a sharpen preview.
+     *
+     * @param sharpenFilters Number of sharpen filters.
+     */
+    QImage createSharpenPreview(int sharpenFilters);
+    /**
+     * Saves the sharpen effects.
+     *
+     * @param sharpenFilters Number of sharpen filters.
+     */
+    void saveSharpen(int sharpenFilters);
+
   public slots:
     /**
      * Loads the image into ImageMagick.

@@ -202,14 +202,40 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     void crop(const QRect &area);
 
     /**
-     * Cancel the crop.
+     * Cancel the transformation changes.
      */
-    void cancelCrop();
+    void closeTransformations();
 
     /**
      * Save the crop operation result.
      */
     void saveCrop();
+
+    /**
+     * Shows the blur preview.
+     *
+     * @param blurFilters Number of blur filters
+     */
+    void blurPreview(int blurFilters);
+    /**
+     * Saves the blur effects.
+     *
+     * @param blurFilters Number of blur filters
+     */
+    void saveBlur(int blurFilters);
+
+    /**
+     * Shows the sharpen preview.
+     *
+     * @param sharpenFilters Number of sharpen filters
+     */
+    void sharpenPreview(int sharpenFilters);
+    /**
+     * Saves the sharpen effects.
+     *
+     * @param sharpenFilters Number of sharpen filters
+     */
+    void saveSharpen(int sharpenFilters);
 
   public slots:
     /**
@@ -287,7 +313,7 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     int m_rotation;
 
     // Connection with the model
-    GCore::ImageItem *m_item;
+    //GCore::ImageItem *m_item;
     QModelIndex m_index;
 
     /**

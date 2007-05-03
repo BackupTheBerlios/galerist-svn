@@ -26,6 +26,7 @@
 
 #include "ui_photocontrol-main.h"
 #include "ui_photocontrol-crop.h"
+#include "ui_photocontrol-blur.h"
 
 class QStackedWidget;
 class QPushButton;
@@ -52,6 +53,14 @@ class PhotoControl : public QWidget
     void saveChange(int operation, const QMap<int, QVariant> &params);
 
     /**
+     * Emitted upon value change.
+     *
+     * @param operation Which operation has been saved (or need to be saved).
+     * @param params Parameters for the selected operation.
+     */
+    void valuesChange(int operation, const QMap<int, QVariant> &params);
+
+    /**
      * Emitted when an operation has been selected.
      */
     void operationSelected(int operation);
@@ -69,9 +78,13 @@ class PhotoControl : public QWidget
     {
       /** Used for defining operationless state. */
       NoOperation,
-      /** Cropping */
-      Crop
-  };
+      /** Crop operation. */
+      Crop,
+      /** Blur operation. */
+      Blur,
+      /** Sharpen operation. */
+      Sharpen
+    };
 
     /**
      * List of possible parameter types.
@@ -79,8 +92,10 @@ class PhotoControl : public QWidget
     enum ParameterType
     {
       /** Parameter describing an area. */
-      Area
-  };
+      Area,
+      /** Parameter describing the number of repeating operation. */
+      RepeatNumber
+    };
 
     /**
      * Just a constructor.
@@ -107,10 +122,13 @@ class PhotoControl : public QWidget
     QStackedWidget *m_controlPanel;
     Operation m_currentOperation;
     bool m_saved;
+    QMap<int, QVariant> m_params;
 
     // Layouts for pages
     Ui::PhotoControlMain m_mainPage;
     Ui::PhotoControlCrop m_cropPage;
+    Ui::PhotoControlBlur m_blurPage;
+    Ui::PhotoControlBlur m_sharpenPage;
 
     /**
      * Setups and returns the main control page.
@@ -121,6 +139,16 @@ class PhotoControl : public QWidget
      * Setups and returns the control page for cropping tool.
      */
     QWidget *setupCropControl();
+
+    /**
+     * Setups and returns the control page for blur tool.
+     */
+    QWidget *setupBlurPage();
+
+    /**
+     * Setups and returns the control page for sharpen tool.
+     */
+    QWidget *setupSharpenPage();
 
   private slots:
     /**
@@ -139,9 +167,24 @@ class PhotoControl : public QWidget
     void valuesChanged();
 
     /**
+     * Requests a preview.
+     */
+    void requestPreview();
+
+    /**
      * Executed when the crop tool is selected.
      */
     void selectCrop();
+
+    /**
+     * Selects the Blur transformation tool.
+     */
+    void selectBlur();
+
+    /**
+     * Selects the Sharpen transformation tool.
+     */
+    void selectSharpen();
 };
 
 }

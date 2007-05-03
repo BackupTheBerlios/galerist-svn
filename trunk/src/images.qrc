@@ -3,6 +3,7 @@
         <file>images/add-existing.png</file>
         <file>images/add.png</file>
         <file>images/back.png</file>
+        <file>images/blur.png</file>
         <file>images/cancel.png</file>
         <file>images/configure.png</file>
         <file>images/crop.png</file>
@@ -27,11 +28,13 @@
         <file>images/loading.png</file>
         <file>images/new.png</file>
         <file>images/newgallerywizard-banner.png</file>
+        <file>images/preview.png</file>
         <file>images/remove.png</file>
         <file>images/rename.png</file>
         <file>images/rotate_ccw.png</file>
         <file>images/rotate_cw.png</file>
         <file>images/round-rect.png</file>
+        <file>images/sharpen.png</file>
         <file>images/show-progress.png</file>
         <file>images/upgrade.png</file>
         <file>images/zommselect.png</file>

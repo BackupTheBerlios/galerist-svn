@@ -42,6 +42,8 @@
 #include "widgets/photowidgets/photorect.h"
 #include "widgets/photowidgets/photopixmap.h"
 
+#include <QtCore/QtDebug>
+
 namespace GWidgets
 {
 
@@ -70,8 +72,6 @@ PhotoItem::PhotoItem(PhotoView *view, const QModelIndex &index)
   setAcceptsHoverEvents(true);
   setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 
-  m_item = static_cast<GCore::ImageItem*>(index.internalPointer());
-
   m_itemTimeLine = new QTimeLine(1000, this);
   m_itemTimeLine->setUpdateInterval(10);
 
@@ -87,7 +87,7 @@ PhotoItem::PhotoItem(PhotoView *view, const QModelIndex &index)
   // Connect the elements
   connect(m_itemTimeLine, SIGNAL(valueChanged(qreal)), this, SLOT(slotSetFullsizePixmap(qreal)));
   connect(view, SIGNAL(signalEditMode(bool)), this, SLOT(slotEdit(bool)));
-  connect(view, SIGNAL(signalEditMode(bool)), m_item, SLOT(prepareForEdit(bool)));
+  connect(view, SIGNAL(signalEditMode(bool)), static_cast<GCore::ImageItem*>(index.internalPointer()), SLOT(prepareForEdit(bool)));
   connect(m_text, SIGNAL(editingFinished(const QString&)), this, SLOT(slotSaveName(const QString&)));
   connect(m_description, SIGNAL(editingFinished(const QString&)), this, SLOT(slotSaveDescription(const QString&)));
 }
@@ -116,7 +116,7 @@ void PhotoItem::setupUi()
   m_pixmap->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
 
   // Get the thumbnail
-  m_pixmap->setPixmap(m_index.data(GCore::ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(128, 128));
+  setPixmap(m_index.data(GCore::ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(128, 128));
 
   m_text = new PhotoName(this, m_view->scene(), m_view);
   m_text->setPos(15, 140);
@@ -381,18 +381,18 @@ void PhotoItem::crop(const QRect &area)
     m_pixmap->setPixmap(QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>()));
     delete m_new;
   }
-  //mappedArea = m_pixmap->pixmap().rect().intersected(mappedArea);
+  mappedArea = m_pixmap->pixmap().rect().intersected(mappedArea);
 
   m_new = new PhotoPixmap(this, m_view->scene());
   m_new->setPixmap(m_pixmap->pixmap().copy(mappedArea));
   m_new->setPos(mappedArea.topLeft());
-  m_new->setZValue(2);
+  m_new->setZValue(5);
   //m_pixmap->setZValue(1);
 
   m_pixmap->setPixmap(QPixmap::fromImage(m_pixmap->pixmap().toImage().convertToFormat(QImage::Format_Mono)));
 }
 
-void PhotoItem::cancelCrop()
+void PhotoItem::closeTransformations()
 {
   if (m_new) {
     m_pixmap->setPixmap(QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>()));
@@ -410,12 +410,61 @@ void PhotoItem::saveCrop()
 
   QRect area(m_new->pos().toPoint(), m_new->pixmap().rect().size());
 
-  m_item->crop(area);
+  
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
 
-  cancelCrop();
+  if (item)
+  item->crop(area);
+
+  if (m_new) {
+    delete m_new;
+    m_new = 0;
+  }
 
   m_fullsizePixmap = new QPixmap(QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>()));
   m_pixmap->setPixmap(*m_fullsizePixmap);
+}
+
+void PhotoItem::blurPreview(int blurFilters)
+{
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+
+  if (m_new)
+    delete m_new;
+
+  m_new = new PhotoPixmap(this, m_view->scene());
+  m_new->setPixmap(QPixmap::fromImage(item->createBlurPreview(blurFilters)));
+  m_new->setZValue(5);
+}
+
+void PhotoItem::saveBlur(int blurFilters)
+{
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+
+  item->saveBlur(blurFilters);
+
+  closeTransformations();
+}
+
+void PhotoItem::sharpenPreview(int sharpenFilters)
+{
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+
+  if (m_new)
+    delete m_new;
+
+  m_new = new PhotoPixmap(this, m_view->scene());
+  m_new->setPixmap(QPixmap::fromImage(item->createSharpenPreview(sharpenFilters)));
+  m_new->setZValue(5);
+}
+
+void PhotoItem::saveSharpen(int sharpenFilters)
+{
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+
+  item->saveSharpen(sharpenFilters);
+
+  closeTransformations();
 }
 
 void PhotoItem::rotate(int rotation)
@@ -531,6 +580,8 @@ void PhotoItem::slotEdit(bool edit)
   m_zooming = true;
   m_editMode = edit;
 
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*> (m_index.internalPointer());
+
   // Make changes to go to or out of edit
   if (edit) {
     // Item isn't selectable nor focusable
@@ -544,7 +595,8 @@ void PhotoItem::slotEdit(bool edit)
     m_description->hide();
     m_rect->hide();
 
-    connect(m_item, SIGNAL(imageChanged(const QImage&)), this, SLOT(changeImage(const QImage&)));
+    if (item)
+    connect(item, SIGNAL(imageChanged(const QImage&)), this, SLOT(changeImage(const QImage&)));
   } else {
     // Item is selectable and focusable again
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
@@ -557,19 +609,26 @@ void PhotoItem::slotEdit(bool edit)
     // Go back to default value
     setZValue(1);
 
-    disconnect(m_item, SIGNAL(imageChanged(const QImage&)), this, SLOT(changeImage(const QImage&)));
+    /*if (item)
+    disconnect(item, SIGNAL(imageChanged(const QImage&)), this, SLOT(changeImage(const QImage&)));*/
   }
 }
 
 void PhotoItem::slotSaveName(const QString &name)
 {
-  m_item->setName(name);
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+
+  if (item)
+  item->setName(name);
   setToolTip(m_index.data(GCore::ImageModel::ImageTooltipRole).toString());
 }
 
 void PhotoItem::slotSaveDescription(const QString &description)
 {
-  m_item->setDescription(description);
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+
+  if (item)
+  item->setDescription(description);
   setToolTip(m_index.data(GCore::ImageModel::ImageTooltipRole).toString());
 }
 

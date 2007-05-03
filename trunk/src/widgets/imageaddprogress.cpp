@@ -54,7 +54,7 @@ void ImageAddProgress::setProgress(int finished, int total, const QString &curre
   imageLabel->setPixmap(QPixmap::fromImage(currentPixmap).scaled(64, 64, Qt::KeepAspectRatio));
 
   if (finished == total) {
-    nameLabel->setText(tr("Copiing of pictures is successful."));
+    nameLabel->setText(tr("Copying of pictures is successful."));
     QTimer::singleShot(1000, this, SLOT(hide()));
   }
 }

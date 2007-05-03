@@ -44,7 +44,6 @@
 #include "dialogs/newgallerywizard.h"
 #include "dialogs/configuration.h"
 
-#include "widgets/imageaddprogress.h"
 #include "widgets/photocontrol.h"
 
 
@@ -245,25 +244,18 @@ void MainWindow::slotAddImages()
 {
   QStringList pictures = QFileDialog::getOpenFileNames(this, tr("Add images"), QDir::homePath(), tr("Images (*.png *.gif *.jpg *.jpeg)"));
 
-  addImages(pictures);
-}
+  //addImages(pictures);
 
-void MainWindow::addImages(const QStringList &images)
-{
-  if (images.isEmpty())
-    return;
-
-  QString image = images.first();
+  // Add images
+  QString image = pictures.first();
   image.remove(QRegExp("^.+/"));
-  QString path = images.first();
+  QString path = pictures.first();
   path.remove(image);
 
-  QStringList pictures = images;
-  pictures.replaceInStrings(path, QString());
-  QStringList::const_iterator end = pictures.end();
+  QStringList images = pictures;
+  images.replaceInStrings(path, QString());
 
-  qRegisterMetaType<QImage>("QImage");
-  connect(GCore::Data::self()->getImageModel()->addImages(imageList->rootIndex(), path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(slotStatusProgress(int, int, const QString&, const QImage&)));
+  connect(GCore::Data::self()->getImageModel()->addImages(imageList->rootIndex(), path, images), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getImageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
 }
 
 void MainWindow::slotConfiguration()
@@ -291,7 +283,7 @@ void MainWindow::timerEvent(QTimerEvent*)
 
 void MainWindow::showEXIF()
 {
-  GCore::ExifManager exifData(imageList->indexForItem(imageList->getSelectedPhoto()).data(GCore::ImageModel::ImageFilepathRole).toString(), this);
+/*  GCore::ExifManager exifData(imageList->getSelectedPhoto()->getIndex().data(GCore::ImageModel::ImageFilepathRole).toString(), this);
   QString message = tr("Camera manufacturer: ") + exifData.getCameraMaker() + "\n";
   message += tr("Camera model: ") + exifData.getCameraModel() + "\n";
   message += tr("Aperture: ") + exifData.getAperture() + "\n";
@@ -300,5 +292,5 @@ void MainWindow::showEXIF()
   message += tr("Exposure time: ") + exifData.getExposureTime() + "\n";
   message += tr("Focal length: ") + exifData.getFocalLength() + "\n";
   message += tr("Flash: ") + exifData.getFlash() + "\n";
-  QMessageBox::information(this, tr("EXIF metadata"), message);
+  QMessageBox::information(this, tr("EXIF metadata"), message);*/
 }

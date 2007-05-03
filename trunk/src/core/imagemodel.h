@@ -38,7 +38,7 @@ class CopyJob;
 }
 
 /**
- * @short The model with images and all of it's data.
+ * @short The model with images and all of its data.
  * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class ImageModel : public QAbstractItemModel
@@ -359,10 +359,6 @@ class ImageModel : public QAbstractItemModel
      * Removes a finished copy job.
      */
     void slotRemoveCopyJob();
-    /**
-     * Refreshes the model.
-     */
-    void slotRefresh();
 
 };
 

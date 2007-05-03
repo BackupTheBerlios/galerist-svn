@@ -109,7 +109,7 @@ void PhotoView::setModel(QAbstractItemModel *model)
     // Disconnect old model
     disconnect(m_model, SIGNAL(layoutChanged()), this, SLOT(slotModelLayoutChanged()));
     disconnect(m_model, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this, SLOT(slotModelRowsInserted(const QModelIndex&, int, int)));
-    disconnect(m_model, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this, SLOT(slotModelRowsRemoved(const QModelIndex&, int, int)));
+    disconnect(m_model, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)), this, SLOT(slotModelRowsRemoved(const QModelIndex&, int, int)));
     disconnect(m_model, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(slotModelDataChanged(const QModelIndex&, const QModelIndex&)));
     disconnect(m_model, SIGNAL(modelReset()), this, SLOT(slotModelReset()));
   }
@@ -119,7 +119,7 @@ void PhotoView::setModel(QAbstractItemModel *model)
   // Connect the new model
   connect(m_model, SIGNAL(layoutChanged()), this, SLOT(slotModelLayoutChanged()));
   connect(m_model, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this, SLOT(slotModelRowsInserted(const QModelIndex&, int, int)));
-  connect(m_model, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this, SLOT(slotModelRowsRemoved(const QModelIndex&, int, int)));
+  connect(m_model, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)), this, SLOT(slotModelRowsRemoved(const QModelIndex&, int, int)));
   connect(m_model, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(slotModelDataChanged(const QModelIndex&, const QModelIndex&)));
   connect(m_model, SIGNAL(modelReset()), this, SLOT(slotModelReset()));
 }
@@ -127,7 +127,7 @@ void PhotoView::setModel(QAbstractItemModel *model)
 void PhotoView::setRootIndex(const QModelIndex &index)
 {
   QModelIndex mappedIndex = GCore::Data::self()->getModelProxy()->mapToSource(index);
-  
+
   if (!mappedIndex.isValid() || mappedIndex.model() != m_model || mappedIndex == m_rootIndex)
     return;
 
@@ -194,11 +194,19 @@ void PhotoView::setFilter(const QString &filter)
 
 void PhotoView::initiateOperation(int operation)
 {
+  if (!m_editMode)
+    return;
+
   switch (operation) {
     case (PhotoControl::Crop) : {
-      beginCrop(true);
-      break;
-    }
+        m_needRubberBand = true;
+
+        connect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+
+        viewport()->setCursor(Qt::CrossCursor);
+
+        break;
+      }
     default : {
       qDebug("Operation not supported.");
       break;
@@ -208,9 +216,50 @@ void PhotoView::initiateOperation(int operation)
 
 void PhotoView::cancelOperation(int operation)
 {
+  if (!m_editMode)
+    return;
+
   switch (operation) {
     case (PhotoControl::Crop) : {
-      beginCrop(false);
+        // We disable rubberband
+        m_needRubberBand = false;
+
+        disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+
+        viewport()->setCursor(Qt::OpenHandCursor);
+        break;
+      }
+    default : {
+      break;
+    }
+  }
+
+  m_currentEdited->closeTransformations();
+}
+
+void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
+{
+  if (!m_editMode)
+    return;
+
+  switch (operation) {
+    case (PhotoControl::Crop) : {
+        // We enable rubberband
+        m_needRubberBand = false;
+
+        disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+
+        viewport()->setCursor(Qt::OpenHandCursor);
+
+        m_currentEdited->saveCrop();
+        break;
+      }
+    case (PhotoControl::Blur) : {
+      m_currentEdited->saveBlur(params.value(PhotoControl::RepeatNumber).toInt());
+      break;
+    }
+    case (PhotoControl::Sharpen) : {
+      m_currentEdited->saveSharpen(params.value(PhotoControl::RepeatNumber).toInt());
       break;
     }
     default : {
@@ -220,12 +269,18 @@ void PhotoView::cancelOperation(int operation)
   }
 }
 
-void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
+void PhotoView::previewOperation(int operation, const QMap<int, QVariant> &params)
 {
+  if (!m_editMode)
+    return;
+
   switch (operation) {
-    case (PhotoControl::Crop) : {
-      m_currentEdited->saveCrop();
-      beginCrop(false);
+    case (PhotoControl::Blur) : {
+      m_currentEdited->blurPreview(params.value(PhotoControl::RepeatNumber).toInt());
+      break;
+    }
+    case (PhotoControl::Sharpen) : {
+      m_currentEdited->sharpenPreview(params.value(PhotoControl::RepeatNumber).toInt());
       break;
     }
     default : {
@@ -241,30 +296,7 @@ void PhotoView::rotateSelectedImageCW()
     return;
 
   m_currentEdited->rotateCW();
-  GCore::Data::self()->getImageModel()->rotate(indexForItem(m_currentEdited), GCore::ImageModel::ClockWise);
-}
-
-void PhotoView::beginCrop(bool enable)
-{
-  if (!m_editMode)
-    return;
-  
-  // We enable rubberband
-  m_needRubberBand = enable;
-
-  // Connect or disconnect the necessary slot
-  if (enable)
-    connect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
-  else
-    disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
-
-  // Set the cross cursor
-  if (enable)
-    viewport()->setCursor(Qt::CrossCursor);
-  else {
-    viewport()->setCursor(Qt::OpenHandCursor);
-    m_currentEdited->cancelCrop();
-  }
+  GCore::Data::self()->getImageModel()->rotate(m_currentEdited->getIndex(), GCore::ImageModel::ClockWise);
 }
 
 void PhotoView::rotateSelectedImageCCW()
@@ -273,7 +305,7 @@ void PhotoView::rotateSelectedImageCCW()
     return;
 
   m_currentEdited->rotateCCW();
-  GCore::Data::self()->getImageModel()->rotate(indexForItem(m_currentEdited), GCore::ImageModel::CounterClockWise);
+  GCore::Data::self()->getImageModel()->rotate(m_currentEdited->getIndex(), GCore::ImageModel::CounterClockWise);
 }
 
 void PhotoView::slotNextPhoto()
@@ -291,11 +323,11 @@ void PhotoView::slotNextPhoto()
 
   emit photoEditSelectionChanged(newIndex, m_itemVector.count());
 
-  disconnect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+  disconnect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   m_currentEdited = m_itemVector.at(newIndex);
 
-  connect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+  connect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   updateScene();
 }
@@ -315,11 +347,11 @@ void PhotoView::slotPreviousPhoto()
 
   emit photoEditSelectionChanged(newIndex, m_itemVector.count());
 
-  disconnect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+  disconnect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   m_currentEdited = m_itemVector.at(newIndex);
 
-  connect(indexForItem(m_currentEdited).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+  connect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   updateScene();
 }
@@ -369,7 +401,7 @@ void PhotoView::slotZoomInputPhoto()
 
 void PhotoView::slotEditPhoto()
 {
-  QString photo = m_model->data(indexForItem(m_currentEdited), GCore::ImageModel::ImageFilepathRole).toString();
+  QString photo = m_currentEdited->getIndex().data(GCore::ImageModel::ImageFilepathRole).toString();
 
   QStringList arguments;
   arguments << QDir::toNativeSeparators(photo);
@@ -388,7 +420,7 @@ void PhotoView::slotExitEdit()
 GPhotoWidgets::PhotoItem *PhotoView::itemForIndex(const QModelIndex &index)
 {
   // !index.isValid() || m_itemVector.count() < index.row()
-  if (index.isValid())
+  if (!index.isValid())
     return 0;
 
   return m_itemHash.value(index);
@@ -421,16 +453,10 @@ void PhotoView::readModel()
       continue;
 
     GPhotoWidgets::PhotoItem *item = new GPhotoWidgets::PhotoItem(this, row);
-    /*item->setText(row.data(Qt::DisplayRole).toString(), row.data(GCore::ImageModel::ImageDescriptionRole).toString());
-    item->setPixmap(row.data(Qt::DecorationRole).value<QIcon>().pixmap(128, 128));
-    item->setToolTip(row.data(Qt::ToolTipRole).toString());*/
 
     // Add to item vector
     m_itemHash.insert(row, item);
     m_itemVector.append(item);
-
-    // Connect the View item with its counterpart in Model
-    //connect(this, SIGNAL(signalEditMode(bool)), row.data(GCore::ImageModel::ObjectRole).value<QObject*>(), SLOT(prepareForEdit(bool)));
   }
 
   updateScene();
@@ -460,9 +486,6 @@ void PhotoView::slotModelRowsInserted(const QModelIndex &parent, int start, int 
       continue;
 
     GPhotoWidgets::PhotoItem *item = new GPhotoWidgets::PhotoItem(this, row);
-    //item->setText(row.data(Qt::DisplayRole).toString(), row.data(GCore::ImageModel::ImageDescriptionRole).toString());
-    //item->setPixmap(row.data(Qt::DecorationRole).value<QIcon>().pixmap(128, 128));
-    //item->setToolTip(row.data(Qt::ToolTipRole).toString());
 
     // Add to item vector
     m_itemHash.insert(row, item);
@@ -552,12 +575,12 @@ int PhotoView::rearrangeItems(bool update)
       item->setPos(1000, -500);
       continue;
     }
-/*
-    if (item->getText() == tr("Unavailable")) {
-      item->setText(item->getIndex().data(GCore::ImageModel::ImageNameRole).toString(), item->getIndex().data(GCore::ImageModel::ImageDescriptionRole).toString());
-      m_timerId = startTimer(500);
-    }
-*/
+    /*
+        if (item->getText() == tr("Unavailable")) {
+          item->setText(item->getIndex().data(GCore::ImageModel::ImageNameRole).toString(), item->getIndex().data(GCore::ImageModel::ImageDescriptionRole).toString());
+          m_timerId = startTimer(500);
+        }
+    */
     if (!item->group()) {
       if (item->pos() != QPointF(x, y))
         change = true;
@@ -622,7 +645,7 @@ void PhotoView::mousePressEvent(QMouseEvent *event)
     m_rubberBand = new QRubberBand(QRubberBand::Rectangle, viewport());
 
     if (m_needRubberBand)
-    return;
+      return;
     //m_rubberBand->show();
   }
 
@@ -743,7 +766,7 @@ void PhotoView::dragEnterEvent(QDragEnterEvent *event)
 
 void PhotoView::dragMoveEvent(QDragMoveEvent *event)
 {
-    event->acceptProposedAction();
+  event->acceptProposedAction();
 }
 
 void PhotoView::dragLeaveEvent(QDragLeaveEvent *event)
@@ -790,10 +813,9 @@ void PhotoView::dropEvent(QDropEvent *event)
     GDialogs::NewGalleryWizard *wizard = new GDialogs::NewGalleryWizard(path, pictures, this);
     wizard->show();
   } else if (choice == existing) {
-    qRegisterMetaType<QImage>("QImage");
     connect(GCore::Data::self()->getImageModel()->addImages(m_rootIndex, path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getImageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
   }
-  
+
   event->acceptProposedAction();
 }
 
@@ -807,7 +829,7 @@ void PhotoView::keyPressEvent(QKeyEvent *event)
       GCore::Data::self()->getSearchBar()->addLetter(event->text());
     return;
   }
-  
+
   if (!scene()->focusItem() && !m_itemHash.isEmpty())
     scene()->setFocusItem(static_cast<QGraphicsItem*>(m_itemVector.at(0)));
 
@@ -869,9 +891,9 @@ void PhotoView::keyPressEvent(QKeyEvent *event)
         break;
       }
     case(Qt::Key_Escape): {
-      GCore::Data::self()->getSearchBar()->hide();
-      break;
-    }
+        GCore::Data::self()->getSearchBar()->hide();
+        break;
+      }
     default: {
       QGraphicsView::keyPressEvent(event);
     }
@@ -994,13 +1016,6 @@ void PhotoView::cropSelection(const QRect &area)
   m_currentEdited->crop(mapToScene(area).boundingRect().toRect());
 }
 
-QModelIndex PhotoView::indexForItem(GPhotoWidgets::PhotoItem *item)
-{
-  // This is old => return m_itemHash.key(item);
-  // And new
-  return item->getIndex();
-}
-
 QAbstractItemModel *PhotoView::model()
 {
   return m_model;
@@ -1026,8 +1041,6 @@ void PhotoView::setEditMode(bool editMode, GWidgets::GPhotoWidgets::PhotoItem *s
     viewport()->setCursor(Qt::OpenHandCursor);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    //connect(indexForItem(selectedItem).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), selectedItem, SLOT(changeImage(const QImage&)));
   } else if (m_currentEdited) {
     // We have our own Rubber band defined!
     setDragMode(QGraphicsView::NoDrag);
@@ -1038,8 +1051,6 @@ void PhotoView::setEditMode(bool editMode, GWidgets::GPhotoWidgets::PhotoItem *s
 
     verticalScrollBar()->setValue(0);
     horizontalScrollBar()->setValue(0);
-
-    //disconnect(indexForItem(selectedItem).data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), selectedItem, SLOT(changeImage(const QImage&)));
   }
 
   updateScene();

@@ -35,12 +35,8 @@ namespace GCore
 {
 
 MetaDataManager::MetaDataManager(const QString &galleryPath, QObject *parent)
-    : QObject(parent),
-    m_timerId(0)
+    : QObject(parent)
 {
-  // We initialise the insertion timer
-  m_timerId = startTimer(1);
-
   // We initialise the database.
   QDir dir(galleryPath);
   m_galleryName = galleryPath;
@@ -61,16 +57,17 @@ MetaDataManager::MetaDataManager(const QString &galleryPath, QObject *parent)
     m_metadataFile.open();
 }
 
-void MetaDataManager::addImage(const QString &filename)
+int MetaDataManager::addImage(const QString &filename) const
 {
-  if (!m_pendingInsert.contains(filename))
-    m_pendingInsert << filename;
-
-  if (!m_timerId)
-    m_timerId = startTimer(10);
+  QVariant id = m_metadataFile.exec("INSERT INTO image (filename) VALUES ('" + filename + "');").lastInsertId();
+  
+  if (id.isValid())
+    return id.toInt();
+  else
+    return -1;
 }
 
-int MetaDataManager::imageId(const QString &filename)
+int MetaDataManager::imageId(const QString &filename) const
 {
   int id;
 
@@ -81,19 +78,18 @@ int MetaDataManager::imageId(const QString &filename)
   if (result.isValid()) {
     id = result.toInt();
   } else {
-    id = -1;
-    addImage(filename);
+    id = addImage(filename);
   }
 
   return id;
 }
 
-QString MetaDataManager::name(int id)
+QString MetaDataManager::name(int id) const
 {
   return metadataInfo(id)["name"];
 }
 
-bool MetaDataManager::setName(const QString &name, int id)
+bool MetaDataManager::setName(const QString &name, int id) const
 {
   bool status = true;
 
@@ -103,17 +99,22 @@ bool MetaDataManager::setName(const QString &name, int id)
   return status;
 }
 
-QString MetaDataManager::description(int id)
+bool MetaDataManager::checkName(const QString &name) const
+{
+  return query("SELECT image_id FROM image WHERE LOWER(image_name) = LOWER('" + name + "') OR LOWER(filename) = LOWER('" + name + "');").isValid();
+}
+
+QString MetaDataManager::description(int id) const
 {
   return metadataInfo(id)["description"];
 }
 
-void MetaDataManager::setDescription(const QString &description, int id)
+void MetaDataManager::setDescription(const QString &description, int id) const
 {
   query("UPDATE image SET description = '" + description + "' WHERE image_id = '" + QString::number(id) + "';");
 }
 
-QMap<QString, QString> MetaDataManager::metadataInfo(int id)
+QMap<QString, QString> MetaDataManager::metadataInfo(int id) const
 {
   QMap<QString, QString> metadata;
 
@@ -139,12 +140,7 @@ QMap<QString, QString> MetaDataManager::metadataInfo(int id)
   return metadata;
 }
 
-bool MetaDataManager::checkName(const QString &name)
-{
-  return query("SELECT image_id FROM image WHERE LOWER(image_name) = LOWER('" + name + "') OR LOWER(filename) = LOWER('" + name + "');").isValid();
-}
-
-bool MetaDataManager::removePicture(int id)
+bool MetaDataManager::removePicture(int id) const
 {
   bool status = true;
 
@@ -155,31 +151,7 @@ bool MetaDataManager::removePicture(int id)
   return status;
 }
 
-void MetaDataManager::slotInsert()
-{
-  if (m_pendingInsert.isEmpty())
-    return;
-
-  QStringList::const_iterator limit;
-
-  m_metadataFile.transaction();
-
-  limit = m_pendingInsert.constEnd();
-
-  for (QStringList::const_iterator count = m_pendingInsert.constBegin(); count != limit; count++) {
-    if ((*count).isEmpty())
-      continue;
-    query("INSERT INTO image (filename) VALUES ('" + *count + "');");
-  }
-
-  m_pendingInsert.clear();
-
-  m_metadataFile.commit();
-
-  emit signalInsert();
-}
-
-QVariant MetaDataManager::query(const QString &rawQuery)
+QVariant MetaDataManager::query(const QString &rawQuery) const
 {
   QVariant output;
 
@@ -203,16 +175,6 @@ bool MetaDataManager::driverAvailable()
 MetaDataManager::~MetaDataManager()
 {
   m_metadataFile.close();
-}
-
-void MetaDataManager::timerEvent(QTimerEvent*)
-{
-  if (m_timerId) {
-    killTimer(m_timerId);
-    m_timerId = 0;
-  }
-
-  slotInsert();
 }
 
 }

@@ -30,7 +30,7 @@ namespace GWidgets
 /**
  * Class for showing the progress of the adding photos to the existing gallery.
  * @short Class with a progress bar etc.
- * @author Gregor Kališ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class ImageAddProgress : public QWidget, private Ui::ImageAddProgress
 {

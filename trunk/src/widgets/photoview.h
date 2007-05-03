@@ -87,10 +87,6 @@ class PhotoView : public QGraphicsView
      * @param area Area of selection.
      */
     void areaSelected(const QRect &area);
-    /**
-     * Emitted at mouseReleaseEvent. Used for reporting back to the checkable button (to uncheck).
-     */
-    void toolReleased(bool check);
 
   public:
     /**
@@ -129,14 +125,6 @@ class PhotoView : public QGraphicsView
      * @return Reference to the item.
      */
     GPhotoWidgets::PhotoItem *itemForIndex(const QModelIndex &index);
-    /**
-     * Converts an item into an index.
-     *
-     * @param item Reference to the item.
-     *
-     * @return Returns the index.
-     */
-    QModelIndex indexForItem(GPhotoWidgets::PhotoItem *item);
 
     /**
      * Method to get reference to the model that PhotoView is using.
@@ -225,6 +213,11 @@ class PhotoView : public QGraphicsView
     void saveOperation(int operation, const QMap<int, QVariant> &params);
 
     /**
+     * Creates the preview of the operation.
+     */
+    void previewOperation(int operation, const QMap<int, QVariant> &params);
+
+    /**
      * Rotates the current image (edit mode only) clock-wise.
      */
     void rotateSelectedImageCW();
@@ -232,12 +225,6 @@ class PhotoView : public QGraphicsView
      * Rotates the current image (edit mode only) counter clock-wise.
      */
     void rotateSelectedImageCCW();
-
-    /**
-     * Initiates the crop action.
-     */
-    void beginCrop(bool enable);
-
 
     /**
      * Slot for switching to the next photo.

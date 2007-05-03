@@ -182,7 +182,14 @@
       <number>1</number>
      </property>
      <item row="2" column="0" >
-      <widget class="GWidgets::PhotoControl" native="1" name="photoControl" />
+      <widget class="GWidgets::PhotoControl" native="1" name="photoControl" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>

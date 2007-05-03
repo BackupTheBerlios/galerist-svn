@@ -48,9 +48,6 @@ ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
     m_id = metadata()->imageId(getFileName());
   else
     m_metadata = new MetaDataManager(getFilePath());
-  
-  // We setup the metadata entry
-  //metadata();
 }
 
 ImageItem::~ImageItem()
@@ -151,7 +148,7 @@ MetaDataManager *ImageItem::metadata() const
   MetaDataManager *output = 0;
   if (!m_metadata && m_type == Gallery)
     qFatal("Error! MetadataManager not initialised! But should be. BUG!");
-    //output = m_metadata = new MetaDataManager(getFilePath());
+  //output = m_metadata = new MetaDataManager(getFilePath());
 
   if (m_type == Gallery)
     output = m_metadata;
@@ -182,18 +179,15 @@ QString ImageItem::description() const
 
 bool ImageItem::setName(const QString &name)
 {
-  bool output;
-  if (imageType() == Image) {
+  bool output = true;
+  if (imageType() == Image)
     output = metadata()->setName(name, m_id);
-    emit valuesChanged();
-    return output;
-  } else if (imageType() == Gallery) {
+  else if (imageType() == Gallery)
     setFilePath(name);
-    emit valuesChanged();
-    return true;
-  }
 
-  return false;
+
+  emit valuesChanged();
+  return output;
 }
 
 void ImageItem::setDescription(const QString &description)
@@ -245,6 +239,78 @@ void ImageItem::crop(const QRect &area)
 
 }
 
+QImage ImageItem::createBlurPreview(int blurFilters)
+{
+  Magick::Image preview;
+
+  try {
+    preview.read(getFilePath().toStdString());
+
+    for (quint8 count = 0; count < blurFilters; count++)
+      preview.blur();
+
+    Magick::Blob blob;
+    preview.write(&blob);
+
+    QImage previewImage(preview.rows(), preview.columns(), QImage::Format_RGB32);
+    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
+
+    return previewImage;
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return QImage();
+  }
+}
+
+void ImageItem::saveBlur(int blurFilters)
+{
+  try {
+    for (quint8 count = 0; count < blurFilters; count++)
+      m_image->blur();
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return;
+  }
+
+  saveImage();
+}
+
+QImage ImageItem::createSharpenPreview(int sharpenFilters)
+{
+  Magick::Image preview;
+
+  try {
+    preview.read(getFilePath().toStdString());
+
+    for (quint8 count = 0; count < sharpenFilters; count++)
+      preview.sharpen();
+
+    Magick::Blob blob;
+    preview.write(&blob);
+
+    QImage previewImage(preview.rows(), preview.columns(), QImage::Format_RGB32);
+    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
+
+    return previewImage;
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return QImage();
+  }
+}
+
+void ImageItem::saveSharpen(int sharpenFilters)
+{
+  try {
+    for (quint8 count = 0; count < sharpenFilters; count++)
+      m_image->sharpen();
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return;
+  }
+
+  saveImage();
+}
+
 QString ImageItem::getThumbName() const
 {
   return getFileName().remove(QRegExp("\\..+$")).append(".jpg");
@@ -288,6 +354,8 @@ void ImageItem::saveImage()
 
   delete m_image;
   m_image = 0;
+
+  loadImage();
 }
 
 void ImageItem::closeImage()

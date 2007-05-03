@@ -75,6 +75,9 @@
         <property name="toolTip" >
          <string>Rotate counter clockwise</string>
         </property>
+        <property name="statusTip" >
+         <string>Rotates the image for 90° counter clockwise.</string>
+        </property>
         <property name="text" >
          <string/>
         </property>
@@ -99,6 +102,9 @@
         </property>
         <property name="toolTip" >
          <string>Rotate clockwise</string>
+        </property>
+        <property name="statusTip" >
+         <string>Rotates image 90° clockwise.</string>
         </property>
         <property name="text" >
          <string/>
@@ -125,6 +131,9 @@
         <property name="toolTip" >
          <string>Open in external editor</string>
         </property>
+        <property name="statusTip" >
+         <string>Opens the image in an external image editor.</string>
+        </property>
         <property name="text" >
          <string/>
         </property>
@@ -150,11 +159,70 @@
         <property name="toolTip" >
          <string>Crop image</string>
         </property>
+        <property name="statusTip" >
+         <string>Crops the image.</string>
+        </property>
         <property name="text" >
          <string/>
         </property>
         <property name="icon" >
          <iconset resource="../images.qrc" >:/images/crop.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QPushButton" name="blurButton" >
+        <property name="minimumSize" >
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Blur</string>
+        </property>
+        <property name="statusTip" >
+         <string>Blurs the image.</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../images.qrc" >:/images/blur.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QPushButton" name="sharpButton" >
+        <property name="minimumSize" >
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="toolTip" >
+         <string>Sharpen</string>
+        </property>
+        <property name="statusTip" >
+         <string>Sharpens the image.</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../images.qrc" >:/images/sharpen.png</iconset>
         </property>
        </widget>
       </item>
@@ -205,14 +273,8 @@
         <property name="toolTip" >
          <string>Zoom out</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Zooms out of photograph.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="text" >
-         <string/>
+        <property name="statusTip" >
+         <string>Zooms out.</string>
         </property>
         <property name="icon" >
          <iconset resource="../images.qrc" >:/images/zoomout.png</iconset>
@@ -236,11 +298,8 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip" >
          <string>Zoom in</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Zooms into photograph.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="statusTip" >
+         <string>Zooms in.</string>
         </property>
         <property name="text" >
          <string/>
@@ -267,14 +326,8 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip" >
          <string>Zoom procentage</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;">Opens a input box to insert zoom procentage.&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-        <property name="text" >
-         <string/>
+        <property name="statusTip" >
+         <string>You manualy select the procentage of the zoom.</string>
         </property>
         <property name="icon" >
          <iconset resource="../images.qrc" >:/images/zommselect.png</iconset>
@@ -298,11 +351,8 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip" >
          <string>Fit to screen</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Zooms out/in to fit the photograph in screen.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="statusTip" >
+         <string>Zooms the image so it fits to the screen.</string>
         </property>
         <property name="text" >
          <string/>
@@ -329,11 +379,8 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip" >
          <string>Actual size</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Zooms into actual size.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="statusTip" >
+         <string>Zooms to actual size.</string>
         </property>
         <property name="text" >
          <string/>
@@ -406,11 +453,8 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip" >
          <string>Previous photograph</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">Moves to the previous photograph, if available.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="statusTip" >
+         <string>Goes to the previous image.</string>
         </property>
         <property name="icon" >
          <iconset resource="../images.qrc" >:/images/back.png</iconset>
@@ -437,11 +481,8 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip" >
          <string>Next photograph</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal; text-decoration:none;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Moves to the next photograph, if available.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="statusTip" >
+         <string>Goes to the next image.</string>
         </property>
         <property name="icon" >
          <iconset resource="../images.qrc" >:/images/forward.png</iconset>
@@ -464,6 +505,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="toolTip" >
          <string>Close</string>
+        </property>
+        <property name="statusTip" >
+         <string>Closes the edit mode.</string>
         </property>
         <property name="text" >
          <string/>

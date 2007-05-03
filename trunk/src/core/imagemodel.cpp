@@ -81,9 +81,6 @@ QModelIndex ImageModel::parent(const QModelIndex &index) const
   ImageItem *childItem = static_cast<ImageItem*>(index.internalPointer());
   ImageItem *parentItem = childItem->parent();
 
-  if (parentItem->imageType() == ImageItem::Gallery)
-    connect(parentItem->metadata(), SIGNAL(signalInsert()), this, SLOT(slotRefresh()));
-
   if (parentItem == m_rootItem)
     return QModelIndex();
 
@@ -805,11 +802,6 @@ QModelIndex ImageModel::processGallerySearch(const QString &name, const QModelIn
   }
 
   return QModelIndex();
-}
-
-void ImageModel::slotRefresh()
-{
-  //emit layoutChanged();
 }
 
 }

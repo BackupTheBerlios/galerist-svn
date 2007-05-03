@@ -22,8 +22,6 @@
 #define MAINWINDOW_H
 
 #include <QtGui/QMainWindow>
-//#include "widgets/photoview.h"
-//#include "widgets/gallerytreeview.h"
 #include "ui_mainwindow.h"
 
 namespace GCore
@@ -54,8 +52,6 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      * A destructor.
      */
     ~MainWindow();
-
-    void addImages(const QStringList &images);
 
   public slots:
     /**
