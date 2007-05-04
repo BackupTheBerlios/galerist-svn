@@ -25,6 +25,7 @@
 
 class QImage;
 class QRect;
+class QSize;
 
 namespace Magick
 {
@@ -207,7 +208,6 @@ class ImageItem : public QObject
      * Rotates for 90 degrees into clock-wise direction.
      */
     void rotateCW();
-
     /**
      * Rotates for 90 degrees into counter clock-wise direction.
      */
@@ -245,6 +245,18 @@ class ImageItem : public QObject
      * @param sharpenFilters Number of sharpen filters.
      */
     void saveSharpen(int sharpenFilters);
+
+    /**
+     * Creates a resize preview.
+     *
+     * @param size The new size.
+     */
+    QImage createResizePreview(const QSize &size);
+
+    /**
+     * Saves the resized image.
+     */
+    void saveResize();
 
   public slots:
     /**

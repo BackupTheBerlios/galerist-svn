@@ -135,11 +135,6 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      */
     void slotAddImages();
 
-    /**
-     * This slot shouldn't exist! It's temporary!
-     */
-    void showEXIF();
-
 };
 
 #endif

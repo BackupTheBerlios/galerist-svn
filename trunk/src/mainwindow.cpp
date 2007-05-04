@@ -36,9 +36,6 @@
 #include "core/imagemodel.h"
 #include "core/metadatamanager.h"
 
-// Get removed soon?
-#include "core/exifmanager.h"
-
 #include "core/network/updater.h"
 
 #include "dialogs/newgallerywizard.h"
@@ -102,7 +99,6 @@ void MainWindow::initActionButtons()
   actionRename->setShortcut(Qt::Key_F2);
   connect(actionDescribe, SIGNAL(triggered()), imageList, SLOT(slotDescribe()));
   actionDescribe->setShortcut(Qt::SHIFT | Qt::Key_F2);
-  connect(actionExif, SIGNAL(triggered()), this, SLOT(showEXIF()));
   connect(actionRemove, SIGNAL(triggered()), imageList, SLOT(slotRemove()));
   actionRemove->setShortcut(Qt::Key_Delete);
 
@@ -146,7 +142,6 @@ void MainWindow::initActionButtons()
   contextMenu->addAction(actionPreview);
   contextMenu->addAction(actionRename);
   contextMenu->addAction(actionDescribe);
-  contextMenu->addAction(actionExif);
   contextMenu->addAction(actionRemove);
   contextMenu->addSeparator();
   contextMenu->addMenu(menuSelection);
@@ -188,8 +183,6 @@ void MainWindow::initDocks()
   connect(albumView, SIGNAL(signalSelected(bool)), actionDeselectAll, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionInvertSelection, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(pressed(const QModelIndex&)), imageList, SLOT(setRootIndex(const QModelIndex&)));
-
-  connect(imageList, SIGNAL(signalSelected(bool)), actionExif, SLOT(setEnabled(bool)));
 }
 
 void MainWindow::about()
@@ -281,8 +274,8 @@ void MainWindow::timerEvent(QTimerEvent*)
     statusBar()->showMessage(tr("Ready"));
 }
 
-void MainWindow::showEXIF()
-{
+//void MainWindow::showEXIF()
+//{
 /*  GCore::ExifManager exifData(imageList->getSelectedPhoto()->getIndex().data(GCore::ImageModel::ImageFilepathRole).toString(), this);
   QString message = tr("Camera manufacturer: ") + exifData.getCameraMaker() + "\n";
   message += tr("Camera model: ") + exifData.getCameraModel() + "\n";
@@ -293,4 +286,4 @@ void MainWindow::showEXIF()
   message += tr("Focal length: ") + exifData.getFocalLength() + "\n";
   message += tr("Flash: ") + exifData.getFlash() + "\n";
   QMessageBox::information(this, tr("EXIF metadata"), message);*/
-}
+//}

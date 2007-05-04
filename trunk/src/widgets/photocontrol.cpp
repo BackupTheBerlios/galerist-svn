@@ -171,6 +171,7 @@ QWidget *PhotoControl::setupResizePage()
   connect(m_resizePage.aspectBox, SIGNAL(clicked()), this, SLOT(valuesChanged()));
   connect(m_resizePage.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
   connect(m_resizePage.saveButton, SIGNAL(clicked()), this, SLOT(saveChanges()));
+  connect(m_sharpenPage.previewButton, SIGNAL(clicked()), this, SLOT(requestPreview()));
 
   return page;
 }
@@ -192,6 +193,9 @@ void PhotoControl::restore()
     case (Blur) : {
       m_blurPage.saveButton->setEnabled(false);
       break;
+    }
+    case (Resize) : {
+      m_resizePage.saveButton->setEnabled(false);
     }
     default : {
       break;
@@ -236,6 +240,11 @@ void PhotoControl::valuesChanged()
     case (Sharpen) : {
       m_sharpenPage.saveButton->setEnabled(true);
       m_params.insert(RepeatNumber, m_sharpenPage.slider->value());
+      break;
+    }
+    case (Resize) : {
+      m_resizePage.saveButton->setEnabled(true);
+      m_params.insert(ResizeSize, QSize(m_resizePage.widthBox->value(), m_resizePage.heightBox->value()));
       break;
     }
     default : {

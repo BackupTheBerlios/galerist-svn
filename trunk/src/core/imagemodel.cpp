@@ -29,6 +29,7 @@
 
 #include "core/imageitem.h"
 #include "core/metadatamanager.h"
+#include "core/exifmanager.h"
 #include "core/data.h"
 #include "core/jobs/readjob.h"
 #include "core/jobs/copyjob.h"
@@ -125,7 +126,24 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
         if (item->imageType() == ImageItem::Gallery) {
           return item->name();
         } else {
-          return item->name() + ": <i>" + item->description().replace('\n', "<br/>") + "</i>";
+          ExifManager exifData(item->getFilePath(), GCore::Data::self()->getImageModel());
+
+          QString date;
+          if (!exifData.getCreationDate().isValid())
+            date = tr("Unavailable");
+          else
+            date = exifData.getCreationDate().toString(Qt::SystemLocaleDate);
+
+          QString message = tr("EXIF information: <br />");
+          message += tr("Camera manufacturer: ") + exifData.getCameraMaker() + "<br />";
+          message += tr("Camera model: ") + exifData.getCameraModel() + "<br />";
+          message += tr("Aperture: ") + exifData.getAperture() + "<br />";
+          message += tr("Creation Date: ") + date + "<br />";
+          message += tr("Shutter speed: ") + exifData.getShutterSpeed() + "<br />";
+          message += tr("Exposure time: ") + exifData.getExposureTime() + "<br />";
+          message += tr("Focal length: ") + exifData.getFocalLength() + "<br />";
+          message += tr("Flash: ") + exifData.getFlash();
+          return item->name() + ": <i>" + item->description().replace('\n', "<br/>") + "</i>" + "<p>" + message + "</p>";
         }
       }
     case Qt::DecorationRole : {

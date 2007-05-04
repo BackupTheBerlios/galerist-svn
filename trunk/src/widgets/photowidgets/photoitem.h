@@ -214,28 +214,39 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     /**
      * Shows the blur preview.
      *
-     * @param blurFilters Number of blur filters
+     * @param blurFilters Number of blur filters.
      */
     void blurPreview(int blurFilters);
     /**
      * Saves the blur effects.
      *
-     * @param blurFilters Number of blur filters
+     * @param blurFilters Number of blur filters.
      */
     void saveBlur(int blurFilters);
 
     /**
      * Shows the sharpen preview.
      *
-     * @param sharpenFilters Number of sharpen filters
+     * @param sharpenFilters Number of sharpen filters.
      */
     void sharpenPreview(int sharpenFilters);
     /**
      * Saves the sharpen effects.
      *
-     * @param sharpenFilters Number of sharpen filters
+     * @param sharpenFilters Number of sharpen filters.
      */
     void saveSharpen(int sharpenFilters);
+
+    /**
+     * Shows the resize preview.
+     *
+     * @param size New size of the image.
+     */
+    void resizePreview(const QSize &size);
+    /**
+     * Saves the resize effects.
+     */
+    void saveResize();
 
   public slots:
     /**

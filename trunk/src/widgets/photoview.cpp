@@ -261,6 +261,10 @@ void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
       m_currentEdited->saveSharpen(params.value(PhotoControl::RepeatNumber).toInt());
       break;
     }
+    case (PhotoControl::Resize) : {
+      m_currentEdited->saveResize();
+      break;
+    }
     default : {
       qDebug("Operation not supported.");
       break;
@@ -280,6 +284,10 @@ void PhotoView::previewOperation(int operation, const QMap<int, QVariant> &param
     }
     case (PhotoControl::Sharpen) : {
       m_currentEdited->sharpenPreview(params.value(PhotoControl::RepeatNumber).toInt());
+      break;
+    }
+    case (PhotoControl::Resize) : {
+      m_currentEdited->resizePreview(params.value(PhotoControl::ResizeSize).toSize());
       break;
     }
     default : {

@@ -94,7 +94,7 @@ QString ExifManager::parse(ExifEntry *entry) const
   char buffer[1024];
 
   if (entry)
-    return QString::fromAscii(exif_entry_get_value(entry, buffer, sizeof(buffer)));
+    return QString::fromUtf8(exif_entry_get_value(entry, buffer, sizeof(buffer)));
 
   return tr("Unavailable");
 }

@@ -22,6 +22,7 @@
 
 #include <QtCore/QTimer>
 #include <QtCore/QRect>
+#include <QtCore/QSize>
 
 #include <QtGui/QImage>
 
@@ -148,15 +149,12 @@ MetaDataManager *ImageItem::metadata() const
   MetaDataManager *output = 0;
   if (!m_metadata && m_type == Gallery)
     qFatal("Error! MetadataManager not initialised! But should be. BUG!");
-  //output = m_metadata = new MetaDataManager(getFilePath());
 
   if (m_type == Gallery)
     output = m_metadata;
 
-  if (!m_metadata && m_type == Image) {
+  if (!m_metadata && m_type == Image)
     output = parent()->metadata();
-    //m_id = output->imageId(getFileName());
-  }
 
   return output;
 }
@@ -184,7 +182,6 @@ bool ImageItem::setName(const QString &name)
     output = metadata()->setName(name, m_id);
   else if (imageType() == Gallery)
     setFilePath(name);
-
 
   emit valuesChanged();
   return output;
@@ -236,7 +233,6 @@ void ImageItem::crop(const QRect &area)
   }
 
   saveImage();
-
 }
 
 QImage ImageItem::createBlurPreview(int blurFilters)
@@ -308,6 +304,29 @@ void ImageItem::saveSharpen(int sharpenFilters)
     return;
   }
 
+  saveImage();
+}
+
+QImage ImageItem::createResizePreview(const QSize &size)
+{
+  try {
+    m_image->sample(Magick::Geometry(size.width(), size.height()));
+
+    Magick::Blob blob;
+    m_image->write(&blob);
+
+    QImage previewImage(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
+    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
+
+    return previewImage;
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+    return QImage();
+  }
+}
+
+void ImageItem::saveResize()
+{
   saveImage();
 }
 

@@ -467,6 +467,22 @@ void PhotoItem::saveSharpen(int sharpenFilters)
   closeTransformations();
 }
 
+void PhotoItem::resizePreview(const QSize &size)
+{
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+
+  zoomActual();
+
+  m_pixmap->setPixmap(QPixmap::fromImage(item->createResizePreview(size)));
+}
+
+void PhotoItem::saveResize()
+{
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+
+  item->saveResize();
+}
+
 void PhotoItem::rotate(int rotation)
 {
   initialiseTimer();
