@@ -46,6 +46,7 @@ PhotoControl::PhotoControl(QWidget *parent)
   m_controlPanel->addWidget(setupCropControl());
   m_controlPanel->addWidget(setupBlurPage());
   m_controlPanel->addWidget(setupSharpenPage());
+  m_controlPanel->addWidget(setupResizePage());
 
   setLayout(mainLayout);
 }
@@ -110,6 +111,7 @@ QWidget *PhotoControl::setupMainPage()
   connect(m_mainPage.cropButton, SIGNAL(clicked()), this, SLOT(selectCrop()));
   connect(m_mainPage.blurButton, SIGNAL(clicked()), this, SLOT(selectBlur()));
   connect(m_mainPage.sharpButton, SIGNAL(clicked()), this, SLOT(selectSharpen()));
+  connect(m_mainPage.resizeButton, SIGNAL(clicked()), this, SLOT(selectResize()));
 
   return mainPage;
 }
@@ -131,7 +133,9 @@ QWidget *PhotoControl::setupBlurPage()
   QWidget *page = new QWidget(m_controlPanel);
   m_blurPage.setupUi(page);
 
-    // Connect the buttons
+  m_blurPage.titleBox->setTitle(tr("Blur"));
+
+  // Connect the buttons
   connect(m_blurPage.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
   connect(m_blurPage.saveButton, SIGNAL(clicked()), this, SLOT(saveChanges()));
   connect(m_blurPage.slider, SIGNAL(valueChanged(int)), this, SLOT(valuesChanged()));
@@ -145,11 +149,28 @@ QWidget *PhotoControl::setupSharpenPage()
   QWidget *page = new QWidget(m_controlPanel);
   m_sharpenPage.setupUi(page);
 
-    // Connect the buttons
+  m_sharpenPage.titleBox->setTitle(tr("Sharpen"));
+
+  // Connect the buttons
   connect(m_sharpenPage.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
   connect(m_sharpenPage.saveButton, SIGNAL(clicked()), this, SLOT(saveChanges()));
   connect(m_sharpenPage.slider, SIGNAL(valueChanged(int)), this, SLOT(valuesChanged()));
   connect(m_sharpenPage.previewButton, SIGNAL(clicked()), this, SLOT(requestPreview()));
+
+  return page;
+}
+
+QWidget *PhotoControl::setupResizePage()
+{
+  QWidget *page = new QWidget(m_controlPanel);
+  m_resizePage.setupUi(page);
+
+  // Connect the buttons
+  connect(m_resizePage.widthBox, SIGNAL(valueChanged(int)), this, SLOT(valuesChanged()));
+  connect(m_resizePage.heightBox, SIGNAL(valueChanged(int)), this, SLOT(valuesChanged()));
+  connect(m_resizePage.aspectBox, SIGNAL(clicked()), this, SLOT(valuesChanged()));
+  connect(m_resizePage.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
+  connect(m_resizePage.saveButton, SIGNAL(clicked()), this, SLOT(saveChanges()));
 
   return page;
 }
@@ -256,6 +277,16 @@ void PhotoControl::selectSharpen()
   m_params.insert(RepeatNumber, 0);
 
   m_currentOperation = Sharpen;
+  emit operationSelected(m_currentOperation);
+}
+
+void PhotoControl::selectResize()
+{
+  m_controlPanel->setCurrentIndex(4);
+
+  //Add the default value
+
+  m_currentOperation = Resize;
   emit operationSelected(m_currentOperation);
 }
 

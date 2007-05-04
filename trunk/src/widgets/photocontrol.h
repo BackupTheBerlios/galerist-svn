@@ -27,6 +27,7 @@
 #include "ui_photocontrol-main.h"
 #include "ui_photocontrol-crop.h"
 #include "ui_photocontrol-blur.h"
+#include "ui_photocontrol-resize.h"
 
 class QStackedWidget;
 class QPushButton;
@@ -83,7 +84,9 @@ class PhotoControl : public QWidget
       /** Blur operation. */
       Blur,
       /** Sharpen operation. */
-      Sharpen
+      Sharpen,
+      /** Resize operation. */
+      Resize
     };
 
     /**
@@ -94,7 +97,9 @@ class PhotoControl : public QWidget
       /** Parameter describing an area. */
       Area,
       /** Parameter describing the number of repeating operation. */
-      RepeatNumber
+      RepeatNumber,
+      /** New size after resize. */
+      ResizeSize
     };
 
     /**
@@ -129,6 +134,7 @@ class PhotoControl : public QWidget
     Ui::PhotoControlCrop m_cropPage;
     Ui::PhotoControlBlur m_blurPage;
     Ui::PhotoControlBlur m_sharpenPage;
+    Ui::PhotoControlResize m_resizePage;
 
     /**
      * Setups and returns the main control page.
@@ -149,6 +155,11 @@ class PhotoControl : public QWidget
      * Setups and returns the control page for sharpen tool.
      */
     QWidget *setupSharpenPage();
+
+    /**
+     * Setups and returns the control page for resize tool.
+     */
+    QWidget *setupResizePage();
 
   private slots:
     /**
@@ -185,6 +196,11 @@ class PhotoControl : public QWidget
      * Selects the Sharpen transformation tool.
      */
     void selectSharpen();
+
+    /**
+     * Selects the Resize transformation tool.
+     */
+    void selectResize();
 };
 
 }

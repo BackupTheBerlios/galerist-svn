@@ -1,22 +1,40 @@
 <ui version="4.0" >
- <class>PhotoControlBlur</class>
- <widget class="QWidget" name="PhotoControlBlur" >
+ <class>PhotoControlResize</class>
+ <widget class="QWidget" name="PhotoControlResize" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>114</width>
-    <height>578</height>
+    <width>159</width>
+    <height>534</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string/>
   </property>
   <layout class="QGridLayout" >
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>1</number>
+   </property>
+   <property name="verticalSpacing" >
+    <number>1</number>
+   </property>
    <item row="0" column="0" >
-    <widget class="QGroupBox" name="titleBox" >
+    <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string/>
+      <string>Resize</string>
      </property>
      <property name="alignment" >
       <set>Qt::AlignHCenter</set>
@@ -25,45 +43,62 @@
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" >
-      <item row="1" column="0" >
+      <property name="leftMargin" >
+       <number>0</number>
+      </property>
+      <property name="topMargin" >
+       <number>0</number>
+      </property>
+      <property name="rightMargin" >
+       <number>0</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>0</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>1</number>
+      </property>
+      <property name="verticalSpacing" >
+       <number>1</number>
+      </property>
+      <item row="0" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>0</string>
+         <string>Height</string>
+        </property>
+        <property name="buddy" >
+         <cstring>heightBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QSpinBox" name="heightBox" >
+        <property name="maximum" >
+         <number>999999999</number>
         </property>
        </widget>
       </item>
       <item row="2" column="0" >
-       <widget class="QSlider" name="slider" >
-        <property name="maximum" >
-         <number>10</number>
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Width</string>
         </property>
-        <property name="pageStep" >
-         <number>5</number>
-        </property>
-        <property name="orientation" >
-         <enum>Qt::Vertical</enum>
+        <property name="buddy" >
+         <cstring>widthBox</cstring>
         </property>
        </widget>
       </item>
       <item row="3" column="0" >
-       <widget class="QPushButton" name="previewButton" >
-        <property name="minimumSize" >
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
+       <widget class="QSpinBox" name="widthBox" >
+        <property name="maximum" >
+         <number>999999999</number>
         </property>
-        <property name="maximumSize" >
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
-        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QCheckBox" name="aspectBox" >
         <property name="text" >
-         <string/>
-        </property>
-        <property name="icon" >
-         <iconset resource="../images.qrc" >:/images/preview.png</iconset>
+         <string>Keep aspect ratio</string>
         </property>
        </widget>
       </item>
@@ -84,10 +119,7 @@
     </spacer>
    </item>
    <item row="2" column="0" >
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
-      <string/>
-     </property>
+    <widget class="QGroupBox" name="groupBox_2" >
      <property name="flat" >
       <bool>true</bool>
      </property>
@@ -124,9 +156,6 @@
           <height>25</height>
          </size>
         </property>
-        <property name="text" >
-         <string/>
-        </property>
         <property name="icon" >
          <iconset resource="../images.qrc" >:/images/cancel.png</iconset>
         </property>
@@ -149,9 +178,6 @@
           <height>25</height>
          </size>
         </property>
-        <property name="text" >
-         <string/>
-        </property>
         <property name="icon" >
          <iconset resource="../images.qrc" >:/images/filesave.png</iconset>
         </property>
@@ -165,22 +191,5 @@
  <resources>
   <include location="../images.qrc" />
  </resources>
- <connections>
-  <connection>
-   <sender>slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>17</x>
-     <y>145</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>49</x>
-     <y>44</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

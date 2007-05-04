@@ -208,7 +208,6 @@ void PhotoView::initiateOperation(int operation)
         break;
       }
     default : {
-      qDebug("Operation not supported.");
       break;
     }
   }
