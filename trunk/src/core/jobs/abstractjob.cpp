@@ -52,7 +52,9 @@ void AbstractJob::run()
 
 void AbstractJob::stop()
 {
+  m_locker.lock();
   m_stop = true;
+  m_locker.unlock();
 }
 
 bool AbstractJob::getStop()

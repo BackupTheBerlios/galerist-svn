@@ -37,6 +37,11 @@ namespace GCore
 
 class MetaDataManager;
 
+namespace GJobs
+{
+class TransformationJob;
+}
+
 /**
  * @short Class that represends a tree of images.
  * @author Gregor Kališnik <gregor@podnapisi.net>
@@ -294,6 +299,7 @@ class ImageItem : public QObject
 
     Magick::Image *m_image;
     bool m_changes;
+    GJobs::TransformationJob *m_transformator;
 
   private slots:
     /**

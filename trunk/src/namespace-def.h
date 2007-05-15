@@ -43,19 +43,19 @@ namespace GDialogs {
 }
 
 /**
- * @short Widgets used by Goya's dialogs.
+ * @short Widgets used by MainWindow and dialogs in GDialogs.
  */
 namespace GWidgets {
 /**
- * @short Widgets used by wizard.
+ * @short Widgets used by NewGalleryWizard.
  */
 namespace GWizard {
 }
 /**
- * A special kind of widgets that are used inside a QGraphicsView and can't be used in normal Qt dialogs.
+ * A special kind of widgets that are used inside a PhotoView and can't be used in normal Qt dialogs.
  * @short Widgets used in PhotoView.
  */
-namespace PhotoWidgets {
+namespace GPhotoWidgets {
 }
 }
 

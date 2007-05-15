@@ -90,6 +90,9 @@ PhotoItem::PhotoItem(PhotoView *view, const QModelIndex &index)
   connect(view, SIGNAL(signalEditMode(bool)), static_cast<GCore::ImageItem*>(index.internalPointer()), SLOT(prepareForEdit(bool)));
   connect(m_text, SIGNAL(editingFinished(const QString&)), this, SLOT(slotSaveName(const QString&)));
   connect(m_description, SIGNAL(editingFinished(const QString&)), this, SLOT(slotSaveDescription(const QString&)));
+
+  GCore::ImageItem *item = static_cast<GCore::ImageItem*>(m_index.internalPointer());
+  connect(item, SIGNAL(imageChanged(const QImage&)), this, SLOT(changeImage(const QImage&)));
 }
 
 PhotoItem::~PhotoItem()
@@ -415,14 +418,6 @@ void PhotoItem::saveCrop()
 
   if (item)
   item->crop(area);
-
-  if (m_new) {
-    delete m_new;
-    m_new = 0;
-  }
-
-  m_fullsizePixmap = new QPixmap(QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>()));
-  m_pixmap->setPixmap(*m_fullsizePixmap);
 }
 
 void PhotoItem::blurPreview(int blurFilters)
@@ -586,11 +581,6 @@ void PhotoItem::initialiseTimer()
     m_itemTimeLine->setPaused(false);
 }
 
-void PhotoItem::changeImage(const QImage &image)
-{
-  m_pixmap->setPixmap(QPixmap::fromImage(image));
-}
-
 void PhotoItem::slotEdit(bool edit)
 {
   m_zooming = true;
@@ -743,6 +733,17 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
     m_pixmap->setPixmap(*m_fullsizePixmap);
     m_zooming = false;
   }
+}
+
+void PhotoItem::changeImage(const QImage &image)
+{
+  if (m_new) {
+    delete m_new;
+    m_new = 0;
+  }
+
+  m_fullsizePixmap = new QPixmap(QPixmap::fromImage(image));
+  m_pixmap->setPixmap(*m_fullsizePixmap);
 }
 
 }

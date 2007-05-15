@@ -8,7 +8,9 @@ CONFIG += warn_on \
 TEMPLATE = lib 
 HEADERS += abstractjob.h \
            copyjob.h \
-           readjob.h 
+           readjob.h \
+           transformationjob.h
 SOURCES += abstractjob.cpp \
            copyjob.cpp \
-           readjob.cpp 
+           readjob.cpp \
+           transformationjob.cpp

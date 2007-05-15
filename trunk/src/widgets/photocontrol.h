@@ -73,36 +73,6 @@ class PhotoControl : public QWidget
 
   public:
     /**
-     * List of operations that this PhotoControl can do.
-     */
-    enum Operation
-    {
-      /** Used for defining operationless state. */
-      NoOperation,
-      /** Crop operation. */
-      Crop,
-      /** Blur operation. */
-      Blur,
-      /** Sharpen operation. */
-      Sharpen,
-      /** Resize operation. */
-      Resize
-    };
-
-    /**
-     * List of possible parameter types.
-     */
-    enum ParameterType
-    {
-      /** Parameter describing an area. */
-      Area,
-      /** Parameter describing the number of repeating operation. */
-      RepeatNumber,
-      /** New size after resize. */
-      ResizeSize
-    };
-
-    /**
      * Just a constructor.
      */
     PhotoControl(QWidget *parent = 0);
@@ -125,7 +95,7 @@ class PhotoControl : public QWidget
 
   private:
     QStackedWidget *m_controlPanel;
-    Operation m_currentOperation;
+    int m_currentOperation;
     bool m_saved;
     QMap<int, QVariant> m_params;
 

@@ -26,11 +26,13 @@
 
 #include <QtGui/QImage>
 
+#include <Magick++.h>
+
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/metadatamanager.h"
 
-#include <Magick++.h>
+#include "core/jobs/transformationjob.h"
 
 namespace GCore
 {
@@ -43,7 +45,8 @@ ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
     m_metadata(0),
     m_id(-1),
     m_image(0),
-    m_changes(false)
+    m_changes(false),
+    m_transformator(0)
 {
   if (m_type == Image)
     m_id = metadata()->imageId(getFileName());
@@ -59,6 +62,11 @@ ImageItem::~ImageItem()
   if (m_metadata && m_type != Image) {
     delete m_metadata;
     m_metadata = 0;
+  }
+
+  if (m_transformator) {
+    m_transformator->stop();
+    m_transformator->wait();
   }
 }
 
@@ -222,6 +230,12 @@ void ImageItem::rotateCCW()
 
 void ImageItem::crop(const QRect &area)
 {
+  if (!m_transformator)
+    return;
+
+  m_transformator->cropImage(area);
+
+  /*
   if (!m_image)
     return;
 
@@ -231,8 +245,8 @@ void ImageItem::crop(const QRect &area)
     qDebug(QString::fromStdString(error.what()).toAscii().data());
     return;
   }
-
-  saveImage();
+*/
+  //saveImage();
 }
 
 QImage ImageItem::createBlurPreview(int blurFilters)
@@ -337,6 +351,14 @@ QString ImageItem::getThumbName() const
 
 void ImageItem::loadImage()
 {
+  if (!m_transformator) {
+    m_transformator = new GJobs::TransformationJob(this);
+    m_transformator->loadImage();
+    m_transformator->start();
+
+    connect(m_transformator, SIGNAL(completed(const QImage&)), this, SIGNAL(imageChanged(const QImage&)));
+  }
+
   m_image = new Magick::Image();
 
   try {
@@ -371,8 +393,7 @@ void ImageItem::saveImage()
     return;
   }
 
-  delete m_image;
-  m_image = 0;
+  closeImage();
 
   loadImage();
 }
@@ -384,6 +405,14 @@ void ImageItem::closeImage()
 
   delete m_image;
   m_image = 0;
+
+  if (m_transformator) {
+    disconnect(m_transformator, SIGNAL(completed(const QImage&)), this, SIGNAL(imageChanged(const QImage&)));
+
+    m_transformator->closeImage(false);
+    m_transformator->stop();
+    m_transformator = 0;
+  }
 }
 
 void ImageItem::prepareForEdit(bool open)

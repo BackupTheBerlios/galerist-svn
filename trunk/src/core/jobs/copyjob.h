@@ -113,7 +113,6 @@ class CopyJob : public GCore::GJobs::AbstractJob
     void unpause();
 
   protected:
-    //Inherited method.
     /**
      * Reimplemented method to define the work process.
      */

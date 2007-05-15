@@ -47,6 +47,8 @@
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
 
+#include "core/jobs/transformationjob.h"
+
 #include "widgets/inputzoomdialog.h"
 #include "widgets/searchbar.h"
 #include "widgets/photocontrol.h"
@@ -198,7 +200,7 @@ void PhotoView::initiateOperation(int operation)
     return;
 
   switch (operation) {
-    case (PhotoControl::Crop) : {
+    case (GCore::GJobs::TransformationJob::Crop) : {
         m_needRubberBand = true;
 
         connect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
@@ -219,7 +221,7 @@ void PhotoView::cancelOperation(int operation)
     return;
 
   switch (operation) {
-    case (PhotoControl::Crop) : {
+    case (GCore::GJobs::TransformationJob::Crop) : {
         // We disable rubberband
         m_needRubberBand = false;
 
@@ -242,7 +244,7 @@ void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
     return;
 
   switch (operation) {
-    case (PhotoControl::Crop) : {
+    case (GCore::GJobs::TransformationJob::Crop) : {
         // We enable rubberband
         m_needRubberBand = false;
 
@@ -253,18 +255,18 @@ void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
         m_currentEdited->saveCrop();
         break;
       }
-    case (PhotoControl::Blur) : {
-      m_currentEdited->saveBlur(params.value(PhotoControl::RepeatNumber).toInt());
-      break;
-    }
-    case (PhotoControl::Sharpen) : {
-      m_currentEdited->saveSharpen(params.value(PhotoControl::RepeatNumber).toInt());
-      break;
-    }
-    case (PhotoControl::Resize) : {
-      m_currentEdited->saveResize();
-      break;
-    }
+    case (GCore::GJobs::TransformationJob::Blur) : {
+        m_currentEdited->saveBlur(params.value(GCore::GJobs::TransformationJob::RepeatNumber).toInt());
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Sharpen) : {
+        m_currentEdited->saveSharpen(params.value(GCore::GJobs::TransformationJob::RepeatNumber).toInt());
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Resize) : {
+        m_currentEdited->saveResize();
+        break;
+      }
     default : {
       qDebug("Operation not supported.");
       break;
@@ -278,18 +280,18 @@ void PhotoView::previewOperation(int operation, const QMap<int, QVariant> &param
     return;
 
   switch (operation) {
-    case (PhotoControl::Blur) : {
-      m_currentEdited->blurPreview(params.value(PhotoControl::RepeatNumber).toInt());
-      break;
-    }
-    case (PhotoControl::Sharpen) : {
-      m_currentEdited->sharpenPreview(params.value(PhotoControl::RepeatNumber).toInt());
-      break;
-    }
-    case (PhotoControl::Resize) : {
-      m_currentEdited->resizePreview(params.value(PhotoControl::ResizeSize).toSize());
-      break;
-    }
+    case (GCore::GJobs::TransformationJob::Blur) : {
+        m_currentEdited->blurPreview(params.value(GCore::GJobs::TransformationJob::RepeatNumber).toInt());
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Sharpen) : {
+        m_currentEdited->sharpenPreview(params.value(GCore::GJobs::TransformationJob::RepeatNumber).toInt());
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Resize) : {
+        m_currentEdited->resizePreview(params.value(GCore::GJobs::TransformationJob::ResizeSize).toSize());
+        break;
+      }
     default : {
       qDebug("Operation not supported.");
       break;

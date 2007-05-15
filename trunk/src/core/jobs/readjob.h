@@ -41,8 +41,21 @@ class ReadJob : public GCore::GJobs::AbstractJob
 {
     Q_OBJECT
   signals:
+    /**
+     * Emitted when a thumbnail is finished.
+     */
     void signalThumb(const QString &fileName);
+    /**
+     * Same signal as above but using a QModelIndex.
+     *
+     * @see GCore#GJobs#ReadJob#signalThumb
+     */
     void signalProcessed(const QModelIndex &item);
+    /**
+     * Same as above signal but has the filename of the thumbnail and the thumbnail itself.
+     *
+     * @see GCore#GJobs#ReadJob#signalThumb
+     */
     void signalProgress(const QString &filename, const QImage &image, const QString &directory = 0);
 
   public:
@@ -82,14 +95,24 @@ class ReadJob : public GCore::GJobs::AbstractJob
      */
     void queuePhoto(const QModelIndex &item);
 
+    /**
+     * A destructor.
+     */
     ~ReadJob();
 
   protected:
-    // Inherited method
+    /**
+     * Reimplemented method.
+     * Defines the loop.
+     */
     void job();
 
   private:
-    // Methods
+    /**
+     * Reads the directory and make image thumbnails.
+     *
+     * @param path Path to the directory with images.
+     */
     void readPath(const QDir &path);
 
     // Variables

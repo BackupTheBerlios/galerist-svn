@@ -27,6 +27,8 @@
 #include <QtGui/QGroupBox>
 #include <QtGui/QIcon>
 
+#include "core/jobs/transformationjob.h"
+
 #include "widgets/photoview.h"
 
 namespace GWidgets
@@ -34,8 +36,8 @@ namespace GWidgets
 
 PhotoControl::PhotoControl(QWidget *parent)
     : QWidget(parent),
-      m_currentOperation(NoOperation),
-      m_saved(false)
+    m_currentOperation(GCore::GJobs::TransformationJob::NoOperation),
+    m_saved(false)
 {
   QHBoxLayout *mainLayout = new QHBoxLayout(this);
 
@@ -186,17 +188,17 @@ void PhotoControl::restore()
     m_saved = false;
 
   switch (m_currentOperation) {
-    case (Crop) : {
-      m_cropPage.saveButton->setEnabled(false);
-      break;
-    }
-    case (Blur) : {
-      m_blurPage.saveButton->setEnabled(false);
-      break;
-    }
-    case (Resize) : {
-      m_resizePage.saveButton->setEnabled(false);
-    }
+    case (GCore::GJobs::TransformationJob::Crop) : {
+        m_cropPage.saveButton->setEnabled(false);
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Blur) : {
+        m_blurPage.saveButton->setEnabled(false);
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Resize) : {
+        m_resizePage.saveButton->setEnabled(false);
+      }
     default : {
       break;
     }
@@ -204,21 +206,21 @@ void PhotoControl::restore()
 
   m_params.clear();
 
-  m_currentOperation = NoOperation;
+  m_currentOperation = GCore::GJobs::TransformationJob::NoOperation;
 }
 
 void PhotoControl::saveChanges()
 {/*
-  switch (m_currentOperation) {
-    case (Crop) : {
-      emit saveChange(Crop, m_params);
-      break;
-    }
-    default : {
-      qDebug("This option is unknown!");
-      break;
-    }
-  }*/
+    switch (m_currentOperation) {
+      case (Crop) : {
+        emit saveChange(Crop, m_params);
+        break;
+      }
+      default : {
+        qDebug("This option is unknown!");
+        break;
+      }
+    }*/
   emit saveChange(m_currentOperation, m_params);
 
   m_saved = true;
@@ -228,25 +230,25 @@ void PhotoControl::saveChanges()
 void PhotoControl::valuesChanged()
 {
   switch (m_currentOperation) {
-    case (Crop) : {
-      m_cropPage.saveButton->setEnabled(true);
-      break;
-    }
-    case (Blur) : {
-      m_blurPage.saveButton->setEnabled(true);
-      m_params.insert(RepeatNumber, m_blurPage.slider->value());
-      break;
-    }
-    case (Sharpen) : {
-      m_sharpenPage.saveButton->setEnabled(true);
-      m_params.insert(RepeatNumber, m_sharpenPage.slider->value());
-      break;
-    }
-    case (Resize) : {
-      m_resizePage.saveButton->setEnabled(true);
-      m_params.insert(ResizeSize, QSize(m_resizePage.widthBox->value(), m_resizePage.heightBox->value()));
-      break;
-    }
+    case (GCore::GJobs::TransformationJob::Crop) : {
+        m_cropPage.saveButton->setEnabled(true);
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Blur) : {
+        m_blurPage.saveButton->setEnabled(true);
+        m_params.insert(GCore::GJobs::TransformationJob::RepeatNumber, m_blurPage.slider->value());
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Sharpen) : {
+        m_sharpenPage.saveButton->setEnabled(true);
+        m_params.insert(GCore::GJobs::TransformationJob::RepeatNumber, m_sharpenPage.slider->value());
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Resize) : {
+        m_resizePage.saveButton->setEnabled(true);
+        m_params.insert(GCore::GJobs::TransformationJob::ResizeSize, QSize(m_resizePage.widthBox->value(), m_resizePage.heightBox->value()));
+        break;
+      }
     default : {
       qDebug("This option is unknown.");
       break;
@@ -263,7 +265,7 @@ void PhotoControl::selectCrop()
 {
   m_controlPanel->setCurrentIndex(1);
 
-  m_currentOperation = Crop;
+  m_currentOperation = GCore::GJobs::TransformationJob::Crop;
   emit operationSelected(m_currentOperation);
 }
 
@@ -272,9 +274,9 @@ void PhotoControl::selectBlur()
   m_controlPanel->setCurrentIndex(2);
 
   // Add the default value
-  m_params.insert(RepeatNumber, 0);
+  m_params.insert(GCore::GJobs::TransformationJob::RepeatNumber, 0);
 
-  m_currentOperation = Blur;
+  m_currentOperation = GCore::GJobs::TransformationJob::Blur;
   emit operationSelected(m_currentOperation);
 }
 
@@ -283,9 +285,9 @@ void PhotoControl::selectSharpen()
   m_controlPanel->setCurrentIndex(3);
 
   // Add the default value
-  m_params.insert(RepeatNumber, 0);
+  m_params.insert(GCore::GJobs::TransformationJob::RepeatNumber, 0);
 
-  m_currentOperation = Sharpen;
+  m_currentOperation = GCore::GJobs::TransformationJob::Sharpen;
   emit operationSelected(m_currentOperation);
 }
 
@@ -295,7 +297,7 @@ void PhotoControl::selectResize()
 
   //Add the default value
 
-  m_currentOperation = Resize;
+  m_currentOperation = GCore::GJobs::TransformationJob::Resize;
   emit operationSelected(m_currentOperation);
 }
 

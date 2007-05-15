@@ -248,14 +248,6 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      */
     void saveResize();
 
-  public slots:
-    /**
-     * Changes the image.
-     *
-     * @param image The new image.
-     */
-    void changeImage(const QImage &image);
-
   protected:
     /**
      * Setup the item's UI.
@@ -363,6 +355,11 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      * @param edit Goes in or out of editing mode.
      */
     void slotEdit(bool edit);
+
+    /**
+     * Changes/Updates the image.
+     */
+    void changeImage(const QImage &image);
 };
 
 }
