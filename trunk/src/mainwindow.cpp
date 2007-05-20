@@ -62,8 +62,6 @@ MainWindow::MainWindow()
   GCore::Data::self()->setSearchBar(searchBar);
   searchBar->hide();
 
-  setEditMode(false);
-
   connect(imageList, SIGNAL(signalEditMode(bool)), this, SLOT(setEditMode(bool)));
 
   initActionButtons();
@@ -172,6 +170,7 @@ void MainWindow::initDocks()
   albumView->header()->setVisible(false);
   albumView->setModel(GCore::Data::self()->getModelProxy());
   imageList->setModel(GCore::Data::self()->getImageModel());
+  imageControlWidget->setVisible(false);
 
   connect(imageList, SIGNAL(signalOneSelected(bool)), actionPreview, SLOT(setEnabled(bool)));
   connect(imageList, SIGNAL(signalOneSelected(bool)), actionRename, SLOT(setEnabled(bool)));
@@ -266,6 +265,15 @@ void MainWindow::setEditMode(bool edit)
   imageControlWidget->setVisible(edit);
   galleryDock->setVisible(!edit);
   galleryDock->toggleViewAction()->setEnabled(!edit);
+
+  // Disable all actions
+  actionNew->setDisabled(edit);
+  actionAdd->setDisabled(edit);
+  actionRemove->setDisabled(edit);
+  actionRemoveGallery->setDisabled(edit);
+  actionDefaultBackground->setDisabled(edit);
+  actionRoundBackground->setDisabled(edit);
+  menuSelection->setDisabled(edit);
 }
 
 void MainWindow::timerEvent(QTimerEvent*)
@@ -273,17 +281,3 @@ void MainWindow::timerEvent(QTimerEvent*)
   if (statusBar()->currentMessage().isEmpty())
     statusBar()->showMessage(tr("Ready"));
 }
-
-//void MainWindow::showEXIF()
-//{
-/*  GCore::ExifManager exifData(imageList->getSelectedPhoto()->getIndex().data(GCore::ImageModel::ImageFilepathRole).toString(), this);
-  QString message = tr("Camera manufacturer: ") + exifData.getCameraMaker() + "\n";
-  message += tr("Camera model: ") + exifData.getCameraModel() + "\n";
-  message += tr("Aperture: ") + exifData.getAperture() + "\n";
-  message += tr("Creation Date: ") + exifData.getCreationDate().toString(Qt::SystemLocaleDate) + "\n";
-  message += tr("Shutter speed: ") + exifData.getShutterSpeed() + "\n";
-  message += tr("Exposure time: ") + exifData.getExposureTime() + "\n";
-  message += tr("Focal length: ") + exifData.getFocalLength() + "\n";
-  message += tr("Flash: ") + exifData.getFlash() + "\n";
-  QMessageBox::information(this, tr("EXIF metadata"), message);*/
-//}

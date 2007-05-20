@@ -28,7 +28,6 @@
 #include <QtCore/QList>
 
 class QTimeLine;
-class QGraphicsPixmapItem;
 class QRubberBand;
 
 namespace GWidgets
@@ -39,6 +38,7 @@ class SearchBar;
 namespace GPhotoWidgets
 {
 class PhotoItem;
+class PhotoLoading;
 }
 
 /**
@@ -87,6 +87,12 @@ class PhotoView : public QGraphicsView
      * @param area Area of selection.
      */
     void areaSelected(const QRect &area);
+    /**
+     * Emitted when image has been switched through next or previous button in edit mode.
+     *
+     * @param size Size of the switched image.
+     */
+    void imageSwitched(const QSize &size);
 
   public:
     /**
@@ -137,8 +143,9 @@ class PhotoView : public QGraphicsView
      * Show the loading image or hide it.
      *
      * @param show Show it or hide it.
+     * @param text Text to show. It's unusable when hiding loading item.
      */
-    void showLoading(bool show);
+    void showLoading(bool show, const QString &text = QString());
 
     /**
      * Wrapper method for retrieving reference to a selected item. If none or more are selected, returns null.
@@ -354,7 +361,7 @@ class PhotoView : public QGraphicsView
 
     QList<GPhotoWidgets::PhotoItem*> m_removeList;
 
-    QGraphicsPixmapItem *m_loading;
+    GPhotoWidgets::PhotoLoading *m_loading;
 
     int m_oldHorizontalScrollMaximum;
     int m_oldVerticalScrollMaximum;

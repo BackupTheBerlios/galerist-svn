@@ -54,6 +54,7 @@
 #include "widgets/photocontrol.h"
 
 #include "widgets/photowidgets/photoitem.h"
+#include "widgets/photowidgets/photoloading.h"
 
 #include "dialogs/newgallerywizard.h"
 
@@ -82,7 +83,7 @@ PhotoView::PhotoView(QWidget *parent)
     setViewport(new QGLWidget(QGLFormat(QGL::DirectRendering | QGL::SampleBuffers)));
 
   // Loading item
-  m_loading = new QGraphicsPixmapItem(QPixmap(":/images/loading.png"), 0, this->scene());
+  m_loading = new GPhotoWidgets::PhotoLoading(this->scene());
   m_loading->setZValue(3.5);
   m_loading->hide();
 
@@ -230,6 +231,18 @@ void PhotoView::cancelOperation(int operation)
         viewport()->setCursor(Qt::OpenHandCursor);
         break;
       }
+    case (GCore::GJobs::TransformationJob::Blur) : {
+        m_currentEdited->cancelTransformations();
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Sharpen) : {
+        m_currentEdited->cancelTransformations();
+        break;
+      }
+    case (GCore::GJobs::TransformationJob::Resize) : {
+        m_currentEdited->cancelTransformations();
+        break;
+      }
     default : {
       break;
     }
@@ -240,6 +253,7 @@ void PhotoView::cancelOperation(int operation)
 
 void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
 {
+  Q_UNUSED(params)
   if (!m_editMode)
     return;
 
@@ -256,11 +270,11 @@ void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
         break;
       }
     case (GCore::GJobs::TransformationJob::Blur) : {
-        m_currentEdited->saveBlur(params.value(GCore::GJobs::TransformationJob::RepeatNumber).toInt());
+        m_currentEdited->saveBlur();
         break;
       }
     case (GCore::GJobs::TransformationJob::Sharpen) : {
-        m_currentEdited->saveSharpen(params.value(GCore::GJobs::TransformationJob::RepeatNumber).toInt());
+        m_currentEdited->saveSharpen();
         break;
       }
     case (GCore::GJobs::TransformationJob::Resize) : {
@@ -281,15 +295,15 @@ void PhotoView::previewOperation(int operation, const QMap<int, QVariant> &param
 
   switch (operation) {
     case (GCore::GJobs::TransformationJob::Blur) : {
-        m_currentEdited->blurPreview(params.value(GCore::GJobs::TransformationJob::RepeatNumber).toInt());
+        m_currentEdited->blurPreview(params.value(GCore::GJobs::TransformationJob::NumberFilter).toInt());
         break;
       }
     case (GCore::GJobs::TransformationJob::Sharpen) : {
-        m_currentEdited->sharpenPreview(params.value(GCore::GJobs::TransformationJob::RepeatNumber).toInt());
+        m_currentEdited->sharpenPreview(params.value(GCore::GJobs::TransformationJob::NumberFilter).toInt());
         break;
       }
     case (GCore::GJobs::TransformationJob::Resize) : {
-        m_currentEdited->resizePreview(params.value(GCore::GJobs::TransformationJob::ResizeSize).toSize());
+        m_currentEdited->resizePreview(params.value(GCore::GJobs::TransformationJob::Size).toSize());
         break;
       }
     default : {
@@ -325,10 +339,8 @@ void PhotoView::slotNextPhoto()
 
   int newIndex = m_itemVector.indexOf(m_currentEdited) + 1;
 
-  if (m_itemVector.count() <= newIndex) {
-    //GCore::Data::self()->getPhotoControl()->getNextButton()->setEnabled(false);
+  if (m_itemVector.count() <= newIndex)
     return;
-  }
 
   emit photoEditSelectionChanged(newIndex, m_itemVector.count());
 
@@ -337,6 +349,8 @@ void PhotoView::slotNextPhoto()
   m_currentEdited = m_itemVector.at(newIndex);
 
   connect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+
+  emit imageSwitched(m_currentEdited->getIndex().data(GCore::ImageModel::ImagePictureRole).value<QImage>().size());
 
   updateScene();
 }
@@ -349,10 +363,8 @@ void PhotoView::slotPreviousPhoto()
 
   int newIndex = m_itemVector.indexOf(m_currentEdited) - 1;
 
-  if (newIndex < 0) {
-    //GCore::Data::self()->getPhotoControl()->getBackButton()->setEnabled(false);
+  if (newIndex < 0)
     return;
-  }
 
   emit photoEditSelectionChanged(newIndex, m_itemVector.count());
 
@@ -361,6 +373,8 @@ void PhotoView::slotPreviousPhoto()
   m_currentEdited = m_itemVector.at(newIndex);
 
   connect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+
+  emit imageSwitched(m_currentEdited->getIndex().data(GCore::ImageModel::ImagePictureRole).value<QImage>().size());
 
   updateScene();
 }
@@ -445,8 +459,6 @@ void PhotoView::readModel()
   foreach(GPhotoWidgets::PhotoItem *item, m_itemHash) {
     if (!item->deleteItself())
       m_removeList << item;
-    //scene()->removeItem(item);
-    //delete item;
   }
 
   m_itemHash.clear();
@@ -561,13 +573,8 @@ int PhotoView::rearrangeItems(bool update)
   qreal y = m_zero.y() + m_spacing;
   qreal x = m_zero.x() + m_spacing;
 
-  if (!m_zero.x()) {
-    m_zero = mapToScene(0, 0);
-  }
-
-  if (m_editMode && m_currentEdited) {
-    x = - (10000) * m_itemVector.indexOf(m_currentEdited);
-  }
+  if (m_editMode && m_currentEdited)
+    x = - (5000) * m_itemVector.indexOf(m_currentEdited);
 
   int itemsPerRow = width() / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing);
 
@@ -584,12 +591,7 @@ int PhotoView::rearrangeItems(bool update)
       item->setPos(1000, -500);
       continue;
     }
-    /*
-        if (item->getText() == tr("Unavailable")) {
-          item->setText(item->getIndex().data(GCore::ImageModel::ImageNameRole).toString(), item->getIndex().data(GCore::ImageModel::ImageDescriptionRole).toString());
-          m_timerId = startTimer(500);
-        }
-    */
+
     if (!item->group()) {
       if (item->pos() != QPointF(x, y))
         change = true;
@@ -600,7 +602,7 @@ int PhotoView::rearrangeItems(bool update)
       item->setPos(x, y);
 
       if (m_editMode)
-        x += 10000;
+        x += 5000;
       else
         x += GPhotoWidgets::PhotoItem::ItemWidth + m_spacing;
 
@@ -636,8 +638,6 @@ void PhotoView::resizeEvent(QResizeEvent *event)
 {
   Q_UNUSED(event)
 
-  m_loading->setPos(mapToScene((width() / 2) - (m_loading->pixmap().width() / 2), (height() / 2) - (m_loading->pixmap().height() / 2)));
-
   updateScene();
 }
 
@@ -655,7 +655,6 @@ void PhotoView::mousePressEvent(QMouseEvent *event)
 
     if (m_needRubberBand)
       return;
-    //m_rubberBand->show();
   }
 
   // If the event does nothing with zooming operation, we handle it in non-edit fashion
@@ -735,8 +734,6 @@ void PhotoView::mouseReleaseEvent(QMouseEvent *event)
   if (m_rubberBand && m_needRubberBand) {
     emit areaSelected(m_rubberBand->geometry());
     return;
-    //emit toolReleased(false);
-    //m_needRubberBand = false;
   }
 
   // If it's not our call, we pass it to QGraphicsView
@@ -930,17 +927,18 @@ void PhotoView::slotSceneChanged()
 void PhotoView::updateScene()
 {
   if (!m_editMode) {
-    int rows = (m_itemVector.count() / (width() / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing))) + 1;
+    int scrollbarWidth = verticalScrollBar()->width();
+    qreal sceneWidth = viewport()->width() - scrollbarWidth;
+    
+    int rows = qRound(static_cast<qreal> (m_itemVector.count()) / static_cast<int> (sceneWidth / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing * 2)));
 
     // Properly resize the scene
-    int scrollbarWidth = verticalScrollBar()->width() * 2;
-    qreal sceneWidth = width() - scrollbarWidth;
 
-    int scrollbarHeight = horizontalScrollBar()->height() * 2;
-    qreal sceneHeight = rows * (GPhotoWidgets::PhotoItem::ItemHeight + m_spacing);
+    int scrollbarHeight = horizontalScrollBar()->height();
+    qreal sceneHeight = rows * (GPhotoWidgets::PhotoItem::ItemHeight + (m_spacing * 2));
 
-    if (sceneHeight < height())
-      sceneHeight = height() - scrollbarHeight;
+    if (sceneHeight < viewport()->height())
+      sceneHeight = viewport()->height();
 
     setSceneRect(0, 0, sceneWidth, sceneHeight);
   }
@@ -1000,7 +998,6 @@ void PhotoView::slotRemove()
 
         static_cast<GCore::ImageModel*>(m_model)->removeImages(selectedIndexes);
         selectedIndexes.clear();
-        //picture->deleteItself();
       }
     }
   }
@@ -1015,11 +1012,6 @@ void PhotoView::cropSelection(const QRect &area)
 {
   if (!m_editMode)
     return;
-  // Disconnect the slot
-  //disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
-
-  // Resets the cursor
-  //viewport()->setCursor(Qt::ClosedHandCursor);
 
   // Crops the image
   m_currentEdited->crop(mapToScene(area).boundingRect().toRect());
@@ -1045,6 +1037,7 @@ void PhotoView::setEditMode(bool editMode, GWidgets::GPhotoWidgets::PhotoItem *s
   emit signalEditMode(editMode);
 
   if (editMode) {
+    emit imageSwitched(m_currentEdited->getIndex().data(GCore::ImageModel::ImagePictureRole).value<QImage>().size());
     emit photoEditSelectionChanged(m_itemVector.indexOf(m_currentEdited), m_itemVector.count());
     setDragMode(QGraphicsView::ScrollHandDrag);
     viewport()->setCursor(Qt::OpenHandCursor);
@@ -1065,9 +1058,13 @@ void PhotoView::setEditMode(bool editMode, GWidgets::GPhotoWidgets::PhotoItem *s
   updateScene();
 }
 
-void PhotoView::showLoading(bool show)
+void PhotoView::showLoading(bool show, const QString &text)
 {
   // Set loading image
+  m_loading->setText(text);
+
+  m_loading->setPos(mapToScene(static_cast<int>((width() / 2) - (m_loading->boundingRect().width() / 2)), static_cast<int>((height() / 2) - (m_loading->boundingRect().height() / 2))));
+
   m_loading->setVisible(show);
 }
 

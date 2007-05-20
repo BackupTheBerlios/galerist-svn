@@ -6,13 +6,31 @@
     <x>0</x>
     <y>0</y>
     <width>114</width>
-    <height>578</height>
+    <height>541</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string/>
   </property>
   <layout class="QGridLayout" >
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>1</number>
+   </property>
+   <property name="verticalSpacing" >
+    <number>1</number>
+   </property>
    <item row="0" column="0" >
     <widget class="QGroupBox" name="titleBox" >
      <property name="title" >

@@ -40,9 +40,7 @@ TransformationJob::TransformationJob(ImageItem *parent)
     : AbstractJob(parent),
     m_image(0),
     m_operation(NoOperation),
-    m_operationDone(false),
-    m_item(parent),
-    m_imageLoaded(false)
+    m_item(parent)
 {}
 
 TransformationJob::~TransformationJob()
@@ -60,42 +58,15 @@ void TransformationJob::loadImage()
   m_operation = LoadImage;
 
   m_locker.unlock();
-  //start();
-}
-
-void TransformationJob::closeImage(bool)
-{
-  //stop();
-
-  /*if (save) {
-    saveImage();
-  }*/
-
 }
 
 void TransformationJob::saveImage()
 {
+  m_locker.lock();
+
   m_operation = SaveImage;
-  /*
-  try {
-    m_image->write(m_item->getFilePath().toStdString());
 
-    QDir dir(m_item->getFilePath());
-    dir.cdUp();
-
-    Magick::Blob blob;
-    m_image->write(&blob);
-
-    dir.cd(".thumbnails");
-
-    QImage newThumb(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
-    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
-    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(m_item->getThumbName()));
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
-    return;
-  }
-  */
+  m_locker.unlock();
 }
 
 void TransformationJob::cropImage(const QRect &area)
@@ -108,16 +79,58 @@ void TransformationJob::cropImage(const QRect &area)
   m_locker.unlock();
 }
 
+void TransformationJob::rotateImage(quint16 angle)
+{
+  m_locker.lock();
+
+  m_params.insert(Angle, angle);
+  m_operation = Rotate;
+
+  m_locker.unlock();
+}
+
+void TransformationJob::blurImage(int numberFilter)
+{
+  m_locker.lock();
+
+  m_operation = Blur;
+  m_params.insert(NumberFilter, numberFilter);
+
+  m_locker.unlock();
+}
+
+void TransformationJob::sharpenImage(int numberFilter)
+{
+  m_locker.lock();
+
+  m_operation = Sharpen;
+  m_params.insert(NumberFilter, numberFilter);
+
+  m_locker.unlock();
+}
+
+void TransformationJob::resizeImage(const QSize &size)
+{
+  m_locker.lock();
+
+  m_operation = Resize;
+  m_params.insert(Size, size);
+
+  m_locker.unlock();
+}
+
 void TransformationJob::job()
 {
   while (!m_stop) {
-    msleep(10);
-
     switch (m_operation) {
       case (NoOperation) : {
+        msleep(10);
         break;
       }
       case (LoadImage) : {
+        if (m_image)
+          delete m_image;
+
         m_image = new Magick::Image();
         try {
           m_image->read(m_item->getFilePath().toStdString());
@@ -157,8 +170,24 @@ void TransformationJob::job()
         m_locker.unlock();
         break;
       }
+      case (Rotate) : {
+        doRotate();
+        break;
+      }
       case (Crop) : {
         doCrop();
+        break;
+      }
+      case (Blur) : {
+        doBlur();
+        break;
+      }
+      case (Sharpen) : {
+        doSharpen();
+        break;
+      }
+      case (Resize) : {
+        doResize();
         break;
       }
       default : {
@@ -196,6 +225,95 @@ void TransformationJob::doCrop()
 
   m_locker.unlock();
 
+}
+
+void TransformationJob::doRotate()
+{
+  quint16 angle = m_params.value(Angle).value<quint16>();
+
+  m_image->rotate(angle);
+
+  m_locker.lock();
+  m_params.clear();
+  m_operation = SaveImage;
+  m_locker.unlock();
+}
+
+void TransformationJob::doBlur()
+{
+  m_locker.lock();
+
+  int blurFilters = m_params.value(NumberFilter).toInt();
+  try {
+    for (int count = 0; count < blurFilters; count++)
+      m_image->blur();
+
+    Magick::Blob blob;
+    m_image->write(&blob);
+
+    QImage previewImage(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
+    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
+
+    emit preview(previewImage);
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+  }
+
+  m_operation = NoOperation;
+  m_params.clear();
+
+  m_locker.unlock();
+}
+
+void TransformationJob::doSharpen()
+{
+  m_locker.lock();
+
+  int sharpenFilters = m_params.value(NumberFilter).toInt();
+  try {
+    for (int count = 0; count < sharpenFilters; count++)
+      m_image->sharpen();
+
+    Magick::Blob blob;
+    m_image->write(&blob);
+
+    QImage previewImage(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
+    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
+
+    emit preview(previewImage);
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+  }
+
+  m_operation = NoOperation;
+  m_params.clear();
+
+  m_locker.unlock();
+}
+
+void TransformationJob::doResize()
+{
+  m_locker.lock();
+
+  QSize size = m_params.value(Size).toSize();
+  try {
+    m_image->sample(Magick::Geometry(size.width(), size.height()));
+
+    Magick::Blob blob;
+    m_image->write(&blob);
+
+    QImage previewImage(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
+    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
+
+    emit preview(previewImage);
+  } catch (Magick::Exception &error) {
+    qDebug(QString::fromStdString(error.what()).toAscii().data());
+  }
+
+  m_operation = NoOperation;
+  m_params.clear();
+
+  m_locker.unlock();
 }
 
 }

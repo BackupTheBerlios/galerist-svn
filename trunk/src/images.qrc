@@ -20,12 +20,11 @@
         <file>images/forward.png</file>
         <file>images/galerist-big.png</file>
         <file>images/galerist.png</file>
-        <file>images/hide-progress.png</file>
+        <file>images/galerist-small.png</file>
         <file>images/image-big.png</file>
         <file>images/image.png</file>
         <file>images/input_ok.png</file>
         <file>images/input_wrong.png</file>
-        <file>images/loading.png</file>
         <file>images/new.png</file>
         <file>images/newgallerywizard-banner.png</file>
         <file>images/preview.png</file>
@@ -36,7 +35,6 @@
         <file>images/rotate_cw.png</file>
         <file>images/round-rect.png</file>
         <file>images/sharpen.png</file>
-        <file>images/show-progress.png</file>
         <file>images/upgrade.png</file>
         <file>images/zommselect.png</file>
         <file>images/zoomactual.png</file>

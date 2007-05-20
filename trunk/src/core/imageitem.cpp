@@ -26,8 +26,6 @@
 
 #include <QtGui/QImage>
 
-#include <Magick++.h>
-
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/metadatamanager.h"
@@ -44,8 +42,6 @@ ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
     m_path(path),
     m_metadata(0),
     m_id(-1),
-    m_image(0),
-    m_changes(false),
     m_transformator(0)
 {
   if (m_type == Image)
@@ -212,20 +208,18 @@ bool ImageItem::remove()
 
 void ImageItem::rotateCW()
 {
-  if (!m_image)
+  if (!m_transformator)
     return;
 
-  m_image->rotate(90);
-  QTimer::singleShot(1000, this, SLOT(saveRotation()));
+  m_transformator->rotateImage(90);
 }
 
 void ImageItem::rotateCCW()
 {
-  if (!m_image)
+  if (!m_transformator)
     return;
 
-  m_image->rotate(270);
-  QTimer::singleShot(1000, this, SLOT(saveRotation()));
+  m_transformator->rotateImage(270);
 }
 
 void ImageItem::crop(const QRect &area)
@@ -234,114 +228,38 @@ void ImageItem::crop(const QRect &area)
     return;
 
   m_transformator->cropImage(area);
+}
 
-  /*
-  if (!m_image)
+void ImageItem::blur(int blurFilters)
+{
+  if (!m_transformator)
     return;
 
-  try {
-    m_image->crop(Magick::Geometry(area.width(), area.height(), area.left(), area.top()));
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
+  m_transformator->blurImage(blurFilters);
+}
+
+void ImageItem::sharpen(int sharpenFilters)
+{
+  if (!m_transformator)
     return;
-  }
-*/
-  //saveImage();
+
+  m_transformator->sharpenImage(sharpenFilters);
 }
 
-QImage ImageItem::createBlurPreview(int blurFilters)
+void ImageItem::resize(const QSize &size)
 {
-  Magick::Image preview;
-
-  try {
-    preview.read(getFilePath().toStdString());
-
-    for (quint8 count = 0; count < blurFilters; count++)
-      preview.blur();
-
-    Magick::Blob blob;
-    preview.write(&blob);
-
-    QImage previewImage(preview.rows(), preview.columns(), QImage::Format_RGB32);
-    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
-
-    return previewImage;
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
-    return QImage();
-  }
-}
-
-void ImageItem::saveBlur(int blurFilters)
-{
-  try {
-    for (quint8 count = 0; count < blurFilters; count++)
-      m_image->blur();
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
+  if (!m_transformator)
     return;
-  }
 
-  saveImage();
+  m_transformator->resizeImage(size);
 }
 
-QImage ImageItem::createSharpenPreview(int sharpenFilters)
+void ImageItem::cancelTransformations()
 {
-  Magick::Image preview;
-
-  try {
-    preview.read(getFilePath().toStdString());
-
-    for (quint8 count = 0; count < sharpenFilters; count++)
-      preview.sharpen();
-
-    Magick::Blob blob;
-    preview.write(&blob);
-
-    QImage previewImage(preview.rows(), preview.columns(), QImage::Format_RGB32);
-    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
-
-    return previewImage;
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
-    return QImage();
-  }
-}
-
-void ImageItem::saveSharpen(int sharpenFilters)
-{
-  try {
-    for (quint8 count = 0; count < sharpenFilters; count++)
-      m_image->sharpen();
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
+  if (!m_transformator)
     return;
-  }
 
-  saveImage();
-}
-
-QImage ImageItem::createResizePreview(const QSize &size)
-{
-  try {
-    m_image->sample(Magick::Geometry(size.width(), size.height()));
-
-    Magick::Blob blob;
-    m_image->write(&blob);
-
-    QImage previewImage(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
-    previewImage.loadFromData((const uchar*) blob.data(), blob.length());
-
-    return previewImage;
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
-    return QImage();
-  }
-}
-
-void ImageItem::saveResize()
-{
-  saveImage();
+  m_transformator->loadImage();
 }
 
 QString ImageItem::getThumbName() const
@@ -357,59 +275,23 @@ void ImageItem::loadImage()
     m_transformator->start();
 
     connect(m_transformator, SIGNAL(completed(const QImage&)), this, SIGNAL(imageChanged(const QImage&)));
-  }
-
-  m_image = new Magick::Image();
-
-  try {
-    m_image->read(getFilePath().toStdString());
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
-    return;
+    connect(m_transformator, SIGNAL(preview(const QImage&)), this, SIGNAL(imageChanged(const QImage&)));
   }
 }
 
 void ImageItem::saveImage()
 {
-  if (!m_image)
+  if (!m_transformator)
     return;
 
-  QDir dir(getFilePath());
-  dir.cdUp();
-
-  try {
-    m_image->write(getFilePath().toStdString());
-
-    Magick::Blob blob;
-    m_image->write(&blob);
-
-    dir.cd(".thumbnails");
-
-    QImage newThumb(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
-    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
-    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(getThumbName()));
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
-    return;
-  }
-
-  closeImage();
-
-  loadImage();
+  m_transformator->saveImage();
 }
 
 void ImageItem::closeImage()
 {
-  if (!m_image)
-    return;
-
-  delete m_image;
-  m_image = 0;
-
   if (m_transformator) {
     disconnect(m_transformator, SIGNAL(completed(const QImage&)), this, SIGNAL(imageChanged(const QImage&)));
 
-    m_transformator->closeImage(false);
     m_transformator->stop();
     m_transformator = 0;
   }
@@ -420,34 +302,7 @@ void ImageItem::prepareForEdit(bool open)
   if (open) {
     loadImage();
   } else {
-    if (m_changes)
-      saveImage();
     closeImage();
-  }
-}
-
-void ImageItem::saveRotation()
-{
-  if (!m_image)
-    return;
-
-  QDir dir(getFilePath());
-  dir.cdUp();
-
-  try {
-    m_image->write(getFilePath().toStdString());
-
-    Magick::Blob blob;
-    m_image->write(&blob);
-
-    dir.cd(".thumbnails");
-
-    QImage newThumb(m_image->rows(), m_image->columns(), QImage::Format_RGB32);
-    newThumb.loadFromData((const uchar*) blob.data(), blob.length());
-    newThumb.scaled(128, 128, Qt::KeepAspectRatio).save(dir.absoluteFilePath(getThumbName()));
-  } catch (Magick::Exception &error) {
-    qDebug(QString::fromStdString(error.what()).toAscii().data());
-    return;
   }
 }
 

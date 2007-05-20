@@ -97,6 +97,7 @@ class PhotoControl : public QWidget
     QStackedWidget *m_controlPanel;
     int m_currentOperation;
     bool m_saved;
+    QSize m_imageSize;
     QMap<int, QVariant> m_params;
 
     // Layouts for pages
@@ -131,6 +132,14 @@ class PhotoControl : public QWidget
      */
     QWidget *setupResizePage();
 
+    /**
+     * Calculates the aspect ratio and fixes the parameters.
+     *
+     * @param heightChanged Defines if the height (true) or width (false) has been changed.
+     * @param value The value that needs to be in the account.
+     */
+    void keepAspectRatio(bool heightChanged, int value);
+
   private slots:
     /**
      * Goes back to operationless existence :D.
@@ -138,14 +147,40 @@ class PhotoControl : public QWidget
     void restore();
 
     /**
+     * Make preperations for the switched image. This happenes in edit mode.
+     *
+     * @param size Size of the switched image.
+     */
+    void switchedImage(const QSize &size);
+
+    /**
      * Saves the change (or better, notifies other to save the change).
      */
     void saveChanges();
 
     /**
-     * Enables the save button.
+     * Enables the save button and other things.
+     *
+     * @see GWidgets#PhotoControl#keepAspectHeight
+     * @see GWidgets#PhotoControl#keepAspectWidth
      */
     void valuesChanged();
+
+    /**
+     * Keeps the aspect ratio when changing height. It's a wrapper slot.
+     *
+     * @see GWidgets#PhotoControl#valuesChanged
+     * @see GWidgets#PhotoControl#keepAspectWidth
+     */
+    void keepAspectHeight(int height);
+
+    /**
+     * Keeps the aspect ratio when changing width. It's a wrapper slot.
+     *
+     * @see GWidgets#PhotoControl#valuesChanged
+     * @see GWidgets#PhotoControl#keepAspectHeight
+     */
+    void keepAspectWidth(int width);
 
     /**
      * Requests a preview.

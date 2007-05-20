@@ -30,7 +30,8 @@
 class QGraphicsItemAnimation;
 class QTimeLine;
 
-namespace GCore {
+namespace GCore
+{
 class ImageItem;
 }
 
@@ -222,7 +223,7 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      *
      * @param blurFilters Number of blur filters.
      */
-    void saveBlur(int blurFilters);
+    void saveBlur();
 
     /**
      * Shows the sharpen preview.
@@ -235,7 +236,7 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      *
      * @param sharpenFilters Number of sharpen filters.
      */
-    void saveSharpen(int sharpenFilters);
+    void saveSharpen();
 
     /**
      * Shows the resize preview.
@@ -247,6 +248,11 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      * Saves the resize effects.
      */
     void saveResize();
+
+    /**
+     * Cancels all transformation changes.
+     */
+    void cancelTransformations();
 
   protected:
     /**
@@ -316,7 +322,7 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     int m_rotation;
 
     // Connection with the model
-    //GCore::ImageItem *m_item;
+    GCore::ImageItem *m_item;
     QModelIndex m_index;
 
     /**

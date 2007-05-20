@@ -18,3 +18,61 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "photoloading.h"
+
+#include <QtGui/QPainter>
+#include <QtGui/QGraphicsTextItem>
+#include <QtGui/QGraphicsPixmapItem>
+
+namespace GWidgets {
+
+namespace GPhotoWidgets {
+
+PhotoLoading::PhotoLoading(QGraphicsScene *scene)
+ : QGraphicsItemGroup(0, scene)
+{
+  QGraphicsPixmapItem *logo = new QGraphicsPixmapItem(QPixmap(":/images/galerist-small.png"), this);
+  addToGroup(logo);
+  m_text = new QGraphicsTextItem(this);
+  m_text->setFont(QFont("", 20));
+  m_text->setPos(m_text->pos() + QPoint(40, 0));
+  addToGroup(m_text);
+}
+
+PhotoLoading::~PhotoLoading()
+{
+}
+
+void PhotoLoading::setText(const QString &text)
+{
+  removeFromGroup(m_text);
+  m_text->setHtml(text);
+  addToGroup(m_text);
+}
+
+QRectF PhotoLoading::boundingRect() const
+{
+  QRectF rect = QGraphicsItemGroup::boundingRect();
+
+  rect.setLeft(rect.left() - 10);
+  rect.setTop(rect.top() - 10);
+  rect.setWidth(rect.width() + 10);
+  rect.setHeight(rect.height() + 10);
+
+  return rect;
+}
+
+void PhotoLoading::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
+{
+  painter->save();
+
+  painter->setPen(QColor(0, 0, 255, 90));
+  painter->setBrush(QBrush(QColor(0, 0, 255, 90)));
+  painter->drawRoundRect(boundingRect(), 10, 70);
+
+  painter->restore();
+}
+
+}
+
+}

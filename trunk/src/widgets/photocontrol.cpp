@@ -85,6 +85,7 @@ void PhotoControl::connectView(PhotoView *view)
   // Feedback information
   connect(view, SIGNAL(photoEditSelectionChanged(int, int)), this, SLOT(checkNavigation(int, int)));
   connect(view, SIGNAL(areaSelected(const QRect&)), this, SLOT(valuesChanged()));
+  connect(view, SIGNAL(imageSwitched(const QSize&)), this, SLOT(switchedImage(const QSize&)));
 }
 
 void PhotoControl::checkNavigation(int newLocation, int totalImages)
@@ -168,14 +169,33 @@ QWidget *PhotoControl::setupResizePage()
   m_resizePage.setupUi(page);
 
   // Connect the buttons
-  connect(m_resizePage.widthBox, SIGNAL(valueChanged(int)), this, SLOT(valuesChanged()));
-  connect(m_resizePage.heightBox, SIGNAL(valueChanged(int)), this, SLOT(valuesChanged()));
+  connect(m_resizePage.heightBox, SIGNAL(valueChanged(int)), this, SLOT(keepAspectHeight(int)));
+  connect(m_resizePage.widthBox, SIGNAL(valueChanged(int)), this, SLOT(keepAspectWidth(int)));
   connect(m_resizePage.aspectBox, SIGNAL(clicked()), this, SLOT(valuesChanged()));
   connect(m_resizePage.cancelButton, SIGNAL(clicked()), this, SLOT(restore()));
   connect(m_resizePage.saveButton, SIGNAL(clicked()), this, SLOT(saveChanges()));
-  connect(m_sharpenPage.previewButton, SIGNAL(clicked()), this, SLOT(requestPreview()));
+  connect(m_resizePage.previewButton, SIGNAL(clicked()), this, SLOT(requestPreview()));
 
   return page;
+}
+
+void PhotoControl::keepAspectRatio(bool heightChanged, int value)
+{
+  if (m_resizePage.aspectBox->isChecked()) {
+    // Temporarily disconnect the eight and width boxes
+    disconnect(m_resizePage.heightBox, SIGNAL(valueChanged(int)), this, SLOT(keepAspectHeight(int)));
+    disconnect(m_resizePage.widthBox, SIGNAL(valueChanged(int)), this, SLOT(keepAspectWidth(int)));
+
+    qreal ratio = (qreal) m_imageSize.height() / (qreal) m_imageSize.width();
+    if (heightChanged)
+      m_resizePage.widthBox->setValue(static_cast<int>(static_cast<qreal>(value) / ratio));
+    else
+      m_resizePage.heightBox->setValue(static_cast<int>(static_cast<qreal>(value) * ratio));
+
+    // Reconnect the eight and width boxes
+    connect(m_resizePage.heightBox, SIGNAL(valueChanged(int)), this, SLOT(keepAspectHeight(int)));
+    connect(m_resizePage.widthBox, SIGNAL(valueChanged(int)), this, SLOT(keepAspectWidth(int)));
+  }
 }
 
 void PhotoControl::restore()
@@ -187,40 +207,35 @@ void PhotoControl::restore()
   else
     m_saved = false;
 
-  switch (m_currentOperation) {
-    case (GCore::GJobs::TransformationJob::Crop) : {
-        m_cropPage.saveButton->setEnabled(false);
-        break;
-      }
-    case (GCore::GJobs::TransformationJob::Blur) : {
-        m_blurPage.saveButton->setEnabled(false);
-        break;
-      }
-    case (GCore::GJobs::TransformationJob::Resize) : {
-        m_resizePage.saveButton->setEnabled(false);
-      }
-    default : {
-      break;
-    }
-  }
+  // Crop
+  m_cropPage.saveButton->setEnabled(false);
+
+  // Blur
+  m_blurPage.saveButton->setEnabled(false);
+  m_blurPage.slider->setValue(0);
+
+  // Sharpen
+  m_sharpenPage.saveButton->setEnabled(false);
+  m_sharpenPage.slider->setValue(0);
+
+  // Resize
+  m_resizePage.saveButton->setEnabled(false);
+  m_resizePage.widthBox->setValue(m_imageSize.width());
+  m_resizePage.heightBox->setValue(m_imageSize.height());
 
   m_params.clear();
 
   m_currentOperation = GCore::GJobs::TransformationJob::NoOperation;
 }
 
+void PhotoControl::switchedImage(const QSize &size)
+{
+  m_imageSize = size;
+  restore();
+}
+
 void PhotoControl::saveChanges()
-{/*
-    switch (m_currentOperation) {
-      case (Crop) : {
-        emit saveChange(Crop, m_params);
-        break;
-      }
-      default : {
-        qDebug("This option is unknown!");
-        break;
-      }
-    }*/
+{
   emit saveChange(m_currentOperation, m_params);
 
   m_saved = true;
@@ -235,29 +250,40 @@ void PhotoControl::valuesChanged()
         break;
       }
     case (GCore::GJobs::TransformationJob::Blur) : {
-        m_blurPage.saveButton->setEnabled(true);
-        m_params.insert(GCore::GJobs::TransformationJob::RepeatNumber, m_blurPage.slider->value());
+        m_params.insert(GCore::GJobs::TransformationJob::NumberFilter, static_cast<quint8>(m_blurPage.slider->value()));
         break;
       }
     case (GCore::GJobs::TransformationJob::Sharpen) : {
-        m_sharpenPage.saveButton->setEnabled(true);
-        m_params.insert(GCore::GJobs::TransformationJob::RepeatNumber, m_sharpenPage.slider->value());
+        m_params.insert(GCore::GJobs::TransformationJob::NumberFilter, m_sharpenPage.slider->value());
         break;
       }
     case (GCore::GJobs::TransformationJob::Resize) : {
-        m_resizePage.saveButton->setEnabled(true);
-        m_params.insert(GCore::GJobs::TransformationJob::ResizeSize, QSize(m_resizePage.widthBox->value(), m_resizePage.heightBox->value()));
+        m_params.insert(GCore::GJobs::TransformationJob::Size, QSize(m_resizePage.widthBox->value(), m_resizePage.heightBox->value()));
         break;
       }
     default : {
-      qDebug("This option is unknown.");
       break;
     }
   }
 }
 
+void PhotoControl::keepAspectHeight(int height)
+{
+  keepAspectRatio(true, height);
+  valuesChanged();
+}
+
+void PhotoControl::keepAspectWidth(int width)
+{
+  keepAspectRatio(false, width);
+  valuesChanged();
+}
+
 void PhotoControl::requestPreview()
 {
+  m_blurPage.saveButton->setEnabled(true);
+  m_sharpenPage.saveButton->setEnabled(true);
+  m_resizePage.saveButton->setEnabled(true);
   emit valuesChange(m_currentOperation, m_params);
 }
 
@@ -274,7 +300,7 @@ void PhotoControl::selectBlur()
   m_controlPanel->setCurrentIndex(2);
 
   // Add the default value
-  m_params.insert(GCore::GJobs::TransformationJob::RepeatNumber, 0);
+  m_params.insert(GCore::GJobs::TransformationJob::NumberFilter, 0);
 
   m_currentOperation = GCore::GJobs::TransformationJob::Blur;
   emit operationSelected(m_currentOperation);
@@ -285,7 +311,7 @@ void PhotoControl::selectSharpen()
   m_controlPanel->setCurrentIndex(3);
 
   // Add the default value
-  m_params.insert(GCore::GJobs::TransformationJob::RepeatNumber, 0);
+  m_params.insert(GCore::GJobs::TransformationJob::NumberFilter, 0);
 
   m_currentOperation = GCore::GJobs::TransformationJob::Sharpen;
   emit operationSelected(m_currentOperation);
@@ -294,8 +320,6 @@ void PhotoControl::selectSharpen()
 void PhotoControl::selectResize()
 {
   m_controlPanel->setCurrentIndex(4);
-
-  //Add the default value
 
   m_currentOperation = GCore::GJobs::TransformationJob::Resize;
   emit operationSelected(m_currentOperation);

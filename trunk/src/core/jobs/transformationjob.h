@@ -52,6 +52,9 @@ class TransformationJob : public AbstractJob
      * Emitted when an operation has finished.
      *
      * @see GCore#GJobs#TransformationJob#cropImage
+     * @see GCore#GJobs#TransformationJob#rotateImage
+     * @see GCore#GJobs#TransformationJob#blurImage
+     * @see GCore#GJobs#TransformationJob#sharpenImage
      *
      * @param image The preview.
      */
@@ -60,6 +63,11 @@ class TransformationJob : public AbstractJob
      * Emitted when a transformation has been completed and committed.
      *
      * @see GCore#GJobs#TransformationJob#cropImage
+     * @see GCore#GJobs#TransformationJob#rotateImage
+     * @see GCore#GJobs#TransformationJob#blurImage
+     * @see GCore#GJobs#TransformationJob#sharpenImage
+     *
+     * @param newImage New transformed image.
      */
     void completed(const QImage &newImage);
   public:
@@ -70,6 +78,8 @@ class TransformationJob : public AbstractJob
     {
       /** Used for defining operationless state. */
       NoOperation,
+      /** Rotate image. */
+      Rotate,
       /** Load the image. */
       LoadImage,
       /** Saves the image. */
@@ -82,7 +92,7 @@ class TransformationJob : public AbstractJob
       Sharpen,
       /** Resize operation. */
       Resize
-    };
+  };
 
     /**
      * List of possible parameter types.
@@ -91,12 +101,14 @@ class TransformationJob : public AbstractJob
     {
       /** Parameter describing an area. */
       Area,
-      /** Parameter describing the number of repeating operation. */
-      RepeatNumber,
-      /** New size after resize. */
-      ResizeSize
-    };
-    
+      /** Parameter describing the number of filters to apply. */
+      NumberFilter,
+      /** Size parameter. */
+      Size,
+      /** Angle of rotation. */
+      Angle
+  };
+
     /**
      * A constructor.
      */
@@ -113,13 +125,6 @@ class TransformationJob : public AbstractJob
     void loadImage();
 
     /**
-     * Closes the image.
-     *
-     * @param save Save upon close.
-     */
-    void closeImage(bool save);
-
-    /**
      * Saves the image.
      */
     void saveImage();
@@ -128,6 +133,34 @@ class TransformationJob : public AbstractJob
      * Crops the image.
      */
     void cropImage(const QRect &area);
+
+    /**
+     * Rotate image.
+     *
+     * @param angle Rotate image for angle.
+     */
+    void rotateImage(quint16 angle);
+
+    /**
+     * Blurs image.
+     *
+     * @param numberFilter How many blur filters to apply.
+     */
+    void blurImage(int numberFilter);
+
+    /**
+     * Sharpens image.
+     *
+     * @param numberFilter How many sharpen filters to apply.
+     */
+    void sharpenImage(int numberFilter);
+
+    /**
+     * Resizes the image.
+     *
+     * @param size The new size.
+     */
+    void resizeImage(const QSize &size);
 
   protected:
     /**
@@ -140,7 +173,6 @@ class TransformationJob : public AbstractJob
     Magick::Image *m_image;
     int m_operation;
     QMap<int, QVariant> m_params;
-    bool m_operationDone;
     QDir m_path;
     ImageItem *m_item;
     bool m_imageLoaded;
@@ -151,6 +183,34 @@ class TransformationJob : public AbstractJob
      * @see GCore#GJobs#TransformationJob#cropImage
      */
     void doCrop();
+
+    /**
+     * Rotates the image.
+     *
+     * @see GCore#GJobs#TransformationJob#rotateImage
+     */
+    void doRotate();
+
+    /**
+     * Blurs the image.
+     *
+     * @see GCore#GJobs#TransformationJob#blurImage
+     */
+    void doBlur();
+
+    /**
+     * Sharpens the image.
+     *
+     * @see GCore#GJobs#TransformationJob#sharpenImage
+     */
+    void doSharpen();
+
+    /**
+     * Resizes the image.
+     *
+     * @see GCore#GJobs#TransformationJob#resizeImage
+     */
+    void doResize();
 
 };
 

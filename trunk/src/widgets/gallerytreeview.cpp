@@ -56,10 +56,8 @@ void GalleryTreeView::slotDelete()
 
   emit clicked(QModelIndex());
 
-  // @TODO need to change this?
   if (QMessageBox::question(0, tr("Confirm deletion"), tr("Are you sure you want to delete %1?").arg(selectedGallery.data().toString()), tr("Delete"), tr("Keep"), QString(), 1, 1) == 0)
     static_cast<GCore::ImageModel*> (static_cast<QSortFilterProxyModel*> (model())->sourceModel())->removeGallery(selectedGallery);
-    //GCore::Data::self()->getImageModel()->removeGallery(selectedGallery);
 }
 
 void GalleryTreeView::slotCheckSelection(const QModelIndex &selected)

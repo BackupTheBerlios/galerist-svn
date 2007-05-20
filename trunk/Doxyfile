@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = galerist.kdevelop
+PROJECT_NAME           = Goya
 PROJECT_NUMBER         = 0.2
 OUTPUT_DIRECTORY       = 
 CREATE_SUBDIRS         = NO
@@ -170,7 +170,7 @@ HTML_ALIGN_MEMBERS     = YES
 GENERATE_HTMLHELP      = NO
 CHM_FILE               = 
 HHC_LOCATION           = 
-GENERATE_CHI           = NO
+GENERATE_CHI           = YES
 BINARY_TOC             = NO
 TOC_EXPAND             = NO
 DISABLE_INDEX          = NO
@@ -277,4 +277,4 @@ DOT_CLEANUP            = YES
 #---------------------------------------------------------------------------
 # Configuration::additions related to the search engine   
 #---------------------------------------------------------------------------
-SEARCHENGINE           = YES
+SEARCHENGINE           = NO

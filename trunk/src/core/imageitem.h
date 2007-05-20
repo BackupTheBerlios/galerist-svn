@@ -27,11 +27,6 @@ class QImage;
 class QRect;
 class QSize;
 
-namespace Magick
-{
-class Image;
-}
-
 namespace GCore
 {
 
@@ -226,42 +221,30 @@ class ImageItem : public QObject
     void crop(const QRect &area);
 
     /**
-     * Creates a blur preview.
+     * Blurs the image.
      *
-     * @param blurFilters Number of blur filters.
+     * @param blurFilters Number of bluring filters.
      */
-    QImage createBlurPreview(int blurFilters);
-    /**
-     * Saves the blur effects.
-     *
-     * @param blurFilters Number of blur filters.
-     */
-    void saveBlur(int blurFilters);
+    void blur(int blurFilters);
 
     /**
-     * Creates a sharpen preview.
+     * Sharpens the image.
      *
      * @param sharpenFilters Number of sharpen filters.
      */
-    QImage createSharpenPreview(int sharpenFilters);
-    /**
-     * Saves the sharpen effects.
-     *
-     * @param sharpenFilters Number of sharpen filters.
-     */
-    void saveSharpen(int sharpenFilters);
+    void sharpen(int shrapenFilters);
 
     /**
-     * Creates a resize preview.
+     * Resizes the image.
      *
      * @param size The new size.
      */
-    QImage createResizePreview(const QSize &size);
+    void resize(const QSize &size);
 
     /**
-     * Saves the resized image.
+     * Cancels and reloads the image.
      */
-    void saveResize();
+    void cancelTransformations();
 
   public slots:
     /**
@@ -297,15 +280,7 @@ class ImageItem : public QObject
     MetaDataManager *m_metadata;
     int m_id;
 
-    Magick::Image *m_image;
-    bool m_changes;
     GJobs::TransformationJob *m_transformator;
-
-  private slots:
-    /**
-     * Saves the rotation. This is for making the rotation animation more smooth.
-     */
-    void saveRotation();
 
 };
 

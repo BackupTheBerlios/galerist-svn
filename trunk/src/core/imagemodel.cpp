@@ -20,21 +20,15 @@
  ***************************************************************************/
 #include "imagemodel.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtGui/QIcon>
 #include <QtGui/QSortFilterProxyModel>
-#include <QtCore/QSize>
-#include <QtCore/QRegExp>
 
 #include "core/imageitem.h"
 #include "core/metadatamanager.h"
 #include "core/exifmanager.h"
 #include "core/data.h"
+
 #include "core/jobs/readjob.h"
 #include "core/jobs/copyjob.h"
-
-#include <QtGui/QLabel>
 
 namespace GCore
 {
@@ -134,15 +128,15 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
           else
             date = exifData.getCreationDate().toString(Qt::SystemLocaleDate);
 
-          QString message = tr("EXIF information: <br />");
-          message += tr("Camera manufacturer: ") + exifData.getCameraMaker() + "<br />";
-          message += tr("Camera model: ") + exifData.getCameraModel() + "<br />";
-          message += tr("Aperture: ") + exifData.getAperture() + "<br />";
-          message += tr("Creation Date: ") + date + "<br />";
-          message += tr("Shutter speed: ") + exifData.getShutterSpeed() + "<br />";
-          message += tr("Exposure time: ") + exifData.getExposureTime() + "<br />";
-          message += tr("Focal length: ") + exifData.getFocalLength() + "<br />";
-          message += tr("Flash: ") + exifData.getFlash();
+          QString message = tr("EXIF information:") + "<table>";
+          message += "<tr><td>" + tr("Camera manufacturer:") + " </td><td> " + exifData.getCameraMaker() + "</td></tr>";
+          message += "<tr><td>" + tr("Camera model:") + " </td><td> " + exifData.getCameraModel() + "</td></tr>";
+          message += "<tr><td>" + tr("Aperture:") + " </td><td> " + exifData.getAperture() + "</td></tr>";
+          message += "<tr><td>" + tr("Creation Date:") + " </td><td> " + date + "</td></tr>";
+          message += "<tr><td>" + tr("Shutter speed:") + " </td><td> " + exifData.getShutterSpeed() + "</td></tr>";
+          message += "<tr><td>" + tr("Exposure time:") + " </td><td> " + exifData.getExposureTime() + "</td></tr>";
+          message += "<tr><td>" + tr("Focal length:") + " </td><td> " + exifData.getFocalLength() + "</td></tr>";
+          message += "<tr><td>" + tr("Flash: ") + " </td><td> " + exifData.getFlash() + "</td></tr></table>";
           return item->name() + ": <i>" + item->description().replace('\n', "<br/>") + "</i>" + "<p>" + message + "</p>";
         }
       }
