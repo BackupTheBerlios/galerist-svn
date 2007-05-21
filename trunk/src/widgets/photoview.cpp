@@ -587,7 +587,7 @@ int PhotoView::rearrangeItems(bool update)
 
     GPhotoWidgets::PhotoItem *item = *i;
 
-    if (!item->getText().contains(m_filter)) {
+    if (!item->getText().contains(m_filter, Qt::CaseInsensitive)) {
       item->setPos(1000, -500);
       continue;
     }
@@ -927,14 +927,13 @@ void PhotoView::slotSceneChanged()
 void PhotoView::updateScene()
 {
   if (!m_editMode) {
-    int scrollbarWidth = verticalScrollBar()->width();
-    qreal sceneWidth = viewport()->width() - scrollbarWidth;
-    
-    int rows = qRound(static_cast<qreal> (m_itemVector.count()) / static_cast<int> (sceneWidth / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing * 2)));
-
     // Properly resize the scene
 
-    int scrollbarHeight = horizontalScrollBar()->height();
+    int scrollbarWidth = verticalScrollBar()->width();
+    qreal sceneWidth = viewport()->width() - scrollbarWidth;
+
+    int rows = qRound(static_cast<qreal> (m_itemVector.count()) / static_cast<int> (sceneWidth / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing * 2)));
+
     qreal sceneHeight = rows * (GPhotoWidgets::PhotoItem::ItemHeight + (m_spacing * 2));
 
     if (sceneHeight < viewport()->height())

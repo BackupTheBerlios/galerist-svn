@@ -83,9 +83,22 @@ class SearchBar : public QWidget
      */
     void keyPressEvent(QKeyEvent *event);
 
+    /**
+     * Reimplemented method.
+     * Hides the bar when nothing is present in the search line edit.
+     */
+    void timerEvent(QTimerEvent *event);
+
   private:
     QHBoxLayout *m_layout;
     LineEdit *m_searchLine;
+    int m_timerId;
+
+  private slots:
+    /**
+     * Checks if the search line is empty. If it is, initiates the hide timer. If the search line gets a text before hiding, timer is stopped.
+     */
+    void checkSearch(const QString &text);
 
 };
 

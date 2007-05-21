@@ -20,17 +20,10 @@
     <item row="0" column="0" >
      <widget class="GWidgets::PhotoView" name="imageList" />
     </item>
+    <item row="1" column="0" >
+     <widget class="GWidgets::SearchBar" native="1" name="searchBar" />
+    </item>
    </layout>
-   <widget class="GWidgets::SearchBar" native="1" name="searchBar" >
-    <property name="geometry" >
-     <rect>
-      <x>9</x>
-      <y>506</y>
-      <width>569</width>
-      <height>16</height>
-     </rect>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar" >
    <property name="geometry" >

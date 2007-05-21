@@ -60,7 +60,6 @@ MainWindow::MainWindow()
   startTimer(100);
 
   GCore::Data::self()->setSearchBar(searchBar);
-  searchBar->hide();
 
   connect(imageList, SIGNAL(signalEditMode(bool)), this, SLOT(setEditMode(bool)));
 

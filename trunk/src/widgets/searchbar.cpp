@@ -28,10 +28,12 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QIcon>
 
-namespace GWidgets {
+namespace GWidgets
+{
 
 SearchBar::SearchBar(QWidget *parent)
- : QWidget(parent)
+    : QWidget(parent),
+    m_timerId(0)
 {
   m_layout = new QHBoxLayout(this);
 
@@ -47,17 +49,23 @@ SearchBar::SearchBar(QWidget *parent)
 
   m_layout->addStretch();
 
+  m_layout->setContentsMargins(0, 0, 0, 0);
+
   setLayout(m_layout);
+
+  setContentsMargins(0, 0, 0, 0);
 
   setFocusProxy(m_searchLine);
 
+  hide();
+
   connect(m_searchLine, SIGNAL(textChanged(const QString&)), this, SIGNAL(filterChanged(const QString&)));
+  connect(m_searchLine, SIGNAL(textChanged(const QString&)), this, SLOT(checkSearch(const QString&)));
   connect(button, SIGNAL(clicked()), this, SLOT(hide()));
 }
 
 SearchBar::~SearchBar()
-{
-}
+{}
 
 void SearchBar::addLetter(const QString &letter)
 {
@@ -87,6 +95,25 @@ void SearchBar::keyPressEvent(QKeyEvent * event)
     hide();
   }
   QWidget::keyPressEvent(event);
+}
+
+void SearchBar::timerEvent(QTimerEvent *event)
+{
+  if (event->timerId() == m_timerId) {
+    killTimer(m_timerId);
+    m_timerId = 0;
+    hide();
+  }
+}
+
+void SearchBar::checkSearch(const QString &text)
+{
+  if (text.isEmpty()) {
+    m_timerId = startTimer(2000);
+  } else {
+    killTimer(m_timerId);
+    m_timerId = 0;
+  }
 }
 
 }
