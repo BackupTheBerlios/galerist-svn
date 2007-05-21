@@ -103,12 +103,11 @@ bool SelectionPage::isComplete() const
 
 void SelectionPage::setPredefinedImages(const QString &path, const QStringList &images)
 {
+  makePreview(path, images);
   imagesEdit->setText(path);
   imagesEdit->setEnabled(false);
-  makePreview(path, images);
   setField("GalleryPath", path);
 
-  slotCheckImagesPath(path);
   browseButton->setEnabled(false);
 }
 

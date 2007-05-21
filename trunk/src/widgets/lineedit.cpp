@@ -21,17 +21,20 @@
 
 #include "lineedit.h"
 
-#include "core/data.h"
-#include "widgets/tooltip.h"
+#include <QtCore/QPoint>
+#include <QtCore/QDir>
 
 #include <QtGui/QPalette>
 #include <QtGui/QColor>
 #include <QtGui/QToolTip>
-#include <QtCore/QPoint>
 #include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QCompleter>
-#include <QtCore/QDir>
+
+
+#include "core/data.h"
+
+#include "widgets/tooltip.h"
 
 namespace GWidgets
 {
@@ -45,28 +48,28 @@ LineEdit::LineEdit(QWidget *parent, Types type)
   // Wrapper slot, so we emit the data with it. No need subclassing keyPressEvent() method
   connect(this, SIGNAL(editingFinished()), this, SLOT(slotEmit()));
 
-  // Setup the type.
+  // Setup the type
   setType(m_type);
 }
 
 void LineEdit::paintEvent(QPaintEvent *event)
 {
   QLineEdit::paintEvent(event);
+  int spacing = 3;
 
   // We don't activate the verification function if the lineedit is a default one
   if (m_type == Default)
     return;
 
   QPainter painter(this);
-  if (!m_valid) {
-    painter.drawImage(QRect(width() - 20, height() - 19, 16, 16), QImage(":/images/input_wrong.png"));
-    //painter.setPen(Qt::red);
-    //painter.drawRect(0, 0, width() - 1, height() - 1);
-  } else {
-    painter.drawImage(QRect(width() - 20, height() - 19, 16, 16), QImage(":/images/input_ok.png"));
-    //painter.setPen(Qt::green);
-    //painter.drawRect(0, 0, width() - 1, height() - 1);
-  }
+
+  QImage image;
+  if (!m_valid)
+    image = QImage(":/images/input_wrong.png");
+  else
+    image = QImage(":/images/input_ok.png");
+
+  painter.drawImage(QRect(width() - (image.width() + spacing), (height() / 2) - (image.height() / 2), image.width(), image.height()), image);
 }
 
 void LineEdit::setValidity(bool valid, const QString &reason, bool firstRun)

@@ -18,7 +18,8 @@ TEMPLATE = app
 unix{
     target.path = $${PREFIX}/bin
     INSTALLS += target
-    LIBS += core/libcore.a \
+    LIBS += -lMagick++ \
+core/libcore.a \
 core/jobs/libjobs.a \
 core/network/libnetwork.a \
 dialogs/libdialogs.a \
@@ -36,7 +37,8 @@ translations/libtranslations.a \
 widgets/photowidgets/libphotowidgets.a
 }
 win32-msvc*{
-    LIBS += core/core.lib \
+    LIBS += -lCORE_RL_Magick++_ \
+core/core.lib \
 dialogs/dialogs.lib \
 widgets/wizard/wizard.lib \
 widgets/widgets.lib \
@@ -55,5 +57,4 @@ win32{
 }
 FORMS += mainwindow.ui
 
-LIBS += -lMagick++ \
--lexif
+LIBS += -lexif

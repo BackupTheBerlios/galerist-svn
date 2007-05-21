@@ -15,4 +15,4 @@ photorect.h \
 photopixmap.h \
 photoloading.h
 INCLUDEPATH += ../..
-
+DESTDIR = ./
