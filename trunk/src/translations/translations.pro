@@ -3,6 +3,6 @@ CONFIG += warn_on \
           staticlib
 TEMPLATE = lib
 
-system("lupdate ../ -ts english.ts")
+system("lupdate -silent ../ -ts english.ts")
 
-system("lrelease english.ts -qm english.qm")
+system("lrelease -silent english.ts -qm english.qm")

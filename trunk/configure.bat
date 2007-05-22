@@ -34,13 +34,13 @@ cd ..
 cd wizard
 qmake -t vclib
 
-cd ..\..\..
+cd ..\..
 
 echo Updating and generating translations
 cd translations
-qmake && make distclean
+qmake
 
-cd ..
+cd ..\..
 
 echo Done
 pause
