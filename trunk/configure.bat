@@ -36,5 +36,11 @@ qmake -t vclib
 
 cd ..\..\..
 
+echo Updating and generating translations
+cd translations
+qmake && make distclean
+
+cd ..
+
 echo Done
 pause

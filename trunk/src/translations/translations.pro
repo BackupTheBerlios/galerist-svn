@@ -2,4 +2,7 @@ INCLUDEPATH += ../../src
 CONFIG += warn_on \
           staticlib
 TEMPLATE = lib
-TRANSLATIONS += english.ts 
+
+system("lupdate ../ -ts english.ts")
+
+system("lrelease english.ts -qm english.qm")

@@ -66,47 +66,17 @@ Data::Data(QObject *parent)
   m_imageFormats << "*.png"; //PNG
   m_imageFormats << "*.gif"; //GIF
 
-  // Search for all available translations
-  QStringList translationsFilter;
-  translationsFilter << "*.qm";
+  // We check our built-in translations
+  QDir translations(":/translations");
+  QStringList translationsList = translations.entryList();
+  QStringList::const_iterator end = translationsList.constEnd();
 
-  // We insert the default language
-  m_availableTranslations.insert("English", QString());
-
-  // First we look into the local "repository" of translations
-  QDir localTranslations(getSettingsPath());
-  if (!localTranslations.cd("translations")) {
-    localTranslations.mkdir("translations");
-    localTranslations.cd("translations");
-  }
-  QStringList localTranslationsList = localTranslations.entryList(translationsFilter, QDir::Files);
-  QStringList::const_iterator localEnd = localTranslationsList.constEnd();
-
-  // We add the local translations
-  for (QStringList::const_iterator localCount = localTranslationsList.constBegin(); localCount != localEnd; localCount++) {
-    QString languageName = QString(*localCount).remove(".qm");
+  // And add them to The list ;)
+  for (QStringList::const_iterator count = translationsList.constBegin(); count != end; count++) {
+    QString languageName = QString(*count).remove(".qm");
     languageName[0] = QChar(languageName[0]).toUpper();
-    m_availableTranslations.insert(languageName, localTranslations.absoluteFilePath(*localCount));
+    m_availableTranslations.insert(languageName, translations.absoluteFilePath(*count));
   }
-
-  // Now comes the global one -> Disabled for now
-  /*QDir globalTranslations(QDir::currentPath());
-  qDebug(globalTranslations.absolutePath().toAscii());
-  if (globalTranslations.cd("translations")) {
-    qDebug(globalTranslations.absolutePath().toAscii());
-    QStringList globalTranslationsList = globalTranslations.entryList(translationsFilter, QDir::Files);
-    QStringList::const_iterator globalEnd = globalTranslationsList.constEnd();
-
-    // We combine translations from both locations. Local translations overwrite global translations
-    for (QStringList::const_iterator globalCount = globalTranslationsList.constBegin(); globalCount != globalEnd; globalCount++) {
-      // If there is no local translation with the same name, we add the global one
-      if (!m_availableTranslations.contains(*globalCount)) {
-        QString languageName = QString(*globalCount).remove(".qm");
-        languageName[0] = QChar(languageName[0]).toUpper();
-        m_availableTranslations.insert(languageName, globalTranslations.absoluteFilePath(*globalCount));
-      }
-    }
-  }*/
 }
 
 Data *Data::self()

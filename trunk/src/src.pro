@@ -2,7 +2,7 @@ HEADERS += mainwindow.h \
 namespace-def.h
 SOURCES += main.cpp \
            mainwindow.cpp
-RESOURCES = images.qrc
+RESOURCES = resources.qrc
 RC_FILE = icons.rc
 QT += qt \
 sql \
