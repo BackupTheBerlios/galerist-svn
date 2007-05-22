@@ -672,7 +672,7 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
 
       // The default scaling at the end
       m_animation->setScaleAt(1, 1, 1);
-    } else if (!m_fullsize) {
+    } else {
       // Calculate the new scaling for the upcoming full sized photo
       qreal scaleMultiplier;
       qreal oldScaleMultiplier;
@@ -682,16 +682,16 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
 
       // We calculate how much spreading is needed for photo to fit the view
       if (m_view->width() < m_view->height())
-        scaleMultiplier = ((qreal) m_view->width() - 20) / (qreal) m_pixmap->pixmap().width();
+        scaleMultiplier = static_cast<qreal> (m_view->width() - 20) / static_cast<qreal> (m_pixmap->pixmap().width());
       else
-        scaleMultiplier = ((qreal) m_view->height() - 20) / (qreal) m_pixmap->pixmap().height();
+        scaleMultiplier = static_cast<qreal> (m_view->height() - 20) / static_cast<qreal> (m_pixmap->pixmap().height());
 
       // And calculation for fullsized photo to fit the view
       if (m_fullsizePixmap) {
         if (m_view->width() < m_view->height())
-          scaleFullscreenMultiplier = ((qreal) m_view->width() - 20) / (qreal) m_fullsizePixmap->width();
+          scaleFullscreenMultiplier = static_cast<qreal> (m_view->width() - 20) / static_cast<qreal> (m_fullsizePixmap->width());
         else
-          scaleFullscreenMultiplier = ((qreal) m_view->height() - 20) / (qreal) m_fullsizePixmap->height();
+          scaleFullscreenMultiplier = static_cast<qreal> (m_view->height() - 20) / static_cast<qreal> (m_fullsizePixmap->height());
 
         m_fullsize = true;
 
@@ -703,11 +703,11 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
       m_scaleMultiplier = scaleFullscreenMultiplier;
 
       // Scaling ratios for fully sized photo
-      m_animation->setScaleAt(0.9999999999, scaleMultiplier, scaleMultiplier);
+      m_animation->setScaleAt(0.9999, scaleMultiplier, scaleMultiplier);
       m_animation->setScaleAt(1, scaleFullscreenMultiplier, scaleFullscreenMultiplier);
     }
 
-  if (m_pendingDoom && step > 0.99999999) {
+  if (m_pendingDoom && step > 0.9999) {
     m_view->scene()->removeItem(this);
     m_pendingDoom = false;
   }

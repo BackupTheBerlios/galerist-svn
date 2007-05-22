@@ -66,8 +66,8 @@ void PhotoLoading::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWi
 {
   painter->save();
 
-  painter->setPen(QColor(0, 0, 255, 90));
-  painter->setBrush(QBrush(QColor(0, 0, 255, 90)));
+  painter->setPen(QColor(0, 0, 255));
+  painter->setBrush(QBrush(QColor(120, 120, 255)));
   painter->drawRoundRect(boundingRect(), 10, 70);
 
   painter->restore();
