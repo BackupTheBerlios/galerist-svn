@@ -57,4 +57,5 @@ win32{
 }
 FORMS += mainwindow.ui
 
-LIBS += -lexif
+LIBS += -lXmlRpc \
+-lexif

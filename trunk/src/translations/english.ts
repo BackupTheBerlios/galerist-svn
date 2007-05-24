@@ -149,86 +149,86 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>GCore::GNetwork::Updater</name>
     <message>
-        <location filename="../core/network/updater.cpp" line="53"/>
+        <location filename="../core/network/updater.cpp" line="55"/>
         <source>&amp;Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="89"/>
+        <location filename="../core/network/updater.cpp" line="101"/>
         <source>Changelog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="89"/>
+        <location filename="../core/network/updater.cpp" line="101"/>
         <source>The changelog:
 
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="168"/>
+        <location filename="../core/network/updater.cpp" line="180"/>
         <source>&amp;Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="168"/>
+        <location filename="../core/network/updater.cpp" line="180"/>
         <source>Do &amp;not update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="101"/>
+        <location filename="../core/network/updater.cpp" line="113"/>
         <source>Download complete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="101"/>
+        <location filename="../core/network/updater.cpp" line="113"/>
         <source>The update has been successfully downloaded. %1 is now going to exit so the update can install.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="101"/>
+        <location filename="../core/network/updater.cpp" line="113"/>
         <source>Quit and install</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="129"/>
+        <location filename="../core/network/updater.cpp" line="141"/>
         <source>Checking for updates...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="140"/>
+        <location filename="../core/network/updater.cpp" line="152"/>
         <source>Downloading the changelog...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="153"/>
+        <location filename="../core/network/updater.cpp" line="165"/>
         <source>Downloading the update...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="168"/>
+        <location filename="../core/network/updater.cpp" line="180"/>
         <source>Update available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="168"/>
+        <location filename="../core/network/updater.cpp" line="180"/>
         <source>A new version of %1 is available. Your version is %2 and the latest is %3.
 
 Do you want to install it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="168"/>
+        <location filename="../core/network/updater.cpp" line="180"/>
         <source>Show &amp;changelog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="180"/>
+        <location filename="../core/network/updater.cpp" line="192"/>
         <source>No update available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../core/network/updater.cpp" line="180"/>
+        <location filename="../core/network/updater.cpp" line="192"/>
         <source>You already have the latest %1 installed.</source>
         <translation type="unfinished"></translation>
     </message>

@@ -31,11 +31,12 @@ namespace GPhotoWidgets {
 PhotoLoading::PhotoLoading(QGraphicsScene *scene)
  : QGraphicsItemGroup(0, scene)
 {
-  QGraphicsPixmapItem *logo = new QGraphicsPixmapItem(QPixmap(":/images/galerist-small.png"), this);
-  addToGroup(logo);
+  //QGraphicsPixmapItem *logo = new QGraphicsPixmapItem(QPixmap(":/images/galerist-small.png"), this);
+  //addToGroup(logo);
   m_text = new QGraphicsTextItem(this);
   m_text->setFont(QFont("", 20));
   m_text->setPos(m_text->pos() + QPoint(40, 0));
+  m_text->setDefaultTextColor(QColor(255, 255, 255));
   addToGroup(m_text);
 }
 
@@ -65,9 +66,15 @@ QRectF PhotoLoading::boundingRect() const
 void PhotoLoading::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   painter->save();
+  painter->setRenderHint(QPainter::Antialiasing, true);
+
+  QLinearGradient gradient(boundingRect().topLeft(), boundingRect().bottomLeft());
+  gradient.setColorAt(0, QColor(75, 128, 209, 240));
+  gradient.setColorAt(0.6, QColor(45, 98, 179, 240));
+  gradient.setColorAt(1, QColor(5, 58, 119, 240));
 
   painter->setPen(QColor(0, 0, 255));
-  painter->setBrush(QBrush(QColor(120, 120, 255)));
+  painter->setBrush(QBrush(gradient));
   painter->drawRoundRect(boundingRect(), 10, 70);
 
   painter->restore();

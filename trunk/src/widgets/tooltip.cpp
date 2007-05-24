@@ -29,6 +29,7 @@
 #include <QtGui/QToolTip>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
+#include <QtGui/QBitmap>
 
 namespace GWidgets
 {
@@ -57,38 +58,72 @@ QString TipLabel::text()
 
 void TipLabel::paintEvent(QPaintEvent*)
 {
-
-  int width = text().count() * 8;
+  int width = text().count() * 7;
+  qDebug(QString::number(width).toAscii().data());
   int height = 50;
 
   QRect desktopGeometry = QApplication::desktop()->screenGeometry();
   QPolygon triangle;
+  QPen border;
+  border.setWidth(2);
+  border.setCapStyle(Qt::RoundCap);
+  border.setJoinStyle(Qt::RoundJoin);
 
   int difference = desktopGeometry.bottomRight().x() - m_pos.x();
 
   if (difference < width) {
-    triangle << QPoint(width, 60) << QPoint(width - 20, 20) << QPoint(width - 40, 30);
-    setGeometry(m_pos.x() - width, m_pos.y(), width, height + 50);
+    triangle << QPoint(width, height + 15) << QPoint(width - 20, height) << QPoint(width - 40, height);
+    setGeometry(m_pos.x() - width, m_pos.y(), width + 2, height + 15);
   } else {
-    triangle << QPoint(0, 60) << QPoint(20, 20) << QPoint(40, 30);
-    setGeometry(m_pos.x(), m_pos.y(), width, height + 50);
+    triangle << QPoint(0, height + 15) << QPoint(20, height) << QPoint(40, height);
+    setGeometry(m_pos.x(), m_pos.y(), width + 2, height + 15);
   }
 
-  QRegion bubble = QRegion(0, 0, width, height, QRegion::Ellipse).united(QRegion(triangle, Qt::WindingFill));
+  QRect rectangle(1, 1, width - 2, height - 1);
+  int roundness = 70;
 
-  QPainterPath path;
-  path.addRegion(bubble);
+  QPainterPath bubblePath;
+  bubblePath.addRoundRect(rectangle, roundness);
+  bubblePath.addPolygon(triangle);
+  bubblePath.closeSubpath();
 
-  QPainter painter(this);
-  painter.setPen(QPen(QColor(255, 255, 0)));
-  painter.setBrush(QColor(255, 255, 0));
-  painter.drawPath(path);
+  QBitmap mask(width + 2, height + 15);
+  mask.fill();
 
-  painter.setPen(QPen(QColor(0, 0, 0)));
-  painter.setBrush(QBrush(QColor(0, 0, 0)));
-  painter.drawText(QRectF(0, 0, width, height), Qt::AlignCenter, text());
+  QPainter maskPainter(&mask);
+  maskPainter.setRenderHint(QPainter::Antialiasing, true);
+  maskPainter.setBrush(QColor(0, 0, 0));
+  maskPainter.setPen(border);
+  maskPainter.drawPath(bubblePath);
+  maskPainter.end();
 
-  setMask(bubble);
+  QLinearGradient bubbleColor(QPointF(width / 2, 0), QPointF(width / 2, height));
+  bubbleColor.setColorAt(1, QColor(150, 150, 0));
+  bubbleColor.setColorAt(0.7, QColor(200, 200, 0));
+  bubbleColor.setColorAt(0, QColor(255, 255, 60));
+
+  QImage bubble(width, height + 15, QImage::Format_ARGB32_Premultiplied);
+
+  QPainter bubblePainter(&bubble);
+  bubblePainter.initFrom(this);
+  bubblePainter.setRenderHint(QPainter::Antialiasing, true);
+  bubblePainter.eraseRect(0, 0, width, height + 15);
+
+  bubblePainter.strokePath(bubblePath, border);
+  bubblePainter.fillPath(bubblePath, bubbleColor);
+
+  bubblePainter.setPen(QPen(QColor(0, 0, 0)));
+  bubblePainter.setBrush(QBrush(QColor(0, 0, 0)));
+  bubblePainter.drawText(QRectF(0, 0, width, height), Qt::AlignCenter, text());
+  bubblePainter.end();
+
+  QPainter widgetPainter(this);
+  widgetPainter.setRenderHint(QPainter::Antialiasing, true);
+  widgetPainter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+  bubblePainter.eraseRect(0, 0, width, height + 15);
+  widgetPainter.drawImage(0, 0, bubble);
+
+  setMask(mask);
 }
 
 void TipLabel::slotClose()

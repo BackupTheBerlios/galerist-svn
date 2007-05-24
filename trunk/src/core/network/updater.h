@@ -20,12 +20,18 @@
  ***************************************************************************/
 
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 #ifdef WANT_UPDATER
 
 class QHttp;
 class QProgressDialog;
 class QTemporaryFile;
+
+namespace XmlRpc
+{
+class XmlRpcClient;
+}
 
 namespace GCore
 {
@@ -80,6 +86,9 @@ class Updater : public QObject
 
   private:
     QHttp *m_httpClient;
+    XmlRpc::XmlRpcClient *m_rpcClient;
+    QUrl m_changelog;
+    QUrl m_patch;
     QString m_latestVersion;
     int m_versionRequestId;
     int m_versionQuiteRequestId;
@@ -96,6 +105,13 @@ class Updater : public QObject
     * Downloads the update. Installation is queued.
     */
     void downloadUpdate();
+
+    /**
+     * Sends a version request to the server.
+     *
+     * @param quite don't show the progress bar.
+     */
+    void getLatestVersion(bool quite);
 
     /**
      * Convenience method for checking versions.

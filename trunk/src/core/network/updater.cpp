@@ -23,15 +23,20 @@
 
 #include "core/data.h"
 
-#include <QtNetwork/QHttp>
-#include <QtGui/QMessageBox>
-#include <QtGui/QProgressDialog>
 #include <QtCore/QTemporaryFile>
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
+
+#include <QtNetwork/QHttp>
+
+#include <QtGui/QMessageBox>
+#include <QtGui/QProgressDialog>
 #include <QtGui/QApplication>
 
-#include <QtCore/QtDebug>
+#include <XmlRpc.h>
+
+#include "core/errorhandler.h"
+
 
 #ifdef WANT_UPDATER
 
@@ -49,9 +54,11 @@ Updater::Updater(QObject *parent)
     m_changeLogRequestId(-1),
     m_downloadRequestId(-1)
 {
-  m_httpClient = new QHttp("goya.mojefotke.si", 80, this);
+  m_httpClient = new QHttp(this);
   m_progressDialog = new QProgressDialog(QString(), tr("&Cancel"), 0, 0, GCore::Data::self()->getMainWindow());
   m_progressDialog->hide();
+
+  m_rpcClient = new XmlRpc::XmlRpcClient("update.unimatrix-one.org", 8000);
 
   connect(m_httpClient, SIGNAL(requestFinished(int, bool)), this, SLOT(slotProcess(int, bool)));
   connect(m_progressDialog, SIGNAL(canceled()), m_httpClient, SLOT(abort()));
@@ -59,12 +66,11 @@ Updater::Updater(QObject *parent)
 
 void Updater::checkUpdate()
 {
-  m_versionQuiteRequestId = m_httpClient->get("/downloads/upgrade");
+  getLatestVersion(true);
 }
 
 Updater::~Updater()
 {
-  //m_progressDialog->close();
 }
 
 void Updater::slotProcess(int requestId, bool error)
@@ -73,19 +79,9 @@ void Updater::slotProcess(int requestId, bool error)
 
   // Check if there was an error
   if (!error) {
-    // Check if we are just checking if there is a new version
     QString response = m_httpClient->readAll();
-    if (requestId == m_versionRequestId) {
-      checkVersions(response);
-      m_versionRequestId = -1;
-
-      // Need to be quite?
-    } else if (requestId == m_versionQuiteRequestId) {
-      checkVersions(response, true);
-      m_versionQuiteRequestId = -1;
-
-      // Get the changelog
-    } else if (requestId == m_changeLogRequestId) {
+    // Get the changelog
+    if (requestId == m_changeLogRequestId) {
       if (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Changelog"), tr("The changelog:\n\n%1").arg(response), tr("&Update"), tr("Do &not update"), QString(), 0, 1) == 0)
         downloadUpdate();
       m_changeLogRequestId = -1;
@@ -110,8 +106,6 @@ void Updater::slotProcess(int requestId, bool error)
         qApp->quit();
     }
 
-  } else {
-    qDebug() << "ERROR";
   }
 }
 
@@ -123,18 +117,13 @@ void Updater::slotShowProgress(int done, int total)
 
 void Updater::slotCheckUpdate()
 {
-  m_versionRequestId = m_httpClient->get("/downloads/upgrade");
-
-  // set up the Progress dialog
-  m_progressDialog->setLabelText(tr("Checking for updates..."));
-  m_progressDialog->setMaximum(0);
-  m_progressDialog->setValue(1);
-  m_progressDialog->show();
+  getLatestVersion(false);
 }
 
 void Updater::showChangeLog()
 {
-  m_changeLogRequestId = m_httpClient->get("/downloads/changelog");
+  m_httpClient->setHost(m_changelog.host());
+  m_changeLogRequestId = m_httpClient->get(m_changelog.path());
 
   // set up the Progress dialog
   m_progressDialog->setLabelText(tr("Downloading the changelog..."));
@@ -147,12 +136,55 @@ void Updater::downloadUpdate()
 {
   m_temp = new QTemporaryFile(this);
   m_temp->open();
-  m_downloadRequestId = m_httpClient->get("/uploads/files/goya-patch-" + m_latestVersion + ".exe", m_temp);
+  m_httpClient->setHost(m_patch.host());
+  m_downloadRequestId = m_httpClient->get(m_patch.path(), m_temp);
 
   // Set up the progress dialog
   m_progressDialog->setLabelText(tr("Downloading the update..."));
   connect(m_httpClient, SIGNAL(dataReadProgress(int, int)), this, SLOT(slotShowProgress(int, int)));
   m_progressDialog->show();
+}
+
+void Updater::getLatestVersion(bool quite)
+{
+  XmlRpc::XmlRpcValue parameters, results;
+  parameters[0] = GCore::Data::self()->getAppName().toLower().toStdString();
+  // For now we have only Windows platform
+  parameters[1] = "windows";
+  // There is no stable branch at the moment
+  parameters[2] = "unstable";
+  
+  if (!m_rpcClient->execute("check", parameters, results)) {
+    qDebug("Updater: Cannot check version!");
+    GCore::ErrorHandler::reportMessage("Cannot contact UniUpdate server.", GCore::ErrorHandler::Critical);
+    return;
+  }
+
+  if (!results["available"]) {
+    qDebug("Updater: We are not supported!");
+    int errcode = results["errcode"];
+    switch (errcode) {
+      case (0) : {
+        GCore::ErrorHandler::reportMessage("This application is not supported by the UniUpdate service.", GCore::ErrorHandler::Critical);
+        break;
+      }
+      case (1) : {
+        GCore::ErrorHandler::reportMessage("Selected branch does not exist on UniUpdate server.", GCore::ErrorHandler::Critical);
+        break;
+      }
+      case (2) : {
+        GCore::ErrorHandler::reportMessage("This platform is not supported by the UniUpdate service.", GCore::ErrorHandler::Critical);
+        break;
+      }
+    }
+    return;
+  }
+
+  QString version = QString::fromStdString(results["version"]);
+  m_changelog.setUrl(QString::fromStdString(results["changelog"]));
+  m_patch.setUrl(QString::fromStdString(results["patch"]));
+
+  checkVersions(version, quite);
 }
 
 void Updater::checkVersions(const QString &newVersion, bool quite)
