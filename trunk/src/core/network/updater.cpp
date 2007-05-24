@@ -55,7 +55,7 @@ Updater::Updater(QObject *parent)
     m_downloadRequestId(-1)
 {
   m_httpClient = new QHttp(this);
-  m_progressDialog = new QProgressDialog(QString(), tr("&Cancel"), 0, 0, GCore::Data::self()->getMainWindow());
+  m_progressDialog = new QProgressDialog(QString(), tr("&Cancel"), 0, 0, GCore::Data::self()->getMainWindow(), Qt::WindowStaysOnTopHint);
   m_progressDialog->hide();
 
   m_rpcClient = new XmlRpc::XmlRpcClient("update.unimatrix-one.org", 8000);
@@ -75,16 +75,15 @@ Updater::~Updater()
 
 void Updater::slotProcess(int requestId, bool error)
 {
-  m_progressDialog->hide();
-
   // Check if there was an error
   if (!error) {
+    m_progressDialog->hide();
     QString response = m_httpClient->readAll();
     // Get the changelog
     if (requestId == m_changeLogRequestId) {
+      m_changeLogRequestId = -1;
       if (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Changelog"), tr("The changelog:\n\n%1").arg(response), tr("&Update"), tr("Do &not update"), QString(), 0, 1) == 0)
         downloadUpdate();
-      m_changeLogRequestId = -1;
 
       // Install the update?
     } else if (requestId == m_downloadRequestId) {

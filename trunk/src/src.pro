@@ -38,6 +38,7 @@ widgets/photowidgets/libphotowidgets.a
 }
 win32-msvc*{
     LIBS += -lCORE_RL_Magick++_ \
+-lWs2_32 \
 core/core.lib \
 dialogs/dialogs.lib \
 widgets/wizard/wizard.lib \

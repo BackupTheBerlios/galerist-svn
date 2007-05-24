@@ -65,7 +65,8 @@ void TipLabel::paintEvent(QPaintEvent*)
   QRect desktopGeometry = QApplication::desktop()->screenGeometry();
   QPolygon triangle;
   QPen border;
-  border.setWidth(2);
+  border.setWidth(3);
+  border.setCosmetic(true);
   border.setCapStyle(Qt::RoundCap);
   border.setJoinStyle(Qt::RoundJoin);
 
@@ -73,13 +74,13 @@ void TipLabel::paintEvent(QPaintEvent*)
 
   if (difference < width) {
     triangle << QPoint(width, height + 15) << QPoint(width - 20, height) << QPoint(width - 40, height);
-    setGeometry(m_pos.x() - width, m_pos.y(), width + 2, height + 15);
+    setGeometry(m_pos.x() - width, m_pos.y(), width + 4, height + 15);
   } else {
     triangle << QPoint(0, height + 15) << QPoint(20, height) << QPoint(40, height);
-    setGeometry(m_pos.x(), m_pos.y(), width + 2, height + 15);
+    setGeometry(m_pos.x(), m_pos.y(), width + 4, height + 15);
   }
 
-  QRect rectangle(1, 1, width - 2, height - 1);
+  QRect rectangle(1, 1, width - 4, height - 1);
   int roundness = 70;
 
   QPainterPath bubblePath;
@@ -87,7 +88,7 @@ void TipLabel::paintEvent(QPaintEvent*)
   bubblePath.addPolygon(triangle);
   bubblePath.closeSubpath();
 
-  QBitmap mask(width + 2, height + 15);
+  QBitmap mask(width + 4, height + 15);
   mask.fill();
 
   QPainter maskPainter(&mask);
