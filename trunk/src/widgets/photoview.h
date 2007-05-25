@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -21,11 +21,12 @@
 #ifndef GWIDGETSPHOTOVIEW_H
 #define GWIDGETSPHOTOVIEW_H
 
-#include <QtGui/QGraphicsView>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QVector>
 #include <QtCore/QHash>
 #include <QtCore/QList>
+
+#include <QtGui/QGraphicsView>
 
 class QTimeLine;
 class QRubberBand;
@@ -47,7 +48,7 @@ class PhotoLoading;
  * @short A view for showing photos, using a model.
  *
  * @author Jernej Kos <kostko@unimatrix-one.org>
- * @author Gregor Kališnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class PhotoView : public QGraphicsView
 {

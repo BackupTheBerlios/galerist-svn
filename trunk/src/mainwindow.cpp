@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -185,7 +185,7 @@ void MainWindow::initDocks()
 
 void MainWindow::about()
 {
-  QString about = tr("With %1 you can create your own galleries of pictures, comment all pictures and upload them to a gallery site.\n\nCurrent version: %2\nAuthor name: Gregor Kališnik\nAuthor email: gregor@podnapisi.net").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion());
+  QString about = tr("With %1 you can create your own galleries of pictures, comment all pictures and upload them to a gallery site.\n\nCurrent version: %2\nAuthor name: Gregor Kališnik\nAuthor email: gregor@unimatrix-one.org").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion());
   QMessageBox::about(this, tr("About %1").arg(GCore::Data::self()->getAppName()), about);
 }
 

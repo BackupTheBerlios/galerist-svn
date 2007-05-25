@@ -31,7 +31,7 @@ namespace GPhotoWidgets
 
 /**
  * @short For showing loading "dialog" in PhotoView.
- * @author Gregor Kališnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class PhotoLoading : public QGraphicsItemGroup
 {

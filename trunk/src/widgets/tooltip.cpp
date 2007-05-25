@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -36,7 +36,7 @@ namespace GWidgets
 
 /**
  * @short A bubble like label. "Floating" of course.
- * @author Gregor Kališnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class TipLabel : public QWidget
 {

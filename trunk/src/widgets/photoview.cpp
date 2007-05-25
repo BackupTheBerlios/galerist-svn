@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -76,11 +76,11 @@ PhotoView::PhotoView(QWidget *parent)
 
   // Set some graphics view options
   setSpacing(10);
-  setRenderHint(QPainter::Antialiasing);
+  setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
   setInteractive(true);
 
   if (GCore::Data::self()->getOpengl() && QGLFormat::hasOpenGL())
-    setViewport(new QGLWidget(QGLFormat(QGL::DirectRendering | QGL::SampleBuffers)));
+    setViewport(new QGLWidget(QGLFormat(QGL::DirectRendering | QGL::SampleBuffers | QGL::DoubleBuffer)));
 
   // Loading item
   m_loading = new GPhotoWidgets::PhotoLoading(this->scene());
@@ -202,14 +202,14 @@ void PhotoView::initiateOperation(int operation)
 
   switch (operation) {
     case (GCore::GJobs::TransformationJob::Crop) : {
-        m_needRubberBand = true;
+      m_needRubberBand = true;
 
-        connect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+      connect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
 
-        viewport()->setCursor(Qt::CrossCursor);
+      viewport()->setCursor(Qt::CrossCursor);
 
-        break;
-      }
+      break;
+    }
     default : {
       break;
     }
@@ -223,26 +223,26 @@ void PhotoView::cancelOperation(int operation)
 
   switch (operation) {
     case (GCore::GJobs::TransformationJob::Crop) : {
-        // We disable rubberband
-        m_needRubberBand = false;
+      // We disable rubberband
+      m_needRubberBand = false;
 
-        disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+      disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
 
-        viewport()->setCursor(Qt::OpenHandCursor);
-        break;
-      }
+      viewport()->setCursor(Qt::OpenHandCursor);
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Blur) : {
-        m_currentEdited->cancelTransformations();
-        break;
-      }
+      m_currentEdited->cancelTransformations();
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Sharpen) : {
-        m_currentEdited->cancelTransformations();
-        break;
-      }
+      m_currentEdited->cancelTransformations();
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Resize) : {
-        m_currentEdited->cancelTransformations();
-        break;
-      }
+      m_currentEdited->cancelTransformations();
+      break;
+    }
     default : {
       break;
     }
@@ -259,28 +259,28 @@ void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
 
   switch (operation) {
     case (GCore::GJobs::TransformationJob::Crop) : {
-        // We enable rubberband
-        m_needRubberBand = false;
+      // We enable rubberband
+      m_needRubberBand = false;
 
-        disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
+      disconnect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
 
-        viewport()->setCursor(Qt::OpenHandCursor);
+      viewport()->setCursor(Qt::OpenHandCursor);
 
-        m_currentEdited->saveCrop();
-        break;
-      }
+      m_currentEdited->saveCrop();
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Blur) : {
-        m_currentEdited->saveBlur();
-        break;
-      }
+      m_currentEdited->saveBlur();
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Sharpen) : {
-        m_currentEdited->saveSharpen();
-        break;
-      }
+      m_currentEdited->saveSharpen();
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Resize) : {
-        m_currentEdited->saveResize();
-        break;
-      }
+      m_currentEdited->saveResize();
+      break;
+    }
     default : {
       qDebug("Operation not supported.");
       break;
@@ -295,17 +295,17 @@ void PhotoView::previewOperation(int operation, const QMap<int, QVariant> &param
 
   switch (operation) {
     case (GCore::GJobs::TransformationJob::Blur) : {
-        m_currentEdited->blurPreview(params.value(GCore::GJobs::TransformationJob::NumberFilter).toInt());
-        break;
-      }
+      m_currentEdited->blurPreview(params.value(GCore::GJobs::TransformationJob::NumberFilter).toInt());
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Sharpen) : {
-        m_currentEdited->sharpenPreview(params.value(GCore::GJobs::TransformationJob::NumberFilter).toInt());
-        break;
-      }
+      m_currentEdited->sharpenPreview(params.value(GCore::GJobs::TransformationJob::NumberFilter).toInt());
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Resize) : {
-        m_currentEdited->resizePreview(params.value(GCore::GJobs::TransformationJob::Size).toSize());
-        break;
-      }
+      m_currentEdited->resizePreview(params.value(GCore::GJobs::TransformationJob::Size).toSize());
+      break;
+    }
     default : {
       qDebug("Operation not supported.");
       break;
@@ -660,19 +660,19 @@ void PhotoView::mousePressEvent(QMouseEvent *event)
   // If the event does nothing with zooming operation, we handle it in non-edit fashion
   switch (event->button()) {
     case (Qt::RightButton) : {
-        // Right button is for context menu only unless nothing is selected
-        if (scene()->selectedItems().isEmpty()) {
-          QPainterPath selectionArea(mapToScene(event->pos()));
-          selectionArea.lineTo(mapToScene(event->pos()).x() + 1, mapToScene(event->pos()).y() + 1);
-          scene()->setSelectionArea(selectionArea);
-        }
-        break;
+      // Right button is for context menu only unless nothing is selected
+      if (scene()->selectedItems().isEmpty()) {
+        QPainterPath selectionArea(mapToScene(event->pos()));
+        selectionArea.lineTo(mapToScene(event->pos()).x() + 1, mapToScene(event->pos()).y() + 1);
+        scene()->setSelectionArea(selectionArea);
       }
+      break;
+    }
     case (Qt::MidButton) : {
-        // Middle button intiates double click, and that's all
-        QGraphicsView::mouseDoubleClickEvent(event);
-        break;
-      }
+      // Middle button intiates double click, and that's all
+      QGraphicsView::mouseDoubleClickEvent(event);
+      break;
+    }
     default : {
       // All other buttons are not defined... Yet!
       QGraphicsView::mousePressEvent(event);
@@ -845,61 +845,61 @@ void PhotoView::keyPressEvent(QKeyEvent *event)
 
   switch (event->key()) {
     case(Qt::Key_Left): {
-        int index = m_itemVector.indexOf(focusedItem);
-        if ((index - 1) >= 0) {
-          if (event->modifiers() != Qt::ShiftModifier)
-            scene()->clearSelection();
-          else if (m_itemVector.at(index - 1)->isSelected())
-            m_itemVector.at(index)->setSelected(false);
-          m_itemVector.at(index - 1)->setSelected(true);
-          scene()->setFocusItem(m_itemVector.at(index - 1));
-          centerOn(scene()->focusItem());
-        }
-        break;
+      int index = m_itemVector.indexOf(focusedItem);
+      if ((index - 1) >= 0) {
+        if (event->modifiers() != Qt::ShiftModifier)
+          scene()->clearSelection();
+        else if (m_itemVector.at(index - 1)->isSelected())
+          m_itemVector.at(index)->setSelected(false);
+        m_itemVector.at(index - 1)->setSelected(true);
+        scene()->setFocusItem(m_itemVector.at(index - 1));
+        centerOn(scene()->focusItem());
       }
+      break;
+    }
     case(Qt::Key_Right): {
-        int index = m_itemVector.indexOf(focusedItem);
-        if ((index + 1) < m_itemVector.size()) {
-          if (event->modifiers() != Qt::ShiftModifier)
-            scene()->clearSelection();
-          else if (m_itemVector.at(index + 1)->isSelected())
-            m_itemVector.at(index)->setSelected(false);
-          m_itemVector.at(index + 1)->setSelected(true);
-          scene()->setFocusItem(m_itemVector.at(index + 1));
-          centerOn(scene()->focusItem());
-        }
-        break;
+      int index = m_itemVector.indexOf(focusedItem);
+      if ((index + 1) < m_itemVector.size()) {
+        if (event->modifiers() != Qt::ShiftModifier)
+          scene()->clearSelection();
+        else if (m_itemVector.at(index + 1)->isSelected())
+          m_itemVector.at(index)->setSelected(false);
+        m_itemVector.at(index + 1)->setSelected(true);
+        scene()->setFocusItem(m_itemVector.at(index + 1));
+        centerOn(scene()->focusItem());
       }
+      break;
+    }
     case(Qt::Key_Up): {
-        int index = m_itemVector.indexOf(focusedItem);
-        if ((index - itemsPerRow) >= 0) {
-          if (event->modifiers() != Qt::ShiftModifier)
-            scene()->clearSelection();
-          else if (m_itemVector.at(index - itemsPerRow)->isSelected())
-            m_itemVector.at(index)->setSelected(false);
-          m_itemVector.at(index - itemsPerRow)->setSelected(true);
-          scene()->setFocusItem(m_itemVector.at(index - itemsPerRow));
-          centerOn(scene()->focusItem());
-        }
-        break;
+      int index = m_itemVector.indexOf(focusedItem);
+      if ((index - itemsPerRow) >= 0) {
+        if (event->modifiers() != Qt::ShiftModifier)
+          scene()->clearSelection();
+        else if (m_itemVector.at(index - itemsPerRow)->isSelected())
+          m_itemVector.at(index)->setSelected(false);
+        m_itemVector.at(index - itemsPerRow)->setSelected(true);
+        scene()->setFocusItem(m_itemVector.at(index - itemsPerRow));
+        centerOn(scene()->focusItem());
       }
+      break;
+    }
     case(Qt::Key_Down): {
-        int index = m_itemVector.indexOf(focusedItem);
-        if ((index + itemsPerRow) < m_itemVector.size()) {
-          if (event->modifiers() != Qt::ShiftModifier)
-            scene()->clearSelection();
-          else if (m_itemVector.at(index + itemsPerRow)->isSelected())
-            m_itemVector.at(index)->setSelected(false);
-          m_itemVector.at(index + itemsPerRow)->setSelected(true);
-          scene()->setFocusItem(m_itemVector.at(index + itemsPerRow));
-          centerOn(scene()->focusItem());
-        }
-        break;
+      int index = m_itemVector.indexOf(focusedItem);
+      if ((index + itemsPerRow) < m_itemVector.size()) {
+        if (event->modifiers() != Qt::ShiftModifier)
+          scene()->clearSelection();
+        else if (m_itemVector.at(index + itemsPerRow)->isSelected())
+          m_itemVector.at(index)->setSelected(false);
+        m_itemVector.at(index + itemsPerRow)->setSelected(true);
+        scene()->setFocusItem(m_itemVector.at(index + itemsPerRow));
+        centerOn(scene()->focusItem());
       }
+      break;
+    }
     case(Qt::Key_Escape): {
-        GCore::Data::self()->getSearchBar()->hide();
-        break;
-      }
+      GCore::Data::self()->getSearchBar()->hide();
+      break;
+    }
     default: {
       QGraphicsView::keyPressEvent(event);
     }
@@ -932,7 +932,7 @@ void PhotoView::updateScene()
     int scrollbarWidth = verticalScrollBar()->width();
     qreal sceneWidth = viewport()->width() - scrollbarWidth;
 
-    int rows = qRound(static_cast<qreal> (m_itemVector.count()) / static_cast<int> (sceneWidth / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing * 2)));
+    int rows = qRound(static_cast<qreal>(m_itemVector.count()) / static_cast<int>(sceneWidth / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing * 2)));
 
     qreal sceneHeight = rows * (GPhotoWidgets::PhotoItem::ItemHeight + (m_spacing * 2));
 

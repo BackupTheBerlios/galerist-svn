@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -25,6 +25,7 @@
 #include <QtCore/QModelIndex>
 
 #include <QtGui/QGraphicsItem>
+#include <QtGui/QGradient>
 
 
 class QGraphicsItemAnimation;
@@ -54,7 +55,7 @@ class PhotoPixmap;
  * @short A photo in a PhotoView.
  *
  * @author Jernej Kos <kostko@unimatrix-one.org>
- * @author Gregor Kališnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class PhotoItem : public QObject, public QGraphicsItemGroup
 {
@@ -74,6 +75,11 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      * Zooming step.
      */
     static const int ItemZoomStep = 50;
+
+    /**
+     * Pixmap position.
+     */
+    static const QPoint PixmapPosition;
 
     /**
      * Class constructor.
@@ -320,6 +326,9 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     bool m_hide;
 
     int m_rotation;
+
+    QGradient m_normalGradient;
+    QGradient m_hoverGradient;
 
     // Connection with the model
     GCore::ImageItem *m_item;

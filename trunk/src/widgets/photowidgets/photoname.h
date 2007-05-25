@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -44,7 +44,7 @@ namespace GPhotoWidgets
 /**
  * Class that represents the name of the Photo.
  * @short Name of the photo.
- * @author Gregor Kališnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class PhotoName : public QObject, public QGraphicsSimpleTextItem
 {

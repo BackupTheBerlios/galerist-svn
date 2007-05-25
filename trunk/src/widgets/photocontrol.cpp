@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -246,21 +246,21 @@ void PhotoControl::valuesChanged()
 {
   switch (m_currentOperation) {
     case (GCore::GJobs::TransformationJob::Crop) : {
-        m_cropPage.saveButton->setEnabled(true);
-        break;
-      }
+      m_cropPage.saveButton->setEnabled(true);
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Blur) : {
-        m_params.insert(GCore::GJobs::TransformationJob::NumberFilter, static_cast<quint8>(m_blurPage.slider->value()));
-        break;
-      }
+      m_params.insert(GCore::GJobs::TransformationJob::NumberFilter, static_cast<quint8>(m_blurPage.slider->value()));
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Sharpen) : {
-        m_params.insert(GCore::GJobs::TransformationJob::NumberFilter, m_sharpenPage.slider->value());
-        break;
-      }
+      m_params.insert(GCore::GJobs::TransformationJob::NumberFilter, m_sharpenPage.slider->value());
+      break;
+    }
     case (GCore::GJobs::TransformationJob::Resize) : {
-        m_params.insert(GCore::GJobs::TransformationJob::Size, QSize(m_resizePage.widthBox->value(), m_resizePage.heightBox->value()));
-        break;
-      }
+      m_params.insert(GCore::GJobs::TransformationJob::Size, QSize(m_resizePage.widthBox->value(), m_resizePage.heightBox->value()));
+      break;
+    }
     default : {
       break;
     }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -31,7 +31,7 @@ namespace GWizard {
 
 /**
  * @short The summary page for GDialogs::NewGalleryWizard.
- * @author Gregor Kalisnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class SummaryPage : public QWizardPage, private Ui::SummaryPage
 {

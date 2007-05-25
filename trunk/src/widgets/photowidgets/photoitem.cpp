@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kalisnik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -49,6 +49,8 @@ namespace GWidgets
 
 namespace GPhotoWidgets
 {
+
+const QPoint PhotoItem::PixmapPosition = QPoint(30, 15);
 
 PhotoItem::PhotoItem(PhotoView *view, const QModelIndex &index)
     : QObject(0),
@@ -109,12 +111,24 @@ void PhotoItem::setupUi()
   m_rect->setRect(0, 0, ItemWidth, ItemHeight);
   m_rect->setZValue(1);
 
-  m_rect->setBrush(QBrush(QColor(231, 231, 231)));
+  QLinearGradient normalGradient(QPoint(0, 0), QPoint(0, ItemHeight));
+  normalGradient.setColorAt(0, QColor(231, 231, 231));
+  normalGradient.setColorAt(0.6, QColor(200, 200, 200));
+  normalGradient.setColorAt(1, QColor(150, 150, 150));
+  m_normalGradient = normalGradient;
+
+  QLinearGradient hoverGradient(QPoint(0, 0), QPoint(0, ItemHeight));
+  hoverGradient.setColorAt(0, QColor(204, 204, 204));
+  hoverGradient.setColorAt(0.6, QColor(170, 170, 170));
+  hoverGradient.setColorAt(1, QColor(120, 120, 120));
+  m_hoverGradient = hoverGradient;
+  
+  m_rect->setBrush(QBrush(m_normalGradient));
   m_rect->setPen(QPen(QColor(231, 231, 231)));
 
   m_pixmap = new PhotoPixmap(this, m_view->scene());
   m_pixmap->setAcceptsHoverEvents(true);
-  m_pixmap->setPos(20, 5);
+  m_pixmap->setPos(PixmapPosition);
   m_pixmap->setZValue(2);
   m_pixmap->setTransformationMode(Qt::SmoothTransformation);
   m_pixmap->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
@@ -157,7 +171,7 @@ void PhotoItem::setPixmap(const QPixmap &pixmap)
   qreal height = m_pixmap->pixmap().height();
   m_rotation = 0;
 
-  m_pixmap->setPos(((30 + 128) / 2) - (width / 2), ((5 + 128) / 2) - (height / 2));
+  m_pixmap->setPos(((PixmapPosition.x() + 128) / 2) - (width / 2), ((PixmapPosition.y() + 128) / 2) - (height / 2));
 
   delete m_fullsizePixmap;
   m_fullsizePixmap = 0;
@@ -200,7 +214,7 @@ void PhotoItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
   Q_UNUSED(event)
 
-  m_rect->setBrush(QBrush(QColor(204, 204, 204)));
+  m_rect->setBrush(QBrush(m_hoverGradient));
   m_rect->setPen(QPen(QColor(0, 0, 0)));
 }
 
@@ -208,7 +222,7 @@ void PhotoItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
   Q_UNUSED(event)
 
-  m_rect->setBrush(QBrush(QColor(231, 231, 231)));
+  m_rect->setBrush(QBrush(m_normalGradient));
   m_rect->setPen(QPen(QColor(231, 231, 231)));
 }
 

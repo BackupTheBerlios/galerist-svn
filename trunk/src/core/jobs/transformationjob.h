@@ -42,7 +42,7 @@ namespace GJobs
 
 /**
  * @short Transformation of images like crop, resize, etc.
- * @author Gregor Kališnik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class TransformationJob : public AbstractJob
 {
