@@ -27,68 +27,8 @@ namespace GWidgets
 {
 
 /**
- * @short A bubble like label. "Floating" of course.
- * @author Gregor Kališnik <gregor@podnapisi.net>
- */
-class TipLabel : public QLabel
-{
-    Q_OBJECT
-  public:
-    /**
-     * A default constructor.
-     */
-    TipLabel(QWidget *parent = 0);
-
-    /**
-     * Overloaded method for moving the widget. The only reason is it saves the position.
-     *
-     * @param pos Position to move to.
-     */
-    void move(const QPoint &pos);
-
-    /**
-     * Method for setting the text.
-     *
-     * @param text Text to show.
-     */
-    void setText(const QString &text);
-
-    /**
-     * Returns the current text.
-     *
-     * @return The text.
-     */
-    QString text();
-
-    /**
-     * A destructor.
-     */
-    ~TipLabel();
-
-  public slots:
-    /**
-     * A closing slot.
-     */
-    void slotClose();
-
-  protected:
-    /**
-     * Defines it's own painting event.
-     */
-    void paintEvent(QPaintEvent*);
-
-  private:
-    QPoint m_pos;
-    static TipLabel *m_tipLabel;
-    QString m_text;
-
-    friend class ToolTip;
-
-};
-
-/**
  * @short Class for showing text in a bubble like widget.
- * @author Gregor Kališ¡nik <gregor@podnapisi.net>
+ * @author Gregor Kališnik <gregor@podnapisi.net>
  */
 class ToolTip
 {
