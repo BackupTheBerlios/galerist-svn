@@ -102,14 +102,14 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      *
      * @see MainWindow#slotRoundBackground
      */
-    void slotDefaultBackground(bool checked);
+    void slotRectangularBackground(bool checked);
 
     /**
      * Slots that sets the background to rounded rectangles.
      *
      * @param checked Sets it if true, if false cheks what is selected.
      *
-     * @see MainWindow#slotDefaultBackground
+     * @see MainWindow#slotRectangularBackground
      */
     void slotRoundBackground(bool checked);
 

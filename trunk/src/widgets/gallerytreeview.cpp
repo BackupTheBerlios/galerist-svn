@@ -30,8 +30,6 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
 
-#include <QtCore/QtDebug>
-
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
 #include "core/data.h"

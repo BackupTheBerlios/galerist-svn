@@ -61,7 +61,7 @@ class Data : public QObject
 
     enum BackgroundType {
       Round,
-      Default,
+      Rectangular,
       NotDefined
   };
 

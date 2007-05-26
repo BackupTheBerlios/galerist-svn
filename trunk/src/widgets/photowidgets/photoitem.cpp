@@ -42,8 +42,6 @@
 #include "widgets/photowidgets/photorect.h"
 #include "widgets/photowidgets/photopixmap.h"
 
-#include <QtCore/QtDebug>
-
 namespace GWidgets
 {
 
@@ -112,19 +110,21 @@ void PhotoItem::setupUi()
   m_rect->setZValue(1);
 
   QLinearGradient normalGradient(QPoint(0, 0), QPoint(0, ItemHeight));
-  normalGradient.setColorAt(0, QColor(231, 231, 231));
-  normalGradient.setColorAt(0.6, QColor(200, 200, 200));
-  normalGradient.setColorAt(1, QColor(150, 150, 150));
+  normalGradient.setColorAt(0, QColor(228, 241, 247));
+  normalGradient.setColorAt(0.5, QColor(240, 249, 254));
+  normalGradient.setColorAt(1, QColor(228, 241, 247));
   m_normalGradient = normalGradient;
+  m_normalBorder = QPen(QColor(134, 201, 239));
 
   QLinearGradient hoverGradient(QPoint(0, 0), QPoint(0, ItemHeight));
-  hoverGradient.setColorAt(0, QColor(204, 204, 204));
-  hoverGradient.setColorAt(0.6, QColor(170, 170, 170));
-  hoverGradient.setColorAt(1, QColor(120, 120, 120));
+  hoverGradient.setColorAt(0, QColor(202, 232, 245));
+  hoverGradient.setColorAt(0.5, QColor(213, 241, 252));
+  hoverGradient.setColorAt(1, QColor(202, 232, 245));
   m_hoverGradient = hoverGradient;
+  m_hoverBorder = QPen(QColor(159, 211, 249));
   
   m_rect->setBrush(QBrush(m_normalGradient));
-  m_rect->setPen(QPen(QColor(231, 231, 231)));
+  m_rect->setPen(m_normalBorder);
 
   m_pixmap = new PhotoPixmap(this, m_view->scene());
   m_pixmap->setAcceptsHoverEvents(true);
@@ -215,7 +215,7 @@ void PhotoItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
   Q_UNUSED(event)
 
   m_rect->setBrush(QBrush(m_hoverGradient));
-  m_rect->setPen(QPen(QColor(0, 0, 0)));
+  m_rect->setPen(m_hoverBorder);
 }
 
 void PhotoItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
@@ -223,7 +223,7 @@ void PhotoItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
   Q_UNUSED(event)
 
   m_rect->setBrush(QBrush(m_normalGradient));
-  m_rect->setPen(QPen(QColor(231, 231, 231)));
+  m_rect->setPen(m_normalBorder);
 }
 
 void PhotoItem::keyPressEvent(QKeyEvent *event)
@@ -311,7 +311,7 @@ QPointF PhotoItem::getScaledSize()
 void PhotoItem::fullSizePixmap()
 {
   if (!m_fullsizePixmap) {
-    m_view->showLoading(true, tr("Sharpening image. Please wait."));
+    m_view->showLoading(true, tr("Sharpening image, please wait"));
     QPixmap pixmap = QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>());
 
     m_fullsizePixmap = new QPixmap(pixmap);
@@ -432,7 +432,7 @@ void PhotoItem::blurPreview(int blurFilters)
 {
   m_item->blur(blurFilters);
 
-  m_view->showLoading(true, tr("Generating blur preview. Please wait."));
+  m_view->showLoading(true, tr("Generating blur preview, please wait"));
 }
 
 void PhotoItem::saveBlur()
@@ -441,14 +441,14 @@ void PhotoItem::saveBlur()
 
   closeTransformations();
 
-  m_view->showLoading(true, tr("Saving image with blur filters. Please wait."));
+  m_view->showLoading(true, tr("Saving image with blur filters, please wait"));
 }
 
 void PhotoItem::sharpenPreview(int sharpenFilters)
 {
   m_item->sharpen(sharpenFilters);
 
-  m_view->showLoading(true, tr("Generating sharpen preview. Please wait."));
+  m_view->showLoading(true, tr("Generating sharpen preview, please wait"));
 }
 
 void PhotoItem::saveSharpen()
@@ -457,14 +457,14 @@ void PhotoItem::saveSharpen()
 
   closeTransformations();
 
-  m_view->showLoading(true, tr("Saving image with blur filters. Please wait."));
+  m_view->showLoading(true, tr("Saving image with blur filters, please wait"));
 }
 
 void PhotoItem::resizePreview(const QSize &size)
 {
   m_item->resize(size);
 
-  m_view->showLoading(true, tr("Generating resize preview. Please wait."));
+  m_view->showLoading(true, tr("Generating resize preview, please wait"));
 }
 
 void PhotoItem::saveResize()
@@ -473,7 +473,7 @@ void PhotoItem::saveResize()
 
   closeTransformations();
 
-  m_view->showLoading(true, tr("Saving resized image. Please wait."));
+  m_view->showLoading(true, tr("Saving resized image, please wait"));
 }
 
 void PhotoItem::cancelTransformations()
@@ -488,7 +488,7 @@ void PhotoItem::cancelTransformations()
 void PhotoItem::rotate(int rotation)
 {
   Q_UNUSED(rotation)
-  m_view->showLoading(true, tr("Rotating. Please wait."));
+  m_view->showLoading(true, tr("Rotating image, please wait"));
 
   /*initialiseTimer();
   m_rotation += rotation;

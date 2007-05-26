@@ -24,20 +24,21 @@
 #include <QtGui/QGraphicsTextItem>
 #include <QtGui/QGraphicsPixmapItem>
 
+#include <QtCore/QtDebug>
+
 namespace GWidgets {
 
 namespace GPhotoWidgets {
 
 PhotoLoading::PhotoLoading(QGraphicsScene *scene)
- : QGraphicsItemGroup(0, scene)
+ : QGraphicsItemGroup(0, scene),
+   m_dots(0)
 {
-  //QGraphicsPixmapItem *logo = new QGraphicsPixmapItem(QPixmap(":/images/galerist-small.png"), this);
-  //addToGroup(logo);
   m_text = new QGraphicsTextItem(this);
   m_text->setFont(QFont("", 20));
   m_text->setPos(m_text->pos() + QPoint(40, 0));
-  m_text->setDefaultTextColor(QColor(255, 255, 255));
   addToGroup(m_text);
+  startTimer(500);
 }
 
 PhotoLoading::~PhotoLoading()
@@ -47,7 +48,9 @@ PhotoLoading::~PhotoLoading()
 void PhotoLoading::setText(const QString &text)
 {
   removeFromGroup(m_text);
-  m_text->setHtml(text);
+  m_text->setPlainText(text + "...");
+  m_dots = 3;
+  m_rawText = text;
   addToGroup(m_text);
 }
 
@@ -68,16 +71,27 @@ void PhotoLoading::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWi
   painter->save();
   painter->setRenderHint(QPainter::Antialiasing, true);
 
-  QLinearGradient gradient(boundingRect().topLeft(), boundingRect().bottomLeft());
-  gradient.setColorAt(0, QColor(75, 128, 209, 240));
-  gradient.setColorAt(0.6, QColor(45, 98, 179, 240));
-  gradient.setColorAt(1, QColor(5, 58, 119, 240));
+  QLinearGradient normalGradient(boundingRect().topLeft(), boundingRect().bottomLeft());
+  normalGradient.setColorAt(0, QColor(228, 241, 247));
+  normalGradient.setColorAt(0.5, QColor(240, 249, 254));
+  normalGradient.setColorAt(1, QColor(228, 241, 247));
 
-  painter->setPen(QColor(0, 0, 255));
-  painter->setBrush(QBrush(gradient));
+  painter->setPen(QColor(134, 201, 239));
+  painter->setBrush(QBrush(normalGradient));
   painter->drawRoundRect(boundingRect(), 10, 70);
 
   painter->restore();
+}
+
+void PhotoLoading::timerEvent(QTimerEvent *event)
+{
+  if (m_dots < 3) {
+    m_text->setPlainText(m_text->toPlainText() + ".");
+    m_dots++;
+  } else {
+    m_text->setPlainText(m_rawText);
+    m_dots = 0;
+  }
 }
 
 }

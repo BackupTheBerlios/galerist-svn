@@ -148,7 +148,7 @@ void Data::setBackgroundType(BackgroundType type) const
 
 GCore::Data::BackgroundType Data::getBackgroundType() const
 {
-  return static_cast<BackgroundType>(m_settings->value("BackgroundType", Default).toInt());
+  return static_cast<BackgroundType>(m_settings->value("BackgroundType", Round).toInt());
 }
 
 void Data::setOpengl(bool enable) const

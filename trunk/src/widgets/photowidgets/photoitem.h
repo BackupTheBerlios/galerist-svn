@@ -26,6 +26,7 @@
 
 #include <QtGui/QGraphicsItem>
 #include <QtGui/QGradient>
+#include <QtGui/QPen>
 
 
 class QGraphicsItemAnimation;
@@ -328,7 +329,9 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     int m_rotation;
 
     QGradient m_normalGradient;
+    QPen m_normalBorder;
     QGradient m_hoverGradient;
+    QPen m_hoverBorder;
 
     // Connection with the model
     GCore::ImageItem *m_item;

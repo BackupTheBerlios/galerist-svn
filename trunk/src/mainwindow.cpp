@@ -109,7 +109,7 @@ void MainWindow::initActionButtons()
   connect(actionConfiguration, SIGNAL(triggered()), this, SLOT(slotConfiguration()));
 
   // Connect view menu
-  connect(actionDefaultBackground, SIGNAL(toggled(bool)), this, SLOT(slotDefaultBackground(bool)));
+  connect(actionRectangularBackground, SIGNAL(toggled(bool)), this, SLOT(slotRectangularBackground(bool)));
   connect(actionRoundBackground, SIGNAL(toggled(bool)), this, SLOT(slotRoundBackground(bool)));
 
   viewMenu->addAction(galleryDock->toggleViewAction());
@@ -158,7 +158,7 @@ void MainWindow::initToolbar()
         break;
       }
     default: {
-      actionDefaultBackground->setChecked(true);
+      actionRectangularBackground->setChecked(true);
       break;
     }
   }
@@ -196,10 +196,10 @@ void MainWindow::slotNew()
   newWizard->show();
 }
 
-void MainWindow::slotDefaultBackground(bool checked)
+void MainWindow::slotRectangularBackground(bool checked)
 {
   if (checked) {
-    GCore::Data::self()->setBackgroundType(GCore::Data::Default);
+    GCore::Data::self()->setBackgroundType(GCore::Data::Rectangular);
     actionRoundBackground->setChecked(false);
     imageList->viewport()->update();
   } else {
@@ -211,7 +211,7 @@ void MainWindow::slotRoundBackground(bool checked)
 {
   if (checked) {
     GCore::Data::self()->setBackgroundType(GCore::Data::Round);
-    actionDefaultBackground->setChecked(false);
+    actionRectangularBackground->setChecked(false);
     imageList->viewport()->update();
   } else {
     initToolbar();
@@ -270,7 +270,7 @@ void MainWindow::setEditMode(bool edit)
   actionAdd->setDisabled(edit);
   actionRemove->setDisabled(edit);
   actionRemoveGallery->setDisabled(edit);
-  actionDefaultBackground->setDisabled(edit);
+  actionRectangularBackground->setDisabled(edit);
   actionRoundBackground->setDisabled(edit);
   menuSelection->setDisabled(edit);
 }

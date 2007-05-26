@@ -21,6 +21,8 @@
 #ifndef GWIDGETS_GPHOTOWIDGETSPHOTOLOADING_H
 #define GWIDGETS_GPHOTOWIDGETSPHOTOLOADING_H
 
+#include <QtCore/QObject>
+
 #include <QtGui/QGraphicsItemGroup>
 
 namespace GWidgets
@@ -33,7 +35,7 @@ namespace GPhotoWidgets
  * @short For showing loading "dialog" in PhotoView.
  * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
-class PhotoLoading : public QGraphicsItemGroup
+class PhotoLoading : public QGraphicsItemGroup, QObject
 {
   public:
     /**
@@ -66,8 +68,15 @@ class PhotoLoading : public QGraphicsItemGroup
      */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*);
 
+    /**
+     * Reimplemented method.
+     */
+    void timerEvent(QTimerEvent *event);
+
   private:
     QGraphicsTextItem *m_text;
+    QString m_rawText;
+    short m_dots;
 
 };
 

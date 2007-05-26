@@ -44,7 +44,7 @@ void PhotoPixmap::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
   if (isSelected()) {
     painter->setPen(Qt::NoPen);
-    painter->setBrush(QColor(0, 0, 250, 100));
+    painter->setBrush(QColor(0, 0, 250, 50));
     painter->drawRect(exposed);
   }
 }

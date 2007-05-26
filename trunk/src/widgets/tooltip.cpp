@@ -191,19 +191,20 @@ void TipLabel::paintBubble()
   int height = 50;
 
   QPen border;
-  border.setWidth(3);
+  border.setWidth(3.0);
   border.setCosmetic(true);
   border.setCapStyle(Qt::RoundCap);
   border.setJoinStyle(Qt::RoundJoin);
+  border.setColor(QColor(134, 201, 239));
 
   QPainterPath bubblePath = createBubblePath(width, height);
 
   setMask(width, height, bubblePath, border);
 
   QLinearGradient bubbleColor(QPointF(width / 2, 0), QPointF(width / 2, height));
-  bubbleColor.setColorAt(1, QColor(150, 150, 0));
-  bubbleColor.setColorAt(0.7, QColor(200, 200, 0));
-  bubbleColor.setColorAt(0, QColor(255, 255, 60));
+  bubbleColor.setColorAt(0, QColor(228, 241, 247));
+  bubbleColor.setColorAt(0.5, QColor(240, 249, 254));
+  bubbleColor.setColorAt(1, QColor(228, 241, 247));
 
   m_bubble = QImage(width, height + 15, QImage::Format_ARGB32_Premultiplied);
 
@@ -252,7 +253,7 @@ void TipLabel::setMask(int width, int height, const QPainterPath &path, const QP
   mask.fill();
 
   QPen maskBorder(pen);
-  maskBorder.setWidth(maskBorder.width() + 1);
+  maskBorder.setWidth(maskBorder.width() + 1.0);
 
   QPainter maskPainter(&mask);
   maskPainter.setRenderHint(QPainter::Antialiasing, true);

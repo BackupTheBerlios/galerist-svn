@@ -25,8 +25,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <QtCore/QtDebug>
-
 #include "core/data.h"
 #include "core/imageitem.h"
 #include "core/errorhandler.h"
