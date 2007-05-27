@@ -152,6 +152,10 @@ void Updater::getLatestVersion(bool quite)
   parameters[1] = "windows";
   // There is no stable branch at the moment
   parameters[2] = "unstable";
+  // App version number
+  parameters[3] = GCore::Data::self()->getAppVersion().toStdString();
+  // App branch
+  parameters[4] = GCore::Data::self()->getBranch().toLower().toStdString();
   
   if (!m_rpcClient->execute("check", parameters, results)) {
     qDebug("Updater: Cannot check version!");
@@ -160,7 +164,6 @@ void Updater::getLatestVersion(bool quite)
   }
 
   if (!results["available"]) {
-    qDebug("Updater: We are not supported!");
     int errcode = results["errcode"];
     switch (errcode) {
       case (0) : {
@@ -175,41 +178,31 @@ void Updater::getLatestVersion(bool quite)
         GCore::ErrorHandler::reportMessage("This platform is not supported by the UniUpdate service.", GCore::ErrorHandler::Critical);
         break;
       }
+      case (3) : {
+        if (!quite)
+          QMessageBox::information(GCore::Data::self()->getMainWindow(), tr("No update available"), tr("You already have the latest %1 installed.").arg(GCore::Data::self()->getAppName()));
+        break;
+      }
     }
     return;
   }
 
-  QString version = QString::fromStdString(results["version"]);
   m_changelog.setUrl(QString::fromStdString(results["changelog"]));
   m_patch.setUrl(QString::fromStdString(results["patch"]));
 
-  checkVersions(version, quite);
-}
-
-void Updater::checkVersions(const QString &newVersion, bool quite)
-{
-  QString version = newVersion;
-  version.remove("\n").replace(" ", "_");
-  // Is it newer?
-  if (version > GCore::Data::self()->getAppVersion().replace(" ", "_")) {
-    // We save the new version tag
-    m_latestVersion = version.replace(" ", "_");
-
-    // Ask if we download the update
-    switch (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Update available"), tr("A new version of %1 is available. Your version is %2 and the latest is %3.\n\nDo you want to install it?").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion()).arg(version), tr("&Update"), tr("Do &not update"), tr("Show &changelog"), 0, 1)) {
-      case (0) : {
-        downloadUpdate();
-        break;
-      }
-      case (2) : {
-        showChangeLog();
-        break;
-      }
+  // Ask if we download the update
+  switch (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Update available"), tr("A new version of %1 is available. Your version is %2 and the latest is %3.\n\nDo you want to install it?").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion()).arg(version), tr("&Update"), tr("Do &not update"), tr("Show &changelog"), 0, 1)) {
+    case (0) : {
+      downloadUpdate();
+      break;
     }
-  } else if (!quite) {
-    // Just notify that it's the newest version
-    QMessageBox::information(GCore::Data::self()->getMainWindow(), tr("No update available"), tr("You already have the latest %1 installed.").arg(GCore::Data::self()->getAppName()));
+    case (2) : {
+      showChangeLog();
+      break;
+    }
   }
+
+
 }
 
 }

@@ -298,14 +298,20 @@ QString Data::getAppName() const
   return qApp->applicationName();
 }
 
-void Data::setAppVersion(const QString &version)
+void Data::setAppVersion(const QString &version, const QString &branch)
 {
   m_appVersion = version;
+  m_branch = branch;
 }
 
 QString Data::getAppVersion() const
 {
   return m_appVersion;
+}
+
+QString Data::getBranch() const
+{
+  return m_branch;
 }
 
 void Data::setSupportedFormats(const QRegExp &supportedFormats)

@@ -112,14 +112,6 @@ class Updater : public QObject
      * @param quite don't show the progress bar.
      */
     void getLatestVersion(bool quite);
-
-    /**
-     * Convenience method for checking versions.
-     *
-     * @param newVersion The new version string.
-     * @param quite Be more quite or not.
-     */
-    void checkVersions(const QString &newVersion, bool quite = false);
 };
 
 }

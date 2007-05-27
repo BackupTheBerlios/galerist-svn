@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
   app.setOrganizationName("Unimatrix-One");
   app.setApplicationName("Goya");
-  GCore::Data::self()->setAppVersion("0.2");
+  GCore::Data::self()->setAppVersion("0.2", "unstable");
   GCore::Data::self()->setSupportedFormats(QRegExp("gif|jpg|jpeg|png"));
 
   QTranslator translation;

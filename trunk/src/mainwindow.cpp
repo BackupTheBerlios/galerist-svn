@@ -235,8 +235,6 @@ void MainWindow::slotAddImages()
 {
   QStringList pictures = QFileDialog::getOpenFileNames(this, tr("Add images"), QDir::homePath(), tr("Images (*.png *.gif *.jpg *.jpeg)"));
 
-  //addImages(pictures);
-
   // Add images
   QString image = pictures.first();
   image.remove(QRegExp("^.+/"));
@@ -264,6 +262,9 @@ void MainWindow::setEditMode(bool edit)
   imageControlWidget->setVisible(edit);
   galleryDock->setVisible(!edit);
   galleryDock->toggleViewAction()->setEnabled(!edit);
+
+  // Hide main toolbar
+  mainBar->setVisible(!edit);
 
   // Disable all actions
   actionNew->setDisabled(edit);

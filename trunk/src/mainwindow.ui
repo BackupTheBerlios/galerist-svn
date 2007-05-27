@@ -205,7 +205,7 @@
   </action>
   <action name="actionAboutQt" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="resources.qrc" >:/images/qt.png</iconset>
    </property>
    <property name="text" >
     <string>About &amp;Qt</string>

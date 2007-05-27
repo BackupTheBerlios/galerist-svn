@@ -288,8 +288,9 @@ class Data : public QObject
      * Sets the version (hard-coded just used in main.cpp).
      *
      * @param version Version string
+     * @param branch Branch name
      */
-    void setAppVersion(const QString &version);
+    void setAppVersion(const QString &version, const QString& branch);
 
     /**
      * Returns the version of the application.
@@ -297,6 +298,13 @@ class Data : public QObject
      * @return Version string.
      */
     QString getAppVersion() const;
+
+    /**
+     * Returns the branch.
+     *
+     * @return Branch name.
+     */
+    QString getBranch() const;
 
     /**
      * Set the list of supported images.
@@ -360,6 +368,7 @@ class Data : public QObject
     QMenu *m_galleryContextMenu;
     Translations m_availableTranslations;
     QString m_appVersion;
+    QString m_branch;
 #ifdef WANT_UPDATER
     GNetwork::Updater *m_updater;
 #endif
