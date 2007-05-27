@@ -58,7 +58,7 @@ Updater::Updater(QObject *parent)
   m_progressDialog = new QProgressDialog(QString(), tr("&Cancel"), 0, 0, GCore::Data::self()->getMainWindow(), Qt::WindowStaysOnTopHint);
   m_progressDialog->hide();
 
-  m_rpcClient = new XmlRpc::XmlRpcClient("update.unimatrix-one.org", 8000);
+  m_rpcClient = new XmlRpc::XmlRpcClient("francl", 8000);
 
   connect(m_httpClient, SIGNAL(requestFinished(int, bool)), this, SLOT(slotProcess(int, bool)));
   connect(m_progressDialog, SIGNAL(canceled()), m_httpClient, SLOT(abort()));
@@ -77,10 +77,10 @@ void Updater::slotProcess(int requestId, bool error)
 {
   // Check if there was an error
   if (!error) {
-    m_progressDialog->hide();
     QString response = m_httpClient->readAll();
     // Get the changelog
     if (requestId == m_changeLogRequestId) {
+      m_progressDialog->hide();
       m_changeLogRequestId = -1;
       if (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Changelog"), tr("The changelog:\n\n%1").arg(response), tr("&Update"), tr("Do &not update"), QString(), 0, 1) == 0)
         downloadUpdate();
@@ -165,33 +165,35 @@ void Updater::getLatestVersion(bool quite)
 
   if (!results["available"]) {
     int errcode = results["errcode"];
-    switch (errcode) {
-      case (0) : {
-        GCore::ErrorHandler::reportMessage("This application is not supported by the UniUpdate service.", GCore::ErrorHandler::Critical);
-        break;
-      }
-      case (1) : {
-        GCore::ErrorHandler::reportMessage("Selected branch does not exist on UniUpdate server.", GCore::ErrorHandler::Critical);
-        break;
-      }
-      case (2) : {
-        GCore::ErrorHandler::reportMessage("This platform is not supported by the UniUpdate service.", GCore::ErrorHandler::Critical);
-        break;
-      }
-      case (3) : {
-        if (!quite)
+    //if (!quite)
+      switch (errcode) {
+        case (0) : {
+          GCore::ErrorHandler::reportMessage("This application is not supported by the UniUpdate service.", GCore::ErrorHandler::Critical);
+          break;
+        }
+        case (1) : {
+          GCore::ErrorHandler::reportMessage("Selected branch does not exist on UniUpdate server.", GCore::ErrorHandler::Critical);
+          break;
+        }
+        case (2) : {
+          GCore::ErrorHandler::reportMessage("This platform is not supported by the UniUpdate service.", GCore::ErrorHandler::Critical);
+          break;
+        }
+        case (3) : {
           QMessageBox::information(GCore::Data::self()->getMainWindow(), tr("No update available"), tr("You already have the latest %1 installed.").arg(GCore::Data::self()->getAppName()));
-        break;
-      }
+          break;
+        }
     }
     return;
   }
 
+  QString version = QString::fromStdString(results["version"]);
+  QString branch = QString::fromStdString(results["branch"]);
   m_changelog.setUrl(QString::fromStdString(results["changelog"]));
   m_patch.setUrl(QString::fromStdString(results["patch"]));
 
   // Ask if we download the update
-  switch (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Update available"), tr("A new version of %1 is available. Your version is %2 and the latest is %3.\n\nDo you want to install it?").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion()).arg(version), tr("&Update"), tr("Do &not update"), tr("Show &changelog"), 0, 1)) {
+  switch (QMessageBox::question(GCore::Data::self()->getMainWindow(), tr("Update available"), tr("A new version of %1 is available. Your version is %2 %3 and the latest is %4 %5.\n\nDo you want to install it?").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion()).arg(GCore::Data::self()->getBranch()).arg(version).arg(branch), tr("&Update"), tr("Do &not update"), tr("Show &changelog"), 0, 1)) {
     case (0) : {
       downloadUpdate();
       break;
