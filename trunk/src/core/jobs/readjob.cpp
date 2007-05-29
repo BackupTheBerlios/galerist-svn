@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -125,7 +125,7 @@ void ReadJob::readPath(const QDir &path)
     items.removeAll(".");
     items.removeAll("..");
 
-    foreach (QString item, items) {
+    foreach(QString item, items) {
       QDir temp = path;
       temp.cd(item);
       readPath(temp);
@@ -137,10 +137,10 @@ void ReadJob::readPath(const QDir &path)
   QStringList images = path.entryList(QDir::Files);
   if (!m_images.isEmpty())
     images = m_images;
-  foreach (QString image, images) {
+  foreach(QString image, images) {
     if (getStop())
       return;
-    
+
     if (!image.contains(GCore::Data::self()->getSupportedFormats()) || QFileInfo(path, image).size() == 0)
       continue;
 

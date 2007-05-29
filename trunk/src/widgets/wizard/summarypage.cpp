@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -21,12 +21,14 @@
 #include "summarypage.h"
 
 
-namespace GWidgets {
+namespace GWidgets
+{
 
-namespace GWizard {
+namespace GWizard
+{
 
 SummaryPage::SummaryPage()
- : QWizardPage()
+    : QWizardPage()
 {
   setTitle(tr("Summary"));
   setSubTitle(tr("Summary of selected options"));
@@ -36,8 +38,7 @@ SummaryPage::SummaryPage()
 }
 
 SummaryPage::~SummaryPage()
-{
-}
+{}
 
 void SummaryPage::initializePage()
 {

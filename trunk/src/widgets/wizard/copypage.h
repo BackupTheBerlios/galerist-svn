@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -24,17 +24,19 @@
 #include <QtGui/QWizardPage>
 #include "ui_copypage.h"
 
-namespace GWidgets {
+namespace GWidgets
+{
 
-namespace GWizard {
+namespace GWizard
+{
 
 /**
  * @short Copy page for GDialogs::NewGalleryWizard.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class CopyPage : public QWizardPage, private Ui::CopyPage
 {
-  Q_OBJECT
+    Q_OBJECT
   public:
     /**
      * A default constructor.

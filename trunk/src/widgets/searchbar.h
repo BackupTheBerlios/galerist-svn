@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -25,17 +25,18 @@
 
 class QHBoxLayout;
 
-namespace GWidgets {
+namespace GWidgets
+{
 
 class LineEdit;
 
 /**
  * @short A search bar for an easier way of search.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class SearchBar : public QWidget
 {
-  Q_OBJECT
+    Q_OBJECT
   signals:
     /**
      * Emited when SearchBar loses focus (aka gets hidden).

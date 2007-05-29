@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -21,6 +21,8 @@
 #ifndef GDIALOGSUNIUPDATE_H
 #define GDIALOGSUNIUPDATE_H
 
+#ifdef WANT_UPDATER
+
 #include <QtGui/QDialog>
 
 #include "ui_uniupdate.h"
@@ -38,7 +40,7 @@ namespace GDialogs
 
 /**
  * @short Frontend class for UniUpdate services.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class UniUpdate : public QDialog, private Ui::UniUpdate
 {
@@ -97,5 +99,7 @@ class UniUpdate : public QDialog, private Ui::UniUpdate
 };
 
 }
+
+#endif
 
 #endif

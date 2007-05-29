@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -39,7 +39,7 @@ class CopyJob;
 
 /**
  * @short The model with images and all of its data.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class ImageModel : public QAbstractItemModel
 {
@@ -82,7 +82,7 @@ class ImageModel : public QAbstractItemModel
       ImagePictureRole       = Qt::UserRole + 8,
       /** Returns the pointer to the object */
       ObjectRole             = Qt::UserRole + 9
-    };
+  };
 
     /**
      * Directions for rotating images.
@@ -93,7 +93,7 @@ class ImageModel : public QAbstractItemModel
       ClockWise,
       /** Counter clock-wise direction */
       CounterClockWise
-    };
+  };
 
     /**
      * A constructor.

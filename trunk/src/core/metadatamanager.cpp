@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -58,7 +58,7 @@ MetaDataManager::MetaDataManager(const QString &galleryPath, QObject *parent)
 int MetaDataManager::addImage(const QString &filename) const
 {
   QVariant id = m_metadataFile.exec("INSERT INTO image (filename) VALUES ('" + filename + "');").lastInsertId();
-  
+
   if (id.isValid())
     return id.toInt();
   else

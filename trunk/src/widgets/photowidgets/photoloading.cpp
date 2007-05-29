@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -26,13 +26,15 @@
 
 #include <QtCore/QtDebug>
 
-namespace GWidgets {
+namespace GWidgets
+{
 
-namespace GPhotoWidgets {
+namespace GPhotoWidgets
+{
 
 PhotoLoading::PhotoLoading(QGraphicsScene *scene)
- : QGraphicsItemGroup(0, scene),
-   m_dots(0)
+    : QGraphicsItemGroup(0, scene),
+    m_dots(0)
 {
   m_text = new QGraphicsTextItem(this);
   m_text->setFont(QFont("", 20));
@@ -42,8 +44,7 @@ PhotoLoading::PhotoLoading(QGraphicsScene *scene)
 }
 
 PhotoLoading::~PhotoLoading()
-{
-}
+{}
 
 void PhotoLoading::setText(const QString &text)
 {
@@ -85,6 +86,8 @@ void PhotoLoading::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWi
 
 void PhotoLoading::timerEvent(QTimerEvent *event)
 {
+  Q_UNUSED(event)
+
   if (m_dots < 3) {
     m_text->setPlainText(m_text->toPlainText() + ".");
     m_dots++;

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -122,7 +122,7 @@ void PhotoItem::setupUi()
   hoverGradient.setColorAt(1, QColor(202, 232, 245));
   m_hoverGradient = hoverGradient;
   m_hoverBorder = QPen(QColor(159, 211, 249));
-  
+
   m_rect->setBrush(QBrush(m_normalGradient));
   m_rect->setPen(m_normalBorder);
 
@@ -235,13 +235,13 @@ void PhotoItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
   switch (event->button()) {
     case (Qt::LeftButton) : {
-        QGraphicsItemGroup::mousePressEvent(event);
-        break;
-      }
+      QGraphicsItemGroup::mousePressEvent(event);
+      break;
+    }
     case (Qt::MidButton) : {
-        mouseDoubleClickEvent(event);
-        break;
-      }
+      mouseDoubleClickEvent(event);
+      break;
+    }
     default : {
       return;
     }
@@ -696,16 +696,16 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
 
       // We calculate how much spreading is needed for photo to fit the view
       if (m_view->width() < m_view->height())
-        scaleMultiplier = static_cast<qreal> (m_view->width() - 20) / static_cast<qreal> (m_pixmap->pixmap().width());
+        scaleMultiplier = static_cast<qreal>(m_view->width() - 20) / static_cast<qreal>(m_pixmap->pixmap().width());
       else
-        scaleMultiplier = static_cast<qreal> (m_view->height() - 20) / static_cast<qreal> (m_pixmap->pixmap().height());
+        scaleMultiplier = static_cast<qreal>(m_view->height() - 20) / static_cast<qreal>(m_pixmap->pixmap().height());
 
       // And calculation for fullsized photo to fit the view
       if (m_fullsizePixmap) {
         if (m_view->width() < m_view->height())
-          scaleFullscreenMultiplier = static_cast<qreal> (m_view->width() - 20) / static_cast<qreal> (m_fullsizePixmap->width());
+          scaleFullscreenMultiplier = static_cast<qreal>(m_view->width() - 20) / static_cast<qreal>(m_fullsizePixmap->width());
         else
-          scaleFullscreenMultiplier = static_cast<qreal> (m_view->height() - 20) / static_cast<qreal> (m_fullsizePixmap->height());
+          scaleFullscreenMultiplier = static_cast<qreal>(m_view->height() - 20) / static_cast<qreal>(m_fullsizePixmap->height());
 
         m_fullsize = true;
 

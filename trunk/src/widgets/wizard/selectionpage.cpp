@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -36,24 +36,26 @@
 #include <QtGui/QIcon>
 #include <QtGui/QPixmap>
 
-namespace GWidgets {
+namespace GWidgets
+{
 
-namespace GWizard {
+namespace GWizard
+{
 
 SelectionPage::SelectionPage()
     : QWizardPage(),
-      m_initialised(false),
-      m_readJob(0)
+    m_initialised(false),
+    m_readJob(0)
 {
   setTitle(tr("Gallery settings"));
   setSubTitle(tr("Main settings of the new gallery"));
-  
+
   setupUi(this);
-  
+
   registerField("GalleryName*", nameEdit);
   registerField("GalleryPath*", imagesEdit);
   registerField("ParentGallery", parentBox);
-  
+
   connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowseClicked()));
 }
 
@@ -63,8 +65,7 @@ SelectionPage::~SelectionPage()
 }
 
 void SelectionPage::cleanupPage()
-{
-}
+{}
 
 void SelectionPage::initializePage()
 {
@@ -97,7 +98,7 @@ bool SelectionPage::isComplete() const
 {
   if (checkImagesPath(imagesEdit->text()) && checkName(nameEdit->text()))
     return QWizardPage::isComplete();
-  
+
   return false;
 }
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -114,69 +114,69 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
 
   switch (role) {
     case Qt::DisplayRole : {
-        return item->name();
-      }
+      return item->name();
+    }
     case Qt::ToolTipRole : {
-        if (item->imageType() == ImageItem::Gallery) {
-          return item->name();
-        } else {
-          ExifManager exifData(item->getFilePath(), GCore::Data::self()->getImageModel());
+      if (item->imageType() == ImageItem::Gallery) {
+        return item->name();
+      } else {
+        ExifManager exifData(item->getFilePath(), GCore::Data::self()->getImageModel());
 
-          QString date;
-          if (!exifData.getCreationDate().isValid())
-            date = tr("Unavailable");
-          else
-            date = exifData.getCreationDate().toString(Qt::SystemLocaleDate);
+        QString date;
+        if (!exifData.getCreationDate().isValid())
+          date = tr("Unavailable");
+        else
+          date = exifData.getCreationDate().toString(Qt::SystemLocaleDate);
 
-          QString message = tr("EXIF information:") + "<table>";
-          message += "<tr><td>" + tr("Camera manufacturer:") + " </td><td> " + exifData.getCameraMaker() + "</td></tr>";
-          message += "<tr><td>" + tr("Camera model:") + " </td><td> " + exifData.getCameraModel() + "</td></tr>";
-          message += "<tr><td>" + tr("Aperture:") + " </td><td> " + exifData.getAperture() + "</td></tr>";
-          message += "<tr><td>" + tr("Creation Date:") + " </td><td> " + date + "</td></tr>";
-          message += "<tr><td>" + tr("Shutter speed:") + " </td><td> " + exifData.getShutterSpeed() + "</td></tr>";
-          message += "<tr><td>" + tr("Exposure time:") + " </td><td> " + exifData.getExposureTime() + "</td></tr>";
-          message += "<tr><td>" + tr("Focal length:") + " </td><td> " + exifData.getFocalLength() + "</td></tr>";
-          message += "<tr><td>" + tr("Flash: ") + " </td><td> " + exifData.getFlash() + "</td></tr></table>";
-          return item->name() + ": <i>" + item->description().replace('\n', "<br/>") + "</i>" + "<p>" + message + "</p>";
-        }
+        QString message = tr("EXIF information:") + "<table>";
+        message += "<tr><td>" + tr("Camera manufacturer:") + " </td><td> " + exifData.getCameraMaker() + "</td></tr>";
+        message += "<tr><td>" + tr("Camera model:") + " </td><td> " + exifData.getCameraModel() + "</td></tr>";
+        message += "<tr><td>" + tr("Aperture:") + " </td><td> " + exifData.getAperture() + "</td></tr>";
+        message += "<tr><td>" + tr("Creation Date:") + " </td><td> " + date + "</td></tr>";
+        message += "<tr><td>" + tr("Shutter speed:") + " </td><td> " + exifData.getShutterSpeed() + "</td></tr>";
+        message += "<tr><td>" + tr("Exposure time:") + " </td><td> " + exifData.getExposureTime() + "</td></tr>";
+        message += "<tr><td>" + tr("Focal length:") + " </td><td> " + exifData.getFocalLength() + "</td></tr>";
+        message += "<tr><td>" + tr("Flash: ") + " </td><td> " + exifData.getFlash() + "</td></tr></table>";
+        return item->name() + ": <i>" + item->description().replace('\n', "<br/>") + "</i>" + "<p>" + message + "</p>";
       }
+    }
     case Qt::DecorationRole : {
-        if (index.column() == 0)
-          return fileIcon(index);
-      }
+      if (index.column() == 0)
+        return fileIcon(index);
+    }
     case ImageModel::ImageDescriptionRole : {
-        if (item->imageType() != ImageItem::Image)
-          return QVariant();
+      if (item->imageType() != ImageItem::Image)
+        return QVariant();
 
-        return item->description();
-      }
+      return item->description();
+    }
     case ImageModel::ImageTypeRole : {
-        return item->imageType();
-      }
+      return item->imageType();
+    }
     case ImageModel::ImageMetadataRole : {
-        return QVariant::fromValue(static_cast<QObject*>(item->metadata()));
-      }
+      return QVariant::fromValue(static_cast<QObject*>(item->metadata()));
+    }
     case ImageModel::ImageFilenameRole : {
-        return item->getFileName();
-      }
+      return item->getFileName();
+    }
     case ImageModel::ImageFilepathRole : {
-        return item->getFilePath();
-      }
+      return item->getFilePath();
+    }
     case ImageModel::ImageDirPathRole : {
-        return item->getFilePath().remove(QDir::fromNativeSeparators(item->getFilePath()).remove(QRegExp("^.+/")));
-      }
+      return item->getFilePath().remove(QDir::fromNativeSeparators(item->getFilePath()).remove(QRegExp("^.+/")));
+    }
     case ImageModel::ImageThumbnailPathRole : {
-        return item->getThumbName();
-      }
+      return item->getThumbName();
+    }
     case Qt::EditRole : {
-        return item->data(index.column());
-      }
+      return item->data(index.column());
+    }
     case (ImageModel::ImagePictureRole) : {
-        return QImage(item->getFilePath());
-      }
+      return QImage(item->getFilePath());
+    }
     case ImageModel::ObjectRole : {
-        return qVariantFromValue(static_cast<QObject*> (item));
-      }
+      return qVariantFromValue(static_cast<QObject*>(item));
+    }
     default:
       return QVariant();
   }
@@ -191,19 +191,19 @@ bool ImageModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
   switch (item->imageType()) {
     case (ImageItem::Image) : {
-        item->setName(value.toString());
-        return true;
-      }
+      item->setName(value.toString());
+      return true;
+    }
     case (ImageItem::Gallery) : {
-        bool status = false;
-        QDir gallery(item->getFilePath());
-        gallery.cdUp();
-        status = gallery.rename(item->getFileName(), value.toString());
+      bool status = false;
+      QDir gallery(item->getFilePath());
+      gallery.cdUp();
+      status = gallery.rename(item->getFileName(), value.toString());
 
-        if (status)
-          item->setName(value.toString());
-        return status;
-      }
+      if (status)
+        item->setName(value.toString());
+      return status;
+    }
     default : {
       return false;
     }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -24,12 +24,14 @@
 #include <QtGui/QLabel>
 #include <QtGui/QAbstractButton>
 
-namespace GWidgets {
+namespace GWidgets
+{
 
-namespace GWizard {
+namespace GWizard
+{
 
 FinishPage::FinishPage()
- : QWizardPage()
+    : QWizardPage()
 {
   setTitle(tr("Finish"));
   setSubTitle(tr("Wizard is complete"));
@@ -44,8 +46,7 @@ FinishPage::FinishPage()
 }
 
 FinishPage::~FinishPage()
-{
-}
+{}
 
 void FinishPage::initializePage()
 {

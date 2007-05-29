@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÃÂ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -21,6 +21,8 @@
 #ifndef GCORE_GNETWORKUNIUPDATEMANAGER_H
 #define GCORE_GNETWORKUNIUPDATEMANAGER_H
 
+#ifdef WANT_UPDATER
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
@@ -36,7 +38,7 @@ namespace GNetwork
 
 /**
  * @short Manager for UniUpdate service.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÃÂ¡nik <gregor@unimatrix-one.org>
  */
 class UniUpdateManager : public QObject
 {
@@ -83,7 +85,7 @@ class UniUpdateManager : public QObject
       PlatformUnsupported,
       /** Specified branch is unsupported. */
       BranchUnsupported
-    };
+  };
 
     /**
      * A default constructor.
@@ -135,5 +137,7 @@ class UniUpdateManager : public QObject
 }
 
 }
+
+#endif
 
 #endif

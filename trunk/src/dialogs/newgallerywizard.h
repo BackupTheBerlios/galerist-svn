@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -23,15 +23,16 @@
 
 #include <QtGui/QWizard>
 
-namespace GDialogs {
+namespace GDialogs
+{
 
 /**
  * @short Wizard for easier creation of a gallery.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class NewGalleryWizard : public QWizard
 {
-  Q_OBJECT
+    Q_OBJECT
   public:
     /**
      * A constructor.

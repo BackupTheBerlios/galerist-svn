@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -28,33 +28,33 @@
 
 #include <QtGui/QMessageBox>
 
-namespace GDialogs {
+namespace GDialogs
+{
 
 NewGalleryWizard::NewGalleryWizard(QWidget *parent)
- : QWizard(parent)
+    : QWizard(parent)
 {
   setupUi();
 }
 
 NewGalleryWizard::NewGalleryWizard(const QString &path, const QStringList &images, QWidget *parent)
-  : QWizard(parent)
+    : QWizard(parent)
 {
   setupUi();
-  
-  GWidgets::GWizard::SelectionPage *selectionPage = static_cast<GWidgets::GWizard::SelectionPage*> (page(m_selectionPage));
+
+  GWidgets::GWizard::SelectionPage *selectionPage = static_cast<GWidgets::GWizard::SelectionPage*>(page(m_selectionPage));
 
   selectionPage->setPredefinedImages(path, images);
 }
 
 NewGalleryWizard::~NewGalleryWizard()
-{
-}
+{}
 
 void NewGalleryWizard::reject()
 {
   if (currentId() == m_copyPage)
     static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->pauseCopy();
-  
+
   if (QMessageBox::question(0, tr("Confirm cancel"), tr("Are you sure you want to cancel this wizard?"), tr("Cancel"), tr("Continue"), QString(), 1, 1) == 0) {
     if (currentId() == m_copyPage) {
       static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->stopCopy();

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -37,11 +37,11 @@ namespace GJobs
 
 /**
  * @short Class for copiing images.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class CopyJob : public GCore::GJobs::AbstractJob
 {
-  Q_OBJECT
+    Q_OBJECT
   signals:
     /**
      * Signal for reporting process.
@@ -64,7 +64,7 @@ class CopyJob : public GCore::GJobs::AbstractJob
        * Copy whole bunch of images.
        */
       MultiMode
-    };
+  };
 
     /**
      * A constructor for copiing the whole folder.

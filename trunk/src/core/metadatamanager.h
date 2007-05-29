@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -32,11 +32,11 @@ class ImageItem;
 
 /**
  * @short A manager for the gallerys metadata.
- * @author Gregor Kališnik.
+ * @author Gregor KaliÅ¡nik.
  */
 class MetaDataManager : public QObject
 {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
     /**

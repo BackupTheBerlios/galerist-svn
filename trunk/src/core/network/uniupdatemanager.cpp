@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÃÂÃÂ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -18,6 +18,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#ifdef WANT_UPDATER
+
 #include "uniupdatemanager.h"
 
 #include <QtCore/QBuffer>
@@ -36,8 +39,8 @@ namespace GNetwork
 
 UniUpdateManager::UniUpdateManager(QObject *parent)
     : QObject(parent),
-      m_changelogId(-1),
-      m_patchId(-1)
+    m_changelogId(-1),
+    m_patchId(-1)
 {
   m_httpClient = new QHttp(this);
 
@@ -121,7 +124,7 @@ void UniUpdateManager::processRequest(int id, bool error)
   } else if (m_patchId == id) {
     // We have to rename the file so Windows can execute it (dumb system of extensions!!!)
     QString patchFileName = QDir::toNativeSeparators(m_patch->fileName());
-    m_patch->close();    
+    m_patch->close();
     QFile::rename(patchFileName, patchFileName + ".exe");
 
     emit patchReady(patchFileName + ".exe");
@@ -132,3 +135,5 @@ void UniUpdateManager::processRequest(int id, bool error)
 }
 
 }
+
+#endif

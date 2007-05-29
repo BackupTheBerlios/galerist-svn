@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -42,14 +42,14 @@ void PhotoRect::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidge
 
   switch (GCore::Data::self()->getBackgroundType()) {
     case (GCore::Data::Round) : {
-        painter->drawRoundRect(rect());
+      painter->drawRoundRect(rect());
 
-        if (isSelected()) {
-          painter->setBrush(QColor(0, 0, 250, 50));
-          painter->drawRoundRect(rect());
-        }
-        break;
+      if (isSelected()) {
+        painter->setBrush(QColor(0, 0, 250, 50));
+        painter->drawRoundRect(rect());
       }
+      break;
+    }
     default: {
       painter->drawRect(rect());
 

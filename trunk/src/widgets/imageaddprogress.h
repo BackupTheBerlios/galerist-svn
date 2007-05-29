@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -30,7 +30,7 @@ namespace GWidgets
 /**
  * Class for showing the progress of the adding photos to the existing gallery.
  * @short Class with a progress bar etc.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class ImageAddProgress : public QWidget, private Ui::ImageAddProgress
 {
@@ -59,7 +59,7 @@ class ImageAddProgress : public QWidget, private Ui::ImageAddProgress
     void setProgress(int finished, int total, const QString &currentName, const QImage &currentPixmap);
 
   private:
-    
+
   private slots:
 
 };

@@ -22,41 +22,43 @@
 /**
  * @short Core parts of Goya.
  */
-namespace GCore {
+namespace GCore
+{
 /**
  * @short "Working" part of Goya (threaded).
  */
-namespace GJobs {
-}
+namespace GJobs
+  {}
 
 /**
  * @short Part of Goya that utilises network.
  */
-namespace GNetwork {
-}
+namespace GNetwork
+  {}
 }
 
 /**
  * @short Dialogs used by Goya.
  */
-namespace GDialogs {
-}
+namespace GDialogs
+  {}
 
 /**
  * @short Widgets used by MainWindow and dialogs in GDialogs.
  */
-namespace GWidgets {
+namespace GWidgets
+{
 /**
  * @short Widgets used by NewGalleryWizard.
  */
-namespace GWizard {
-}
+namespace GWizard
+  {}
 /**
  * A special kind of widgets that are used inside a PhotoView and can't be used in normal Qt dialogs.
  * @short Widgets used in PhotoView.
  */
-namespace GPhotoWidgets {
-}
+namespace GPhotoWidgets
+  {}
 }
 
 

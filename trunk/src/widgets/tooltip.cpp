@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -36,7 +36,7 @@ namespace GWidgets
 
 /**
  * @short A bubble like label. "Floating" of course.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class TipLabel : public QWidget
 {
@@ -139,7 +139,7 @@ TipLabel *TipLabel::m_tipLabel = 0;
 
 TipLabel::TipLabel(QWidget *parent)
     : QWidget(parent, Qt::ToolTip),
-      m_timerId(0)
+    m_timerId(0)
 {}
 
 void TipLabel::move(const QPoint &pos)

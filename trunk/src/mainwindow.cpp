@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -153,9 +153,9 @@ void MainWindow::initToolbar()
 
   switch (GCore::Data::self()->getBackgroundType()) {
     case (GCore::Data::Round) : {
-        actionRoundBackground->setChecked(true);
-        break;
-      }
+      actionRoundBackground->setChecked(true);
+      break;
+    }
     default: {
       actionRectangularBackground->setChecked(true);
       break;
@@ -184,7 +184,7 @@ void MainWindow::initDocks()
 
 void MainWindow::about()
 {
-  QString about = tr("With %1 you can create your own galleries of pictures, comment all pictures and upload them to a gallery site.\n\nCurrent version: %2\nAuthor name: Gregor Kališnik\nAuthor email: gregor@unimatrix-one.org").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion());
+  QString about = tr("With %1 you can create your own galleries of pictures, comment all pictures and upload them to a gallery site.\n\nCurrent version: %2\nAuthor name: Gregor KaliÅ¡nik\nAuthor email: gregor@unimatrix-one.org").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion());
   QMessageBox::about(this, tr("About %1").arg(GCore::Data::self()->getAppName()), about);
 }
 
@@ -260,8 +260,7 @@ void MainWindow::slotConfiguration()
 }
 
 MainWindow::~MainWindow()
-{
-}
+{}
 
 void MainWindow::setEditMode(bool edit)
 {

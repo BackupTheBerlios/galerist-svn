@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -163,7 +163,7 @@ void CopyJob::multiCopy()
   for (int count = 0; count <= numberImages; count++) {
     while (getStop() || m_paused) {
       if (getStop()) {
-       // deleteCopied();
+        // deleteCopied();
         emit signalProcess(QString());
         emit signalProgress(count, numberImages, QString(), QImage());
         break;

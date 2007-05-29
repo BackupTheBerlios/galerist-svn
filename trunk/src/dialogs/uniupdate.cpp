@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -18,6 +18,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#ifdef WANT_UPDATER
+
 #include "uniupdate.h"
 
 #include <QtCore/QProcess>
@@ -28,10 +31,11 @@
 
 #include "core/network/uniupdatemanager.h"
 
-namespace GDialogs {
+namespace GDialogs
+{
 
 UniUpdate::UniUpdate(QWidget *parent)
- : QDialog(parent)
+    : QDialog(parent)
 {
   setupUi(this);
 
@@ -55,8 +59,7 @@ UniUpdate::UniUpdate(QWidget *parent)
 }
 
 UniUpdate::~UniUpdate()
-{
-}
+{}
 
 void UniUpdate::checkUpdates(QWidget *parent)
 {
@@ -142,3 +145,5 @@ void UniUpdate::updateDownloadProgress(int done, int total)
 }
 
 }
+
+#endif

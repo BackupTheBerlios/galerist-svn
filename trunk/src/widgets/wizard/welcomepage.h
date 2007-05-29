@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -23,18 +23,20 @@
 
 #include <QWizardPage>
 
-namespace GWidgets {
+namespace GWidgets
+{
 
-namespace GWizard {
+namespace GWizard
+{
 
 /**
  * @short Welcome page for the GDialogs::NewGalleryWizard.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class WelcomePage : public QWizardPage
 {
-Q_OBJECT
-public:
+    Q_OBJECT
+  public:
     /**
      * A default constructor.
      */

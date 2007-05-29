@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -55,14 +55,14 @@ void GalleryTreeView::slotDelete()
   emit clicked(QModelIndex());
 
   if (QMessageBox::question(0, tr("Confirm deletion"), tr("Are you sure you want to delete %1?").arg(selectedGallery.data().toString()), tr("Delete"), tr("Keep"), QString(), 1, 1) == 0)
-    static_cast<GCore::ImageModel*> (static_cast<QSortFilterProxyModel*> (model())->sourceModel())->removeGallery(selectedGallery);
+    static_cast<GCore::ImageModel*>(static_cast<QSortFilterProxyModel*>(model())->sourceModel())->removeGallery(selectedGallery);
 }
 
 void GalleryTreeView::slotCheckSelection(const QModelIndex &selected)
 {
   clearFocus();
   collapseAll();
-  
+
   if (selected.isValid()) {
     emit signalSelected(true);
 
