@@ -6,9 +6,11 @@ CONFIG += warn_on \
           thread \
           staticlib
 TEMPLATE = lib
-SOURCES += updater.cpp
-HEADERS += updater.h
+SOURCES += updater.cpp \
+ uniupdatemanager.cpp
+HEADERS += updater.h \
+ uniupdatemanager.h
 
-win32{
+win32 {
     DEFINES += WANT_UPDATER
 }

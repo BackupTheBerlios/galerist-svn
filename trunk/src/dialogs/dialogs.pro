@@ -5,12 +5,15 @@ CONFIG += warn_on \
           thread \
           staticlib 
 TEMPLATE = lib 
-FORMS += configuration.ui 
+FORMS += configuration.ui  \
+ uniupdate.ui
 HEADERS += configuration.h \
-           newgallerywizard.h
+           newgallerywizard.h \
+ uniupdate.h
 SOURCES += configuration.cpp \
-           newgallerywizard.cpp
-win32{
+           newgallerywizard.cpp \
+ uniupdate.cpp
+win32 {
     DEFINES += WANT_UPDATER
 
     INCLUDEPATH += ../../src

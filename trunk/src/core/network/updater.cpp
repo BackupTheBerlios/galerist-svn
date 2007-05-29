@@ -58,7 +58,7 @@ Updater::Updater(QObject *parent)
   m_progressDialog = new QProgressDialog(QString(), tr("&Cancel"), 0, 0, GCore::Data::self()->getMainWindow(), Qt::WindowStaysOnTopHint);
   m_progressDialog->hide();
 
-  m_rpcClient = new XmlRpc::XmlRpcClient("francl", 8000);
+  m_rpcClient = new XmlRpc::XmlRpcClient("uniupdate.unimatrix-one.org", 8000);
 
   connect(m_httpClient, SIGNAL(requestFinished(int, bool)), this, SLOT(slotProcess(int, bool)));
   connect(m_progressDialog, SIGNAL(canceled()), m_httpClient, SLOT(abort()));

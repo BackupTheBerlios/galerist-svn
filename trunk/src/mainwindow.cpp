@@ -43,6 +43,8 @@
 
 #include "widgets/photocontrol.h"
 
+#include "dialogs/uniupdate.h"
+
 
 #include "widgets/textedit.h"
 
