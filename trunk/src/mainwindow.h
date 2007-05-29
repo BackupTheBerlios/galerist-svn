@@ -135,6 +135,11 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      */
     void slotAddImages();
 
+    /**
+     * Checks for updates.
+     */
+    void startUpdater();
+
 };
 
 #endif

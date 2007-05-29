@@ -41,16 +41,17 @@ UniUpdate::UniUpdate(QWidget *parent)
 
   m_updateManager = new GCore::GNetwork::UniUpdateManager(this);
 
-  connect(m_updateManager, SIGNAL(updatesAvailability(int, const QString&)), this, SLOT(updateProcess(int, const QString&)));
+  connect(m_updateManager, SIGNAL(updateAvailability(int, const QString&)), this, SLOT(updateProcess(int, const QString&)));
   connect(m_updateManager, SIGNAL(downloadProgress(int, int)), this, SLOT(updateDownloadProgress(int, int)));
   connect(m_updateManager, SIGNAL(patchReady(const QString&)), this, SLOT(preparePatch(const QString&)));
   connect(updateButton, SIGNAL(clicked()), this, SLOT(beginDownload()));
 
+  progressBar->setMaximum(0);
+
+  statusLabel->setText(tr("Retrieving changelog..."));
+
   // TODO: need to get changed...
   m_updateManager->checkUpdate(GCore::Data::self()->getAppName(), "windows", "unstable", GCore::Data::self()->getAppVersion(), GCore::Data::self()->getBranch());
-
-  progressBar->setMaximum(0);
-  progressBar->setValue(1);
 }
 
 UniUpdate::~UniUpdate()
@@ -71,7 +72,7 @@ void UniUpdate::checkUpdatesStartup(QWidget *parent)
 
 void UniUpdate::updateProcess(int availability, const QString &changelog)
 {
-  progressBar->setValue(0);
+  progressBar->setMaximum(1);
   switch (availability) {
     case (GCore::GNetwork::UniUpdateManager::CannotConnect) : {
       statusLabel->setText(tr("Cannot contact UniUpdate server."));
@@ -111,6 +112,7 @@ void UniUpdate::updateProcess(int availability, const QString &changelog)
 void UniUpdate::beginDownload()
 {
   updateButton->setEnabled(false);
+  progressBar->setTextVisible(true);
   m_updateManager->downloadUpdate();
 }
 
@@ -124,6 +126,7 @@ void UniUpdate::preparePatch(const QString &filename)
   updateButton->setEnabled(true);
 
   connect(updateButton, SIGNAL(clicked()), this, SLOT(executePatch()));
+  disconnect(updateButton, SIGNAL(clicked()), this, SLOT(beginDownload()));
 }
 
 void UniUpdate::executePatch()

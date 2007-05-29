@@ -33,8 +33,6 @@
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
 
-#include "core/network/updater.h"
-
 namespace GCore
 {
 
@@ -47,9 +45,6 @@ Data::Data(QObject *parent)
     m_photoContextMenu(0),
     m_photoEditContextMenu(0),
     m_galleryContextMenu(0),
-#ifdef WANT_UPDATER
-    m_updater(0),
-#endif
     m_mainWindow(0),
     m_modelProxy(0),
     m_imageAddProgress(0)
@@ -282,16 +277,6 @@ QSortFilterProxyModel *Data::getModelProxy()
 
   return m_modelProxy;
 }
-
-#ifdef WANT_UPDATER
-GNetwork::Updater *Data::getUpdater()
-{
-  if (!m_updater)
-    m_updater = new GNetwork::Updater(this);
-
-  return m_updater;
-}
-#endif
 
 QString Data::getAppName() const
 {

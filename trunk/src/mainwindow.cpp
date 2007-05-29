@@ -36,14 +36,11 @@
 #include "core/imagemodel.h"
 #include "core/metadatamanager.h"
 
-#include "core/network/updater.h"
-
 #include "dialogs/newgallerywizard.h"
 #include "dialogs/configuration.h"
+#include "dialogs/uniupdate.h"
 
 #include "widgets/photocontrol.h"
-
-#include "dialogs/uniupdate.h"
 
 
 #include "widgets/textedit.h"
@@ -78,7 +75,7 @@ MainWindow::MainWindow()
 #ifdef WANT_UPDATER
   // Lets check for updates
   if (GCore::Data::self()->getUpdateStartup())
-    GCore::Data::self()->getUpdater()->checkUpdate();
+    GDialogs::UniUpdate::checkUpdatesStartup(this);
 #endif
 }
 
@@ -123,7 +120,7 @@ void MainWindow::initActionButtons()
 
 #ifdef WANT_UPDATER
   actionUpdate->setEnabled(true);
-  connect(actionUpdate, SIGNAL(triggered()), GCore::Data::self()->getUpdater(), SLOT(slotCheckUpdate()));
+  connect(actionUpdate, SIGNAL(triggered()), this, SLOT(startUpdater()));
 #endif
 
   // Connect other actions
@@ -247,6 +244,13 @@ void MainWindow::slotAddImages()
   images.replaceInStrings(path, QString());
 
   connect(GCore::Data::self()->getImageModel()->addImages(imageList->rootIndex(), path, images), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getImageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+}
+
+void MainWindow::startUpdater()
+{
+#ifdef WANT_UPDATER
+  GDialogs::UniUpdate::checkUpdates(this);
+#endif
 }
 
 void MainWindow::slotConfiguration()

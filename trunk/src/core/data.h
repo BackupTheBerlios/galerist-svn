@@ -270,13 +270,6 @@ class Data : public QObject
      */
     QSortFilterProxyModel *getModelProxy();
 
-#ifdef WANT_UPDATER
-    /**
-     * Returns an Updater object.
-     */
-    GNetwork::Updater *getUpdater();
-#endif
-
     /**
      * Returns the name of the program.
      *

@@ -22,6 +22,7 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QTemporaryFile>
+#include <QtCore/QDir>
 
 #include <QtNetwork/QHttp>
 
@@ -41,6 +42,7 @@ UniUpdateManager::UniUpdateManager(QObject *parent)
   m_httpClient = new QHttp(this);
 
   connect(m_httpClient, SIGNAL(requestFinished(int, bool)), this, SLOT(processRequest(int, bool)));
+  connect(m_httpClient, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(downloadProgress(int, int)));
 }
 
 UniUpdateManager::~UniUpdateManager()
@@ -48,7 +50,7 @@ UniUpdateManager::~UniUpdateManager()
 
 void UniUpdateManager::checkUpdate(const QString &appName, const QString &platform, const QString &selectedBranch, const QString &version, const QString &currentBranch)
 {
-  XmlRpc::XmlRpcClient uniUpdate("uniupdate.unimatrix-one.org", 8000);
+  XmlRpc::XmlRpcClient uniUpdate("francl", 8000);
 
   XmlRpc::XmlRpcValue parameters, results;
   parameters[0] = appName.toLower().toStdString();
@@ -95,7 +97,7 @@ void UniUpdateManager::checkUpdate(const QString &appName, const QString &platfo
   m_changelogBuffer = new QBuffer(this);
 
   m_httpClient->setHost(changelog.host());
-  m_httpClient->get(changelog.path(), m_changelogBuffer);
+  m_changelogId = m_httpClient->get(changelog.path(), m_changelogBuffer);
 }
 
 void UniUpdateManager::downloadUpdate()
@@ -104,7 +106,7 @@ void UniUpdateManager::downloadUpdate()
   m_patch->open();
 
   m_httpClient->setHost(m_patchUrl.host());
-  m_httpClient->get(m_patchUrl.path(), m_patch);
+  m_patchId = m_httpClient->get(m_patchUrl.path(), m_patch);
 }
 
 void UniUpdateManager::processRequest(int id, bool error)
@@ -117,8 +119,12 @@ void UniUpdateManager::processRequest(int id, bool error)
     emit updateAvailability(Available, m_changelogBuffer->buffer());
     m_changelogId = -1;
   } else if (m_patchId == id) {
-    m_patch->close();
-    emit patchReady(m_patch->fileName());
+    // We have to rename the file so Windows can execute it (dumb system of extensions!!!)
+    QString patchFileName = QDir::toNativeSeparators(m_patch->fileName());
+    m_patch->close();    
+    QFile::rename(patchFileName, patchFileName + ".exe");
+
+    emit patchReady(patchFileName + ".exe");
     m_patchId = -1;
   }
 }
