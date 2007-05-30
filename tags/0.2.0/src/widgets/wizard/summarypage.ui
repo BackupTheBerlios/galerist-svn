@@ -1,0 +1,112 @@
+<ui version="4.0" >
+ <class>SummaryPage</class>
+ <widget class="QWizardPage" name="SummaryPage" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>432</width>
+    <height>398</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>&lt;p>The configuration is now completed. Next step will copy all the images from the source directory to the temporary destination in your &lt;b>home&lt;/b>.&lt;/p>&lt;p> &lt;/p>&lt;p >You can review the summary of the configuration and go &lt;b>back&lt;/b> to change the settings. Otherwise click &lt;b>next&lt;/b>.&lt;/p></string>
+     </property>
+     <property name="wordWrap" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QFrame" name="frame" >
+     <property name="frameShape" >
+      <enum>QFrame::WinPanel</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <layout class="QVBoxLayout" >
+        <item>
+         <widget class="QLabel" name="label_2" >
+          <property name="text" >
+           <string>Gallery name:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3" >
+          <property name="text" >
+           <string>Gallery source path:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5" >
+          <property name="text" >
+           <string>Parent gallery</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1" >
+       <layout class="QVBoxLayout" >
+        <item>
+         <widget class="QLabel" name="nameLabel" >
+          <property name="text" >
+           <string>name</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="pathLabel" >
+          <property name="text" >
+           <string>path</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="parentLabel" >
+          <property name="text" >
+           <string>parent</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWizardPage</class>
+   <extends>QWidget</extends>
+   <header location="global" >QtGui/QWizardPage</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
