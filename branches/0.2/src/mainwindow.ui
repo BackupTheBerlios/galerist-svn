@@ -1,0 +1,435 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>979</width>
+    <height>605</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Goya</string>
+  </property>
+  <property name="icon" stdset="0" >
+   <iconset resource="resources.qrc" >:/images/galerist-small.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QGridLayout" >
+    <item row="0" column="0" >
+     <widget class="GWidgets::PhotoView" name="imageList" />
+    </item>
+    <item row="1" column="0" >
+     <widget class="GWidgets::SearchBar" native="1" name="searchBar" />
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>979</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="viewMenu" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <addaction name="separator" />
+    <addaction name="actionRectangularBackground" />
+    <addaction name="actionRoundBackground" />
+    <addaction name="separator" />
+    <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionNew" />
+    <addaction name="actionRemoveGallery" />
+    <addaction name="separator" />
+    <addaction name="actionQuit" />
+   </widget>
+   <widget class="QMenu" name="editMenu" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <widget class="QMenu" name="menuSelection" >
+     <property name="title" >
+      <string>&amp;Selection</string>
+     </property>
+     <addaction name="actionSelectAll" />
+     <addaction name="actionDeselectAll" />
+     <addaction name="actionInvertSelection" />
+    </widget>
+    <addaction name="actionAdd" />
+    <addaction name="actionPreview" />
+    <addaction name="actionRename" />
+    <addaction name="actionDescribe" />
+    <addaction name="actionRemove" />
+    <addaction name="separator" />
+    <addaction name="menuSelection" />
+    <addaction name="separator" />
+    <addaction name="actionConfiguration" />
+   </widget>
+   <widget class="QMenu" name="helpMenu" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout" />
+    <addaction name="actionAboutQt" />
+    <addaction name="actionUpdate" />
+   </widget>
+   <addaction name="menuFile" />
+   <addaction name="editMenu" />
+   <addaction name="viewMenu" />
+   <addaction name="helpMenu" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <widget class="QDockWidget" name="galleryDock" >
+   <property name="features" >
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Gallery manager</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents" >
+    <layout class="QGridLayout" >
+     <item row="0" column="0" >
+      <widget class="GWidgets::GalleryTreeView" name="albumView" >
+       <property name="editTriggers" >
+        <set>QAbstractItemView::EditKeyPressed</set>
+       </property>
+       <property name="alternatingRowColors" >
+        <bool>true</bool>
+       </property>
+       <property name="iconSize" >
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="autoExpandDelay" >
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="mainBar" >
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew" />
+   <addaction name="actionRemoveGallery" />
+   <addaction name="separator" />
+   <addaction name="actionAdd" />
+   <addaction name="actionRemove" />
+   <addaction name="separator" />
+  </widget>
+  <widget class="QDockWidget" name="imageControlWidget" >
+   <property name="features" >
+    <set>QDockWidget::DockWidgetVerticalTitleBar</set>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::AllDockWidgetAreas</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Image transformation control</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2" >
+    <layout class="QGridLayout" >
+     <property name="leftMargin" >
+      <number>0</number>
+     </property>
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
+     </property>
+     <property name="horizontalSpacing" >
+      <number>1</number>
+     </property>
+     <property name="verticalSpacing" >
+      <number>1</number>
+     </property>
+     <item row="2" column="0" >
+      <widget class="GWidgets::PhotoControl" native="1" name="photoControl" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionAbout" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/galerist-small.png</iconset>
+   </property>
+   <property name="text" >
+    <string>About &amp;Goya</string>
+   </property>
+   <property name="iconText" >
+    <string>About Goya</string>
+   </property>
+   <property name="toolTip" >
+    <string>About Goya</string>
+   </property>
+   <property name="statusTip" >
+    <string>Shows about Goya dialog.</string>
+   </property>
+  </action>
+  <action name="actionAboutQt" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/qt.png</iconset>
+   </property>
+   <property name="text" >
+    <string>About &amp;Qt</string>
+   </property>
+   <property name="statusTip" >
+    <string>Shows about Qt dialog.</string>
+   </property>
+  </action>
+  <action name="actionQuit" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/exit.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Quit</string>
+   </property>
+   <property name="statusTip" >
+    <string>Quits Goya.</string>
+   </property>
+  </action>
+  <action name="actionNew" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/new.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Create gallery wizard</string>
+   </property>
+   <property name="iconText" >
+    <string>Create gallery wizard</string>
+   </property>
+   <property name="toolTip" >
+    <string>Create gallery wizard</string>
+   </property>
+   <property name="statusTip" >
+    <string>Create a new gallery with the wizard.</string>
+   </property>
+  </action>
+  <action name="actionRectangularBackground" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/default-rect.png</iconset>
+   </property>
+   <property name="text" >
+    <string>R&amp;ectangular background rectangle</string>
+   </property>
+   <property name="statusTip" >
+    <string>Adds the default background rectangles.</string>
+   </property>
+  </action>
+  <action name="actionRoundBackground" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/round-rect.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Round background renctangle</string>
+   </property>
+   <property name="statusTip" >
+    <string>Adds the rounded background rectangles.</string>
+   </property>
+  </action>
+  <action name="actionAdd" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/add.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Add new picture</string>
+   </property>
+   <property name="statusTip" >
+    <string>Adds an individual picture to the selected gallery.</string>
+   </property>
+  </action>
+  <action name="actionRemove" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/remove.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Remove selected pictures</string>
+   </property>
+   <property name="statusTip" >
+    <string>Removes the selected pictures.</string>
+   </property>
+   <property name="shortcut" >
+    <string/>
+   </property>
+  </action>
+  <action name="actionConfiguration" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/configure.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Configuration</string>
+   </property>
+   <property name="statusTip" >
+    <string>Shows a configuration dialog.</string>
+   </property>
+  </action>
+  <action name="actionPreview" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/preview.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Preview</string>
+   </property>
+   <property name="statusTip" >
+    <string>Shows the bigger preview of the selected image.</string>
+   </property>
+  </action>
+  <action name="actionRename" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/rename.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Rename</string>
+   </property>
+   <property name="statusTip" >
+    <string>Lets you rename the selected image.</string>
+   </property>
+  </action>
+  <action name="actionDescribe" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/describe.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Describe</string>
+   </property>
+   <property name="statusTip" >
+    <string>Lets you describe the selected image.</string>
+   </property>
+  </action>
+  <action name="actionSelectAll" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Select all</string>
+   </property>
+   <property name="statusTip" >
+    <string>Selects all images.</string>
+   </property>
+  </action>
+  <action name="actionDeselectAll" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Deselect all</string>
+   </property>
+   <property name="statusTip" >
+    <string>Deselect all images.</string>
+   </property>
+  </action>
+  <action name="actionInvertSelection" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Invert selection</string>
+   </property>
+   <property name="statusTip" >
+    <string>Inverts the selection.</string>
+   </property>
+  </action>
+  <action name="actionRemoveGallery" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/remove.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Remove gallery</string>
+   </property>
+   <property name="statusTip" >
+    <string>Removes the selected gallery.</string>
+   </property>
+  </action>
+  <action name="actionUpdate" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/upgrade.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Check for &amp;updates</string>
+   </property>
+   <property name="statusTip" >
+    <string>Checks for the updates.</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GWidgets::PhotoView</class>
+   <extends>QGraphicsView</extends>
+   <header>widgets/photoview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GWidgets::GalleryTreeView</class>
+   <extends>QTreeView</extends>
+   <header>widgets/gallerytreeview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GWidgets::SearchBar</class>
+   <extends>QWidget</extends>
+   <header>widgets/searchbar.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GWidgets::PhotoControl</class>
+   <extends>QWidget</extends>
+   <header>widgets/photocontrol.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="resources.qrc" />
+ </resources>
+ <connections/>
+</ui>
