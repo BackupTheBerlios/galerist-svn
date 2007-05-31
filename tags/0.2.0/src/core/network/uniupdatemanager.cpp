@@ -53,7 +53,7 @@ UniUpdateManager::~UniUpdateManager()
 
 void UniUpdateManager::checkUpdate(const QString &appName, const QString &platform, const QString &selectedBranch, const QString &version, const QString &currentBranch)
 {
-  XmlRpc::XmlRpcClient uniUpdate("francl", 8000);
+  XmlRpc::XmlRpcClient uniUpdate("update.transwarp.si", 8100);
 
   XmlRpc::XmlRpcValue parameters, results;
   parameters[0] = appName.toLower().toStdString();
