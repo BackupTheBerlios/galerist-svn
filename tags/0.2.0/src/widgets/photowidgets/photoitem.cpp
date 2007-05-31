@@ -204,6 +204,10 @@ bool PhotoItem::deleteItself()
   bool output = m_pendingDoom;
   setPos(500, -300);
   m_pendingDoom = true;
+
+  m_item = 0;
+  m_index = QModelIndex();
+
   return output;
 }
 

@@ -48,7 +48,7 @@ class PhotoLoading;
  * @short A view for showing photos, using a model.
  *
  * @author Jernej Kos <kostko@unimatrix-one.org>
- * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class PhotoView : public QGraphicsView
 {

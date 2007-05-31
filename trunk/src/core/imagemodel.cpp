@@ -548,12 +548,9 @@ bool ImageModel::removeGallery(const QModelIndex &index)
   // Delete what is left in the gallery
   QDir thumbnails(gallery);
   if (thumbnails.cd(".thumbnails")) {
-
-    QStringList thumbs = thumbnails.entryList(QDir::Files | QDir::Hidden | QDir::System);
-    QStringList::const_iterator end = thumbs.constEnd();
-    for (QStringList::const_iterator count = thumbs.constBegin(); count != end; count++) {
-      thumbnails.remove(*count);
-    }
+    QDirIterator thumbnailsImages(thumbnails.absolutePath(), QDir::Files | QDir::Hidden | QDir::System);
+    while (thumbnailsImages.hasNext())
+      thumbnails.remove(thumbnailsImages.next());
 
     thumbnails.cdUp();
 
@@ -568,13 +565,12 @@ bool ImageModel::removeGallery(const QModelIndex &index)
 
   ImageItem *rootItem = item->parent();
 
-  //delete item->metadata();
+
   rootItem->removeChild(item);
 
-  QStringList images = gallery.entryList(QDir::Files | QDir::Hidden | QDir::System);
-  QStringList::const_iterator end = images.constEnd();
-  for (QStringList::const_iterator count = images.constBegin(); count != end; count++) {
-    if (!gallery.remove(*count)) {
+  QDirIterator images(gallery.absolutePath(), QDir::Files | QDir::Hidden | QDir::System);
+  while (images.hasNext()) {
+    if (!gallery.remove(images.next())){
       ErrorHandler::reportMessage(tr("Cannot delete gallery. Images and ohter files in gallery cannot be deleted."), ErrorHandler::Critical);
       return false;
     }
