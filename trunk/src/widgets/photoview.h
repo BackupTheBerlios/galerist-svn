@@ -94,6 +94,10 @@ class PhotoView : public QGraphicsView
      * @param size Size of the switched image.
      */
     void imageSwitched(const QSize &size);
+    /**
+     * Enable the controls. The preview is finished.
+     */
+    void enableControls(bool enable);
 
   public:
     /**

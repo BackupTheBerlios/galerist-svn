@@ -56,7 +56,7 @@ class PhotoPixmap;
  * @short A photo in a PhotoView.
  *
  * @author Jernej Kos <kostko@unimatrix-one.org>
- * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class PhotoItem : public QObject, public QGraphicsItemGroup
 {

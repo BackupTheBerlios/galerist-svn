@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -98,7 +98,6 @@ PhotoItem::PhotoItem(PhotoView *view, const QModelIndex &index)
 
 PhotoItem::~PhotoItem()
 {
-  qDebug("aaaaaaaaaaaaaa");
   delete m_animation;
 }
 
@@ -423,6 +422,9 @@ void PhotoItem::closeTransformations()
 
 void PhotoItem::saveCrop()
 {
+  if (!m_item)
+    return;
+
   if (!m_new) {
     qDebug("BUG! m_new premeturely deleted!");
     return;
@@ -435,6 +437,9 @@ void PhotoItem::saveCrop()
 
 void PhotoItem::blurPreview(int blurFilters)
 {
+  if (!m_item)
+    return;
+
   m_item->blur(blurFilters);
 
   m_view->showLoading(true, tr("Generating blur preview, please wait"));
@@ -442,6 +447,9 @@ void PhotoItem::blurPreview(int blurFilters)
 
 void PhotoItem::saveBlur()
 {
+  if (!m_item)
+    return;
+
   m_item->saveImage();
 
   closeTransformations();
@@ -451,6 +459,9 @@ void PhotoItem::saveBlur()
 
 void PhotoItem::sharpenPreview(int sharpenFilters)
 {
+  if (!m_item)
+    return;
+
   m_item->sharpen(sharpenFilters);
 
   m_view->showLoading(true, tr("Generating sharpen preview, please wait"));
@@ -458,6 +469,9 @@ void PhotoItem::sharpenPreview(int sharpenFilters)
 
 void PhotoItem::saveSharpen()
 {
+  if (!m_item)
+    return;
+
   m_item->saveImage();
 
   closeTransformations();
@@ -467,6 +481,9 @@ void PhotoItem::saveSharpen()
 
 void PhotoItem::resizePreview(const QSize &size)
 {
+  if (!m_item)
+    return;
+
   m_item->resize(size);
 
   m_view->showLoading(true, tr("Generating resize preview, please wait"));
@@ -474,6 +491,9 @@ void PhotoItem::resizePreview(const QSize &size)
 
 void PhotoItem::saveResize()
 {
+  if (!m_item)
+    return;
+
   m_item->saveImage();
 
   closeTransformations();
@@ -483,6 +503,9 @@ void PhotoItem::saveResize()
 
 void PhotoItem::cancelTransformations()
 {
+  if (!m_item)
+    return;
+
   closeTransformations();
 
   m_pixmap->setPixmap(QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>()));
@@ -598,6 +621,9 @@ void PhotoItem::initialiseTimer()
 
 void PhotoItem::slotEdit(bool edit)
 {
+  if (!m_item)
+    return;
+
   m_zooming = true;
   m_editMode = edit;
 
@@ -635,12 +661,18 @@ void PhotoItem::slotEdit(bool edit)
 
 void PhotoItem::slotSaveName(const QString &name)
 {
+  if (!m_item)
+    return;
+
   m_item->setName(name);
   setToolTip(m_index.data(GCore::ImageModel::ImageTooltipRole).toString());
 }
 
 void PhotoItem::slotSaveDescription(const QString &description)
 {
+  if (!m_item)
+    return;
+
   m_item->setDescription(description);
   setToolTip(m_index.data(GCore::ImageModel::ImageTooltipRole).toString());
 }

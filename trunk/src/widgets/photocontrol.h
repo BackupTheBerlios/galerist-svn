@@ -142,6 +142,11 @@ class PhotoControl : public QWidget
 
   private slots:
     /**
+     * Enables/disabled the controls.
+     */
+    void enableControls(bool enable);
+
+    /**
      * Goes back to operationless existence :D.
      */
     void restore();

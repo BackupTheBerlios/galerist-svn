@@ -86,6 +86,7 @@ void PhotoControl::connectView(PhotoView *view)
   connect(view, SIGNAL(photoEditSelectionChanged(int, int)), this, SLOT(checkNavigation(int, int)));
   connect(view, SIGNAL(areaSelected(const QRect&)), this, SLOT(valuesChanged()));
   connect(view, SIGNAL(imageSwitched(const QSize&)), this, SLOT(switchedImage(const QSize&)));
+  connect(view, SIGNAL(enableControls(bool)), this, SLOT(enableControls(bool)));
 }
 
 void PhotoControl::checkNavigation(int newLocation, int totalImages)
@@ -196,6 +197,11 @@ void PhotoControl::keepAspectRatio(bool heightChanged, int value)
     connect(m_resizePage.heightBox, SIGNAL(valueChanged(int)), this, SLOT(keepAspectHeight(int)));
     connect(m_resizePage.widthBox, SIGNAL(valueChanged(int)), this, SLOT(keepAspectWidth(int)));
   }
+}
+
+void PhotoControl::enableControls(bool enable)
+{
+  setEnabled(enable);
 }
 
 void PhotoControl::restore()

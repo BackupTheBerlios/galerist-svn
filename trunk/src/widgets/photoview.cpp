@@ -1065,6 +1065,8 @@ void PhotoView::showLoading(bool show, const QString &text)
   m_loading->setPos(mapToScene(static_cast<int>((width() / 2) - (m_loading->boundingRect().width() / 2)), static_cast<int>((height() / 2) - (m_loading->boundingRect().height() / 2))));
 
   m_loading->setVisible(show);
+
+  emit enableControls(!show);
 }
 
 GPhotoWidgets::PhotoItem *PhotoView::getSelectedPhoto()
