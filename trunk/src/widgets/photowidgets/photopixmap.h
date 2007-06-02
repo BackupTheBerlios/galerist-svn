@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -32,7 +32,7 @@ namespace GPhotoWidgets
 /**
  * Class that represents the thumbnail of the photo.
  * @short Thumbnail of the photo.
- * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class PhotoPixmap : public QGraphicsPixmapItem
 {

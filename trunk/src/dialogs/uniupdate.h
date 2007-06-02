@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -40,7 +40,7 @@ namespace GDialogs
 
 /**
  * @short Frontend class for UniUpdate services.
- * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class UniUpdate : public QDialog, private Ui::UniUpdate
 {
