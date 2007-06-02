@@ -253,6 +253,7 @@ void TipLabel::setMask(int width, int height, const QPainterPath &path, const QP
   mask.fill();
 
   QPen maskBorder(pen);
+  maskBorder.setColor(QColor(0, 0, 0));
   maskBorder.setWidth(maskBorder.width() + 1.0);
 
   QPainter maskPainter(&mask);
