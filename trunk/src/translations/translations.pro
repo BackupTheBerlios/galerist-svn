@@ -3,4 +3,4 @@ CONFIG += warn_on \
           staticlib
 TEMPLATE = lib
 
-system("lrelease -silent english.ts -qm english.qm")
+system("lrelease english.ts -qm english.qm")

@@ -1,21 +1,32 @@
 TEMPLATE = subdirs
 CONFIG += ordered \
 warn_on
-win32-msvc*: MAKE = nmake
+
+contains(UPDATE, ts) {
+system(cd src/translations)
+system(lupdate ../ -ts english.ts)
+system(cd ../..)
+} else {
 
 unix|win32-g++{
     MAKE = make
 }
 
+
+CONFIG(release, debug|release):print(Goya will build in RELEASE mode.)
+CONFIG(debug, debug|release):print(Goya will build in DEBUG mode.)
+
+print(***************************************)
+
 unix{
     isEmpty(PREFIX): PREFIX = /usr
 
-    message(Goya will use $${PREFIX} as its prefix)
-    message("To change it, define PREFIX like qmake PREFIX=/path")
+    print(Goya will use $${PREFIX} as its prefix)
+    print("To change it, define PREFIX like qmake PREFIX=/path")
     system(cd src && qmake PREFIX=$${PREFIX})
 }
-message(***************************************)
-message("Goya is now configured. To start compiling, run $${MAKE}")
+print(***************************************)
+print("Goya is now configured. To start compiling, run $${MAKE}")
 SUBDIRS += src/core/network \
   src/core/jobs \
   src/core \
@@ -26,3 +37,4 @@ SUBDIRS += src/core/network \
   src/translations \
   src
 
+}
