@@ -1,0 +1,16 @@
+0.1.0 => 0.2.0
+
+Features:
+-Subgalleries
+-Search bar
+-Drop down images into a new gallery
+-EXIF reading support
+-Integrated image transformations
+
+Fixes:
+-New Gallery creation wizard
+-Tweaked PhotoViews animation
+-Changed "Loading" item
+
+Bugfixes:
+-Crash upon deleting items, fixed

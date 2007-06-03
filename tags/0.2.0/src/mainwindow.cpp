@@ -234,6 +234,9 @@ void MainWindow::slotAddImages()
 {
   QStringList pictures = QFileDialog::getOpenFileNames(this, tr("Add images"), QDir::homePath(), tr("Images (*.png *.gif *.jpg *.jpeg)"));
 
+  if (pictures.isEmpty())
+    return;
+
   // Add images
   QString image = pictures.first();
   image.remove(QRegExp("^.+/"));

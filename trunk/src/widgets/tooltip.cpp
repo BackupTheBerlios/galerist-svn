@@ -191,7 +191,7 @@ void TipLabel::paintBubble()
   int height = 50;
 
   QPen border;
-  border.setWidth(3.0);
+  border.setWidth(3);
   border.setCosmetic(true);
   border.setCapStyle(Qt::RoundCap);
   border.setJoinStyle(Qt::RoundJoin);
@@ -254,7 +254,7 @@ void TipLabel::setMask(int width, int height, const QPainterPath &path, const QP
 
   QPen maskBorder(pen);
   maskBorder.setColor(QColor(0, 0, 0));
-  maskBorder.setWidth(maskBorder.width() + 1.0);
+  maskBorder.setWidth(maskBorder.width() + 1);
 
   QPainter maskPainter(&mask);
   maskPainter.setRenderHint(QPainter::Antialiasing, true);
