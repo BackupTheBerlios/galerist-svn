@@ -87,6 +87,12 @@ class TipLabel : public QWidget
      */
     void timerEvent(QTimerEvent *event);
 
+    /**
+     * Reimplemented method.
+     * Paints the bubble into the image right before the painting event.
+     */
+    void showEvent(QShowEvent *event);
+
   private:
     QPoint m_pos;
     static TipLabel *m_tipLabel;
@@ -152,7 +158,6 @@ void TipLabel::setText(const QString &text)
 {
   m_text = text;
   m_timerId = startTimer(text.count() * 100);
-  paintBubble();
 }
 
 QString TipLabel::text()
@@ -177,6 +182,13 @@ void TipLabel::timerEvent(QTimerEvent *event)
     close();
     m_timerId = 0;
   }
+}
+
+void TipLabel::showEvent(QShowEvent *event)
+{
+  paintBubble();
+
+  QWidget::showEvent(event);
 }
 
 void TipLabel::close()

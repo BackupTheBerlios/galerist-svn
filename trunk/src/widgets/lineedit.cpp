@@ -123,6 +123,13 @@ void LineEdit::hideEvent(QHideEvent *event)
   QLineEdit::hideEvent(event);
 }
 
+void LineEdit::focusOutEvent(QFocusEvent *event)
+{
+  ToolTip::showMessage(QString(), this);
+
+  QLineEdit::focusOutEvent(event);
+}
+
 void LineEdit::slotEmit()
 {
   if (!m_canceling)

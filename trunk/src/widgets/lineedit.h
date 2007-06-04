@@ -97,7 +97,7 @@ class LineEdit : public QLineEdit
 
   protected:
     /**
-     * Overloaded method for defining behaviour on paint event.
+     * Reimplemented method for defining behaviour on paint event.
      *
      * @param event Event itself.
      */
@@ -110,11 +110,18 @@ class LineEdit : public QLineEdit
     void keyPressEvent(QKeyEvent *event);
 
     /**
+     * Reimplemented method.
      * Defines what to do on hide event.
      *
      * @param event Event itself.
      */
     void hideEvent(QHideEvent *event);
+
+    /**
+     * Reimplemented method.
+     * Hides the bubble when loses focus.
+     */
+    void focusOutEvent(QFocusEvent *event);
 
   private:
     bool m_valid;

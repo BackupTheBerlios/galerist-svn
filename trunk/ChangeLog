@@ -3,9 +3,11 @@
 Changes:
 -Photo controls are disabled when there is a transformation in progress
 -Configuration dialog redesigned
+-Bubble hides on input edit's focus loss
 
 Fixes:
 -Gallery renaming with double click
+-Bubbles change direction when painting at the edge of the screen
 
 Build manager changes:
 -Removed support for MSVC2005
