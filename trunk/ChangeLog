@@ -1,3 +1,11 @@
+0.2.0 => 0.3.0
+
+Fixes:
+-Gallery renaming with double click
+
+Build manager changes:
+-Removed support for MSVC2005
+
 0.1.0 => 0.2.0
 
 Features:
