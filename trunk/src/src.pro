@@ -23,8 +23,8 @@ CONFIG += warn_on \
 TEMPLATE = app
 LIBS += core/libcore.a \
         core/jobs/libjobs.a \
-        core/network/libnetwork.a \
         dialogs/libdialogs.a \
+        core/network/libnetwork.a \
         widgets/libwidgets.a \
         widgets/photowidgets/libphotowidgets.a \
         widgets/wizard/libwizard.a \
@@ -47,7 +47,7 @@ win32{
 DEFINES += WANT_UPDATER
 }
 
-WANT_UPDATER: LIBS += -lXmlRpc
-win32: LIBS += -lWs2_32 -lgdi32
+contains (DEFINES, WANT_UPDATER): LIBS += -lXmlRpc
+win32: LIBS += -lWand -lMagick -llcms -ljpeg -lpng -lWs2_32 -lgdi32
 
 

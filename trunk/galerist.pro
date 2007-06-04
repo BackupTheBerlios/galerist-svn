@@ -16,9 +16,8 @@ unix|win32-g++{
 CONFIG(release, debug|release):print(Goya will build in RELEASE mode.)
 CONFIG(debug, debug|release):print(Goya will build in DEBUG mode.)
 
-print(***************************************)
-
 unix{
+print(***************************************)
     isEmpty(PREFIX): PREFIX = /usr
 
     print(Goya will use $${PREFIX} as its prefix)
