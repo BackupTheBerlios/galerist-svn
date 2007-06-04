@@ -1,5 +1,9 @@
 0.2.0 => 0.3.0
 
+Changes:
+-Photo controls are disabled when there is a transformation in progress
+-Configuration dialog redesigned
+
 Fixes:
 -Gallery renaming with double click
 

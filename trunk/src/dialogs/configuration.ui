@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>498</width>
+    <width>619</width>
     <height>376</height>
    </rect>
   </property>
@@ -13,238 +13,332 @@
    <string>Configuration</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="leftMargin" >
-    <number>9</number>
-   </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>9</number>
-   </property>
-   <property name="horizontalSpacing" >
-    <number>6</number>
-   </property>
-   <property name="verticalSpacing" >
-    <number>6</number>
-   </property>
-   <item row="0" column="0" >
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
-      <string>Photograph list rendering</string>
+   <item rowspan="2" row="0" column="0" >
+    <widget class="QListWidget" name="configList" >
+     <property name="minimumSize" >
+      <size>
+       <width>150</width>
+       <height>0</height>
+      </size>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>9</number>
+     <property name="maximumSize" >
+      <size>
+       <width>150</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="autoScroll" >
+      <bool>false</bool>
+     </property>
+     <property name="editTriggers" >
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="iconSize" >
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="textElideMode" >
+      <enum>Qt::ElideNone</enum>
+     </property>
+     <property name="layoutMode" >
+      <enum>QListView::SinglePass</enum>
+     </property>
+     <property name="viewMode" >
+      <enum>QListView::ListMode</enum>
+     </property>
+     <property name="currentRow" >
+      <number>0</number>
+     </property>
+     <item>
+      <property name="text" >
+       <string>Appearance</string>
       </property>
-      <property name="topMargin" >
-       <number>9</number>
+      <property name="icon" >
+       <iconset resource="../resources.qrc" >:/images/config-appearance.png</iconset>
       </property>
-      <property name="rightMargin" >
-       <number>9</number>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Behaviour</string>
       </property>
-      <property name="bottomMargin" >
-       <number>9</number>
+      <property name="icon" >
+       <iconset resource="../resources.qrc" >:/images/config-behaviour.png</iconset>
       </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Update</string>
       </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
+      <property name="icon" >
+       <iconset resource="../resources.qrc" >:/images/upgrade.png</iconset>
       </property>
-      <item row="0" column="0" >
-       <widget class="QRadioButton" name="glRadio" >
-        <property name="text" >
-         <string>OpenGL rendering</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QRadioButton" name="nonGlRadio" >
-        <property name="text" >
-         <string>Non OpenGL rendering</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     </item>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
-      <string>Photohraph editing mode</string>
+   <item row="0" column="1" >
+    <widget class="QStackedWidget" name="configWidget" >
+     <property name="currentIndex" >
+      <number>0</number>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="3" >
-       <widget class="QPushButton" name="testButton" >
-        <property name="text" >
-         <string>Test</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2" >
-       <widget class="QPushButton" name="browseButton" >
-        <property name="minimumSize" >
-         <size>
-          <width>27</width>
-          <height>27</height>
-         </size>
-        </property>
-        <property name="maximumSize" >
-         <size>
-          <width>27</width>
-          <height>27</height>
-         </size>
-        </property>
-        <property name="text" >
-         <string/>
-        </property>
-        <property name="icon" >
-         <iconset resource="../images.qrc" >:/images/findimageeditor.png</iconset>
-        </property>
-        <property name="iconSize" >
-         <size>
-          <width>16</width>
-          <height>16</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>Image editor</string>
-        </property>
-        <property name="buddy" >
-         <cstring>imageEditorEdit</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="4" >
-       <widget class="QLabel" name="testLabel" >
-        <property name="text" >
-         <string>Click Test button to test the editor.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="GWidgets::LineEdit" name="imageEditorEdit" >
-        <property name="toolTip" >
-         <string>File path to the image editor.</string>
-        </property>
-        <property name="whatsThis" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+     <widget class="QWidget" name="appearancePage" >
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QGroupBox" name="groupBox" >
+         <property name="title" >
+          <string>Photograph list rendering</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="leftMargin" >
+           <number>9</number>
+          </property>
+          <property name="topMargin" >
+           <number>9</number>
+          </property>
+          <property name="rightMargin" >
+           <number>9</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>9</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>6</number>
+          </property>
+          <item row="0" column="0" >
+           <widget class="QRadioButton" name="glRadio" >
+            <property name="text" >
+             <string>OpenGL rendering</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QRadioButton" name="nonGlRadio" >
+            <property name="text" >
+             <string>Non OpenGL rendering</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QGroupBox" name="groupBox_4" >
+         <property name="title" >
+          <string>Translations</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_2" >
+            <property name="text" >
+             <string>Select a translation</string>
+            </property>
+            <property name="buddy" >
+             <cstring>translationBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QComboBox" name="translationBox" />
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="behaviourPage" >
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QGroupBox" name="groupBox_2" >
+         <property name="title" >
+          <string>Photohraph editing mode</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="leftMargin" >
+           <number>9</number>
+          </property>
+          <property name="topMargin" >
+           <number>9</number>
+          </property>
+          <property name="rightMargin" >
+           <number>9</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>9</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>6</number>
+          </property>
+          <item row="0" column="3" >
+           <widget class="QPushButton" name="testButton" >
+            <property name="text" >
+             <string>Test</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QPushButton" name="browseButton" >
+            <property name="minimumSize" >
+             <size>
+              <width>27</width>
+              <height>27</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>27</width>
+              <height>27</height>
+             </size>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="../resources.qrc" >:/images/findimageeditor.png</iconset>
+            </property>
+            <property name="iconSize" >
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label" >
+            <property name="text" >
+             <string>Image editor</string>
+            </property>
+            <property name="buddy" >
+             <cstring>imageEditorEdit</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="4" >
+           <widget class="QLabel" name="testLabel" >
+            <property name="text" >
+             <string>Click Test button to test the editor.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="GWidgets::LineEdit" name="imageEditorEdit" >
+            <property name="toolTip" >
+             <string>File path to the image editor.</string>
+            </property>
+            <property name="whatsThis" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
 &lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Here you specify the file editor executable with it's path. If left blank, &lt;span style=" text-decoration: underline;">no&lt;/span> editor will be used!&lt;/p>&lt;/body>&lt;/html></string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="updatePage" >
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QLabel" name="label_4" >
+         <property name="maximumSize" >
+          <size>
+           <width>200</width>
+           <height>64</height>
+          </size>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="pixmap" >
+          <pixmap resource="../resources.qrc" >:/images/uniupdate.png</pixmap>
+         </property>
+         <property name="scaledContents" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QGroupBox" name="groupBox_5" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title" >
+          <string>General</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QCheckBox" name="updateBox" >
+            <property name="text" >
+             <string>Check for updates at startup</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>200</width>
+           <height>81</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
-   <item row="5" column="0" >
+   <item row="1" column="1" >
     <widget class="QDialogButtonBox" name="buttonBox" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons" >
-      <set>QDialogButtonBox::Close|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Close|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="0" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="0" >
-    <widget class="QGroupBox" name="groupBox_3" >
-     <property name="title" >
-      <string>Other</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="1" column="2" >
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="translationBox" />
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>Select a translation</string>
-        </property>
-        <property name="buddy" >
-         <cstring>translationBox</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="3" >
-       <widget class="QCheckBox" name="updateBox" >
-        <property name="text" >
-         <string>Check for update at startup</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
   </layout>
@@ -266,7 +360,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="../images.qrc" />
+  <include location="../resources.qrc" />
  </resources>
  <connections>
   <connection>
@@ -298,6 +392,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel" >
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>configList</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>configWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>72</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>476</x>
+     <y>10</y>
     </hint>
    </hints>
   </connection>
