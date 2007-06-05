@@ -114,11 +114,14 @@ class Data : public QObject
     ImageModel *getImageModel();
 
     /**
-     * Returns the completer for the LineEdits.
-     *
-     * @return Completer.
+     * Get the dir completer. Used most by LineEdit.
      */
     QCompleter *getDirCompleter() const;
+
+    /**
+     * Get the file completer. Used most by LineEdit.
+     */
+    QCompleter *getFileCompleter() const;
 
     /**
      * Sets the look of image's background in PhotoView.
@@ -356,6 +359,7 @@ class Data : public QObject
     QStringList m_imageFormats;
     ImageModel *m_imageModel;
     QCompleter *m_dirCompleter;
+    QCompleter *m_fileCompleter;
     QMenu *m_photoContextMenu;
     QMenu *m_photoEditContextMenu;
     QMenu *m_galleryContextMenu;

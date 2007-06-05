@@ -71,13 +71,7 @@ class Configuration : public QDialog, private Ui::Configuration
      * Tests if the executable works.
      */
     void slotTest();
-    /**
-     * Process text changing in imageEditorEdit.
-     *
-     * @param filePath File path to verify.
-     * @param firstRun Is it first run? Needed only when the dialog is created.
-     */
-    void slotProcessEdit(const QString &filePath, bool firstRun = false);
+
     /**
      * Opens a browse dialog for selecting an external image editor.
      */

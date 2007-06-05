@@ -46,6 +46,10 @@ class LineEdit : public QLineEdit
      * Signals end of editing. A canceled one.
      */
     void editingCanceled();
+    /**
+     * Validity changed.
+     */
+    void validityChanged(bool valid);
 
   public:
     /**
@@ -55,10 +59,14 @@ class LineEdit : public QLineEdit
     {
       /** Default lineedit without any verification and auto completion. */
       Default,
-      /** Lineedit with verification module */
+      /** LineEdit with verification module */
       WithVerify,
-      /** Lineedit optimised for selecting files. Includes verification, auto completion and in Windows conversion from / to \. (Maybe with browse button?) */
-      FileSelector
+      /** LineEdit with internal checking enabled. */
+      WithInternalVerify,
+      /** LineEdit optimised for selecting files. Includes verification, auto completion and in Windows conversion from / to \. (Maybe with browse button?) */
+      FileSelector,
+      /** LineEdit like FileSelector, but doesn't complete with files. */
+      DirSelector
   };
     /**
      * Default constructor.
@@ -72,9 +80,9 @@ class LineEdit : public QLineEdit
      *
      * @param valid Valid or not.
      * @param reason Reason why it's valid or invalid. Not used!
-     * @param firstRun Set to true only when the dialog is created. Later use is with false (or default).
+     * @param tested Is the input tested?
      */
-    void setValidity(bool valid, const QString &reason = QString(), bool firstRun = false);
+    void setValidity(bool valid, const QString &reason = QString(), bool tested = false);
 
     /**
      * Checks if the text is valid.
@@ -82,7 +90,7 @@ class LineEdit : public QLineEdit
      * @return @c true It's valid.
      * @return @c false It's invalid.
      */
-    bool isValid();
+    bool isValid() const;
 
     /**
      * Sets the type of the lineedit.
@@ -94,6 +102,47 @@ class LineEdit : public QLineEdit
      * Default destructor.
      */
     ~LineEdit();
+
+    /**
+     * Sets the message that will be shown upon invalid data. Works only when you select WithVerify type.
+     *
+     * @param message The error message.
+     *
+     * @see setValidMessage
+     */
+    void setErrorMessage(const QString &message);
+
+    /**
+     * Sets the message that will be shown when valid data gets inputed.
+     *
+     * @param message The "valid" message.
+     *
+     * @see setErrorMessage
+     */
+    void setValidMessage(const QString &message);
+
+    /**
+     * Adds aditional valid values to the existing list. Works only when you select WithVerify type.
+     *
+     * @param values Valid values.
+     */
+    void addValidValues(const QStringList &values);
+
+    /**
+     * Adds an aditional valid value.
+     *
+     * @param value A valid Value.
+     *
+     * @see addValidValues
+     */
+    void addValidValue(const QString &value);
+
+    /**
+     * Sets the need of testing the data.
+     *
+     * @param test Defines if it needs to get tested or not.
+     */
+    void setNeedTest(bool test);
 
   protected:
     /**
@@ -111,14 +160,6 @@ class LineEdit : public QLineEdit
 
     /**
      * Reimplemented method.
-     * Defines what to do on hide event.
-     *
-     * @param event Event itself.
-     */
-    void hideEvent(QHideEvent *event);
-
-    /**
-     * Reimplemented method.
      * Hides the bubble when loses focus.
      */
     void focusOutEvent(QFocusEvent *event);
@@ -126,7 +167,12 @@ class LineEdit : public QLineEdit
   private:
     bool m_valid;
     bool m_canceling;
+    bool m_testing;
+    bool m_tested;
     Types m_type;
+    QString m_errMessage;
+    QString m_validMessage;
+    QStringList m_validValues;
 
   private slots:
     /**
@@ -138,6 +184,13 @@ class LineEdit : public QLineEdit
      * @param path Path to translate.
      */
     void slotTranslate();
+
+    /**
+     * Checks the text with the defined "true" values.
+     *
+     * @param text Text that needs to be verified.
+     */
+    void checkValidity(const QString &text);
 
 };
 

@@ -28,6 +28,7 @@
 #include <QtCore/QProcess>
 #include <QtGui/QFileDialog>
 
+
 namespace GDialogs
 {
 
@@ -39,6 +40,26 @@ Configuration::Configuration(QWidget *parent)
 
   // Additional initialisations
   imageEditorEdit->setType(GWidgets::LineEdit::FileSelector);
+
+  QString pathString;
+  QStringList environment = QProcess::systemEnvironment();
+  foreach (QString line, environment)
+    if (line.contains(QRegExp("^PATH="))) {
+    pathString = line;
+    continue;
+    }
+
+#ifdef Q_WS_WIN
+    QStringList path = pathString.remove("PATH=").split(';');
+#else
+    QStringList path = pathString.remove("PATH=").split(':');
+#endif
+    foreach (QString directory, path) {
+      foreach (QString executable, QDir(directory).entryList(QDir::Files)) {
+        executable.remove(".exe");
+        imageEditorEdit->addValidValue(executable);
+      }
+    }
 
   glRadio->setEnabled(QGLFormat::hasOpenGL());
 
@@ -52,7 +73,9 @@ Configuration::Configuration(QWidget *parent)
     nonGlRadio->setChecked(true);
 
   imageEditorEdit->setText(QString(GCore::Data::self()->getPhotoEditor()).remove("\""));
-  slotProcessEdit(imageEditorEdit->text(), true);
+  imageEditorEdit->setNeedTest(true);
+
+  dirEdit->setType(GWidgets::LineEdit::DirSelector);
 
 #ifdef WANT_UPDATER
   updateBox->setChecked(GCore::Data::self()->getUpdateStartup());
@@ -62,11 +85,12 @@ Configuration::Configuration(QWidget *parent)
   updateBox->setEnabled(false);
 #endif
 
+  imageEditorEdit->setValidMessage(tr("Click Test button to verify the program."));
 
   // Connect all the slots
   connect(this, SIGNAL(signalFailed(const QString&, int)), GCore::Data::self()->getErrorHandler(), SLOT(slotReporter(const QString&, int)));
   connect(testButton, SIGNAL(clicked()), this, SLOT(slotTest()));
-  connect(imageEditorEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotProcessEdit(const QString&)));
+  connect(imageEditorEdit, SIGNAL(validityChanged(bool)), testButton, SLOT(setEnabled(bool)));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowse()));
 }
 
@@ -94,85 +118,7 @@ void Configuration::accept()
 
 void Configuration::slotTest()
 {
-  if (!imageEditorEdit->text().isEmpty())
-    QProcess::startDetached("\"" + imageEditorEdit->text() + "\"") ? testLabel->setText(tr("Editor command is working.")) : testLabel->setText(tr("Editor command isn't working."));
-  else
-    testLabel->setText(tr("Editor is not defined."));
-}
-
-void Configuration::slotProcessEdit(const QString &filePath, bool firstRun)
-{
-  QFileInfo fileInfo(filePath);
-  // Checks if the file exists if not, he tries if it wsists in the PATH variable
-  if (fileInfo.exists()) {
-    // If it exists, checks if it is a file. If it isn't reports File path is invalid
-    if (fileInfo.isFile())
-      // Last thing to check is if it is executable. If it isn't reports Editor is not executable
-      if (fileInfo.isExecutable()) {
-        imageEditorEdit->setValidity(true);
-        testLabel->setText(tr("Click Test button to test the editor."));
-      } else {
-        imageEditorEdit->setValidity(false, tr("Editor is not executable."), firstRun);
-        testLabel->setText(tr("Editor is not executable."));
-      }
-    else {
-      imageEditorEdit->setValidity(false, tr("File path is invalid."), firstRun);
-      testLabel->setText(tr("File path is invalid."));
-    }
-  } else {
-    // We set the wrong option first, as it is the default behaviour
-    imageEditorEdit->setValidity(false, tr("File path specified is invalid."), firstRun);
-    testLabel->setText(tr("File path specified is invalid."));
-
-    // If the listed filePath contains /, we just skip the PATH checking
-    if (!filePath.contains('/')) {
-      // We look at the system environment
-      QStringList environment = QProcess::systemEnvironment();
-      QStringList::const_iterator end = environment.constEnd();
-      // We go through all the variables
-      for (QStringList::const_iterator count = environment.constBegin(); count != end; count++) {
-        // We stop at the PATH variable
-        if (!(*count).contains(QRegExp("^PATH=")))
-          continue;
-
-        // Convert to a non const, so we can remove the PATH=
-        QString pathString = *count;
-
-        // Remove PATH= and split it
-#ifdef Q_WS_WIN
-        QStringList path = pathString.remove("PATH=").split(';');
-#endif
-#ifdef Q_WS_X11
-        QStringList path = pathString.remove("PATH=").split(':');
-#endif
-
-        QStringList::const_iterator endPath = path.constEnd();
-        // We go through the PATH variable
-        for (QStringList::const_iterator countPath = path.constBegin(); countPath != endPath; countPath++) {
-          fileInfo.setFile((*countPath) + "/" + filePath);
-          // Then we check if it is a executable file
-          if (fileInfo.isFile() && fileInfo.isExecutable()) {
-            imageEditorEdit->setValidity(true);
-            testLabel->setText(tr("Click Test button to test the editor."));
-            // We found the asumed (test button is there for futher testing) editor and we leave this function
-            return;
-          }
-#ifdef Q_WS_WIN
-          // Windows ignores extensions in DOS (idiotic?)
-          QFileInfo fileInfoExtension((*countPath) + "/" + filePath + ".exe");
-          if (fileInfoExtension.isFile() && fileInfoExtension.isExecutable()) {
-            imageEditorEdit->setValidity(true);
-            testLabel->setText(tr("Click Test button to test the editor."));
-            // We found the asumed (test button is there for futher testing) editor and we leave this function
-            return;
-          }
-#endif
-        }
-        // We haven't find any editor, so we finish it with a sad taste (??) ;)
-        return;
-      }
-    }
-  }
+  QProcess::startDetached("\"" + imageEditorEdit->text() + "\"") ? imageEditorEdit->setValidity(true, tr("File successfully executed."), true) : imageEditorEdit->setValidity(false, tr("File cannot be executed."));
 }
 
 void Configuration::slotBrowse()

@@ -45,6 +45,7 @@
         <file alias="zoomin.png" >images/zoomin.png</file>
         <file alias="zoomout.png" >images/zoomout.png</file>
         <file alias="zoomscreen.png" >images/zoomscreen.png</file>
+        <file alias="unknown.png" >images/unknown.png</file>
     </qresource>
     <qresource prefix="/translations" >
         <file alias="english.qm" >translations/english.qm</file>

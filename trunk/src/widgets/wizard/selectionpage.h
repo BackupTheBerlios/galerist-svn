@@ -79,25 +79,6 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
 
   private:
     /**
-     * Checks if the image path is valid.
-     *
-     * @param path Path to verify.
-     *
-     * @return @c true Path is valid.
-     * @return @c false Path is invalid.
-     */
-    bool checkImagesPath(const QString &path) const;
-    /**
-     * Checks if the name is valid.
-     *
-     * @param name Name to verify.
-     *
-     * @return @c true Name is valid.
-     * @return @c false Name is invalid.
-     */
-    bool checkName(const QString &name) const;
-
-    /**
      * Shows what images will be added.
      *
      * @param path Path in where the potential images are stored.
@@ -113,12 +94,6 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
      */
     void slotBrowseClicked();
 
-    /**
-     * Checks if the image path is valid.
-     *
-     * @param path Path to verify.
-     */
-    void slotCheckImagesPath(const QString &path);
     /**
      * Checks if the name is valid.
      *

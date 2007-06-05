@@ -53,7 +53,10 @@ Data::Data(QObject *parent)
   m_self = this;
   m_settings = new QSettings(this);
   m_dirCompleter = new QCompleter(this);
-  m_dirCompleter->setModel(new QDirModel(QStringList(), QDir::AllDirs, QDir::Name, m_dirCompleter));
+  m_dirCompleter->setModel(new QDirModel(QStringList(), QDir::AllDirs | QDir::Drives, QDir::Name, m_dirCompleter));
+
+  m_fileCompleter = new QCompleter(this);
+  m_fileCompleter->setModel(new QDirModel(QStringList(), QDir::AllEntries, QDir::Name, m_fileCompleter));
 
   // Setting up supported image formats
   m_imageFormats << "*.jpg"; //JPEG
@@ -134,6 +137,11 @@ ImageModel *Data::getImageModel()
 QCompleter *Data::getDirCompleter() const
 {
   return m_dirCompleter;
+}
+
+QCompleter *Data::getFileCompleter() const
+{
+  return m_fileCompleter;
 }
 
 void Data::setBackgroundType(BackgroundType type) const

@@ -79,10 +79,11 @@ void SelectionPage::initializePage()
     parentBox->addItems(GCore::Data::self()->getImageModel()->getGalleriesList());
 
     nameEdit->setType(GWidgets::LineEdit::WithVerify);
-    imagesEdit->setType(GWidgets::LineEdit::FileSelector);
+    imagesEdit->setType(GWidgets::LineEdit::DirSelector);
 
     connect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
-    connect(imagesEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckImagesPath(const QString&)));
+    connect(nameEdit, SIGNAL(validityChanged(bool)), this, SIGNAL(completeChanged()));
+    connect(imagesEdit, SIGNAL(validityChanged(bool)), this, SIGNAL(completeChanged()));
 
     // Insert the path to the home directory
     // Only if there is no predefined images!
@@ -96,7 +97,15 @@ void SelectionPage::initializePage()
 
 bool SelectionPage::isComplete() const
 {
-  if (checkImagesPath(imagesEdit->text()) && checkName(nameEdit->text()))
+  m_readJob = 0;
+  previewList->clear();
+
+  if (imagesEdit->isValid())
+    makePreview(imagesEdit->text());
+  else
+    return false;
+
+  if (nameEdit->isValid())
     return QWizardPage::isComplete();
 
   return false;
@@ -110,32 +119,6 @@ void SelectionPage::setPredefinedImages(const QString &path, const QStringList &
   setField("GalleryPath", path);
 
   browseButton->setEnabled(false);
-}
-
-bool SelectionPage::checkImagesPath(const QString &path) const
-{
-  if (imagesEdit->text().isEmpty()) {
-    m_readJob = 0;
-    previewList->clear();
-    return false;
-  } else if (!QDir(path).exists()) {
-    m_readJob = 0;
-    previewList->clear();
-    return false;
-  } else {
-    makePreview(path);
-    return true;
-  }
-}
-
-bool SelectionPage::checkName(const QString &name) const
-{
-  if (nameEdit->text().isEmpty())
-    return false;
-  else if (!nameEdit->text().isEmpty() && !GCore::Data::self()->getImageModel()->checkName(name))
-    return true;
-  else
-    return false;
 }
 
 void SelectionPage::makePreview(const QString &path, const QStringList &images) const
@@ -161,20 +144,10 @@ void SelectionPage::slotBrowseClicked()
   }
 }
 
-void SelectionPage::slotCheckImagesPath(const QString &path)
-{
-  if (imagesEdit->text().isEmpty())
-    imagesEdit->setValidity(false, tr("Please enter a path to the directory with images."));
-  else if (!QDir(path).exists())
-    imagesEdit->setValidity(false, tr("The entered path doesn't exists. Please select another path."));
-  else
-    imagesEdit->setValidity(true);
-}
-
 void SelectionPage::slotCheckName(const QString &name)
 {
   if (nameEdit->text().isEmpty())
-    nameEdit->setValidity(false, tr("Please enter a name."));
+    nameEdit->setValidity(false);
   else if (!nameEdit->text().isEmpty() && !GCore::Data::self()->getImageModel()->findGallery(name).isValid())
     nameEdit->setValidity(true);
   else
