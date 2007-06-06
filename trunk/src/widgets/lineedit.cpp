@@ -100,7 +100,7 @@ void LineEdit::setType(Types type)
 {
   m_type = type;
 
-  if (m_type == FileSelector || m_type == WithVerify) {
+  if (m_type != Default) {
     setStyleSheet(QString(":enabled { padding-right: %1; }").arg(18));
   }
 

@@ -9,8 +9,10 @@ TEMPLATE = lib
 HEADERS += abstractjob.h \
            copyjob.h \
            readjob.h \
-           transformationjob.h
+           transformationjob.h \
+ movejob.h
 SOURCES += abstractjob.cpp \
            copyjob.cpp \
            readjob.cpp \
-           transformationjob.cpp
+           transformationjob.cpp \
+ movejob.cpp

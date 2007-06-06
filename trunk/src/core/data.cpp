@@ -33,6 +33,8 @@
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
 
+#include "core/jobs/movejob.h"
+
 namespace GCore
 {
 
@@ -103,15 +105,32 @@ QStringList Data::getImageFormats() const
   return m_imageFormats;
 }
 
-QString Data::getGalleriesPath() const
+QDir Data::getGalleriesDir() const
 {
-  QDir galleriesPath(QDir::homePath() + "/.goya/galleries");
-  if (!galleriesPath.exists()) {
+  QString galleriesPath = m_settings->value("GalleriesPath", getSettingsPath() + "/galleries").toString();
+
+  QDir galleriesDir(galleriesPath);
+  if (!galleriesDir.exists()) {
     // .galerist directory doen't exists... Creating one
-    galleriesPath.mkpath(galleriesPath.absolutePath());
+    galleriesDir.mkpath(galleriesDir.absolutePath());
   }
 
-  return QDir::toNativeSeparators(galleriesPath.absolutePath());
+  return galleriesDir.absolutePath();
+}
+
+QString Data::getGalleriesPath() const
+{
+  return QDir::toNativeSeparators(getGalleriesDir().absolutePath());
+}
+
+QObject *Data::setGalleriesPath(const QString &path) const
+{
+  GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(getGalleriesDir(), QDir(path), m_mainWindow);
+  job->start();
+
+  m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));
+
+  return job;
 }
 
 QString Data::getSettingsPath() const

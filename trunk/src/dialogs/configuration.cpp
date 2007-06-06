@@ -20,13 +20,16 @@
  ***************************************************************************/
 #include "configuration.h"
 
-#include "core/data.h"
-#include "core/errorhandler.h"
-
-#include <QtOpenGL/QGLFormat>
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
+
 #include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
+
+#include <QtOpenGL/QGLFormat>
+
+#include "core/data.h"
+#include "core/errorhandler.h"
 
 
 namespace GDialogs
@@ -40,6 +43,9 @@ Configuration::Configuration(QWidget *parent)
 
   // Additional initialisations
   imageEditorEdit->setType(GWidgets::LineEdit::FileSelector);
+  dirEdit->setType(GWidgets::LineEdit::DirSelector);
+
+  moveGroup->hide();
 
   QString pathString;
   QStringList environment = QProcess::systemEnvironment();
@@ -72,10 +78,10 @@ Configuration::Configuration(QWidget *parent)
   else
     nonGlRadio->setChecked(true);
 
-  imageEditorEdit->setText(QString(GCore::Data::self()->getPhotoEditor()).remove("\""));
+  imageEditorEdit->setText(GCore::Data::self()->getPhotoEditor());
   imageEditorEdit->setNeedTest(true);
 
-  dirEdit->setType(GWidgets::LineEdit::DirSelector);
+  dirEdit->setText(GCore::Data::self()->getGalleriesPath());
 
 #ifdef WANT_UPDATER
   updateBox->setChecked(GCore::Data::self()->getUpdateStartup());
@@ -96,6 +102,21 @@ Configuration::Configuration(QWidget *parent)
 
 void Configuration::accept()
 {
+  bool wait = false;
+  if (GCore::Data::self()->getGalleriesPath() != dirEdit->text())
+    if (QMessageBox::question(this, tr("Confirm move"), tr("Are you sure you want to move all the galleries?"), tr("&Move"), tr("&No"), "", 1, 1) == 0) {
+      QObject *job = GCore::Data::self()->setGalleriesPath(dirEdit->text());
+      job->setParent(this);
+      moveGroup->show();
+
+      wait = true;
+
+      connect(job, SIGNAL(directoryProgress(int, int, const QString&)), this, SLOT(updateGalleryProgress(int, int, const QString&)));
+      connect(job, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(updateImagesProgress(int, int, const QString&, const QImage&)));
+    } else {
+      return;
+    }
+
   // We save the changes
   if (glRadio->isChecked() != GCore::Data::self()->getOpengl()) {
     GCore::Data::self()->setOpengl(glRadio->isChecked());
@@ -109,11 +130,14 @@ void Configuration::accept()
     emit signalFailed(tr("You need to restart %1 for changes to take effect.").arg(GCore::Data::self()->getAppName()), GCore::ErrorHandler::Information);
   }
 
+#ifdef WANT_UPDATER
   GCore::Data::self()->setUpdateStartup(updateBox->isChecked());
+#endif
 
   GCore::Data::self()->saveChanges();
 
-  QDialog::accept();
+  if (!wait)
+    QDialog::accept();
 }
 
 void Configuration::slotTest()
@@ -134,5 +158,19 @@ void Configuration::slotBrowse()
 
 Configuration::~Configuration()
 {}
+
+void Configuration::updateGalleryProgress(int done, int total, const QString &name)
+{
+  galleriesBar->setMaximum(total);
+  galleriesBar->setValue(done);
+  galleryLabel->setText(name);
+}
+
+void Configuration::updateImagesProgress(int done, int total, const QString &name, const QImage&)
+{
+  imagesBar->setMaximum(total);
+  imagesBar->setValue(done);
+  imageLabel->setText(name);
+}
 
 }

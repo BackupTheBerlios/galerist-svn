@@ -21,10 +21,10 @@
 #ifndef GJOBSCOPYJOB_H
 #define GJOBSCOPYJOB_H
 
-#include "core/jobs/abstractjob.h"
-
 #include <QtCore/QModelIndex>
 #include <QtCore/QStringList>
+
+#include "core/jobs/abstractjob.h"
 
 class QDir;
 
@@ -141,7 +141,6 @@ class CopyJob : public GCore::GJobs::AbstractJob
     CopyMode m_mode;
 
     bool m_paused;
-    //QRegExp m_supportedFormats;
 
 };
 

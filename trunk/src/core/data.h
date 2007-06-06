@@ -24,6 +24,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
 #include <QtCore/QMap>
+#include <QtCore/QDir>
 
 class QCompleter;
 class QSettings;
@@ -39,13 +40,6 @@ class SearchBar;
 
 namespace GCore
 {
-
-namespace GNetwork
-{
-
-class Updater;
-
-}
 
 class ErrorHandler;
 class ImageModel;
@@ -96,9 +90,22 @@ class Data : public QObject
     /**
      * Returns path where galleries resides.
      *
+     * @return Path of galleries as a QDir.
+     */
+    QDir getGalleriesDir() const;
+    /**
+     * Returns path where galleries resides.
+     *
      * @return Path of galleries as a string.
      */
     QString getGalleriesPath() const;
+    /**
+     * Sets the new gallery path.
+     *
+     * @param path New gallery path.
+     */
+    QObject *setGalleriesPath(const QString &path) const;
+
     /**
      * Returns the path to the settings.
      *
@@ -366,9 +373,6 @@ class Data : public QObject
     Translations m_availableTranslations;
     QString m_appVersion;
     QString m_branch;
-#ifdef WANT_UPDATER
-    GNetwork::Updater *m_updater;
-#endif
     QWidget *m_mainWindow;
     QSortFilterProxyModel *m_modelProxy;
     QRegExp m_supportedFormats;

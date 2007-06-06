@@ -77,6 +77,9 @@ class Configuration : public QDialog, private Ui::Configuration
      */
     void slotBrowse();
 
+    void updateGalleryProgress(int done, int total, const QString &name);
+    void updateImagesProgress(int done, int total, const QString &name, const QImage&);
+
 };
 
 }
