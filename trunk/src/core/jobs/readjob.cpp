@@ -80,11 +80,9 @@ void ReadJob::job()
 
       // We set gallery path.
       QDir galleryPath(m_model->data(item, GCore::ImageModel::ImageDirPathRole).toString());
-      //galleryPath.cdUp();
 
       // We set the name of the file.
       QString fileName(m_model->data(item, GCore::ImageModel::ImageFilenameRole).toString());
-      //fileName.remove(QDir::toNativeSeparators(galleryPath.absolutePath() + "/"));
 
       // We make sure, the others know what we are doing!
       emit signalThumb(fileName);
@@ -98,7 +96,7 @@ void ReadJob::job()
 
       // Create the thumbnail.
       QImage thumbnail = QImage(QDir::toNativeSeparators(galleryPath.absoluteFilePath(fileName))).scaled(128, 128, Qt::KeepAspectRatio);
-      thumbnail.save(QDir::toNativeSeparators(thumbPath.absoluteFilePath(fileName.remove(QRegExp("\\..+$")).append(".jpg"))), "JPG");
+      thumbnail.save(QDir::toNativeSeparators(thumbPath.absoluteFilePath(fileName.append(".jpg"))), "JPG");
 
       // We report about our achievement.
       emit signalThumb(QString());

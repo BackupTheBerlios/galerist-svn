@@ -70,8 +70,7 @@ void CopyJob::job()
       return;
     }
     default: {
-      //emit signalFailed(tr("Copy mode undefined."), ErrorHandler::Critical);
-      ErrorHandler::reportMessage(tr("Copy mode undefined."), ErrorHandler::Critical);
+      emit signalFailed(tr("Copy mode undefined."), ErrorHandler::Critical);
       return;
     }
   }
@@ -122,7 +121,7 @@ void CopyJob::singleCopy()
 
     // Save the thumbnail
     QString thumbName = fileName;
-    image.save(thumbnailPath.absoluteFilePath(thumbName.remove(QRegExp("\\..+$")).append(".jpg")), "JPG");
+    image.save(thumbnailPath.absoluteFilePath(thumbName.append(".jpg")), "JPG");
 
     // Copy the image.
     if (!QFile::copy(m_source->absoluteFilePath(*count), m_destination->absoluteFilePath(fileName))) {
@@ -188,7 +187,7 @@ void CopyJob::multiCopy()
 
     // Save the thumbnail
     QString thumbName = fileName;
-    image.save(thumbnailPath.absoluteFilePath(thumbName.remove(QRegExp("\\..+$")).append(".jpg")), "JPG");
+    image.save(thumbnailPath.absoluteFilePath(thumbName.append(".jpg")), "JPG");
 
     // Copy the image.
     if (!QFile::copy(m_source->absoluteFilePath(imageFiles.at(count)), m_destination->absoluteFilePath(fileName))) {

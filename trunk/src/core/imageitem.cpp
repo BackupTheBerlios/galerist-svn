@@ -264,7 +264,7 @@ void ImageItem::cancelTransformations()
 
 QString ImageItem::getThumbName() const
 {
-  return getFileName().remove(QRegExp("\\..+$")).append(".jpg");
+  return getFileName().append(".jpg");
 }
 
 void ImageItem::loadImage()

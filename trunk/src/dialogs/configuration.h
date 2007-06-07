@@ -66,6 +66,9 @@ class Configuration : public QDialog, private Ui::Configuration
      */
     void accept();
 
+  private:
+    QObject *m_job;
+
   private slots:
     /**
      * Tests if the executable works.
@@ -77,8 +80,28 @@ class Configuration : public QDialog, private Ui::Configuration
      */
     void slotBrowse();
 
+    /**
+     * Updates the progressbar for current gallery.
+     *
+     * @param done Images already moved.
+     * @param total Total images to move.
+     * @param name Curent gallery name.
+     */
     void updateGalleryProgress(int done, int total, const QString &name);
+    /**
+     * Updates the prograssbar for total progress.
+     *
+     * @param done Images already moved.
+     * @param total Total number of images.
+     * @param name Name of the current image.
+     */
     void updateImagesProgress(int done, int total, const QString &name, const QImage&);
+    /**
+     * Set of actions to execute at finish.
+     *
+     * @param succesful The state of the job.
+     */
+    void finish(bool successful);
 
 };
 

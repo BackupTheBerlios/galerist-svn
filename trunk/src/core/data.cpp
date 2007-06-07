@@ -111,7 +111,7 @@ QDir Data::getGalleriesDir() const
 
   QDir galleriesDir(galleriesPath);
   if (!galleriesDir.exists()) {
-    // .galerist directory doen't exists... Creating one
+    // Temporary directory for galleries doesn't exist, creating it
     galleriesDir.mkpath(galleriesDir.absolutePath());
   }
 
@@ -128,6 +128,8 @@ QObject *Data::setGalleriesPath(const QString &path)
   GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(getGalleriesDir(), QDir(path), m_mainWindow);
   job->start();
 
+  connect(job, SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
+
   m_backup.insert("GalleriesPath", getGalleriesPath());
 
   m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));
@@ -139,7 +141,7 @@ QString Data::getSettingsPath() const
 {
   QDir settingsPath(QDir::homePath() + "/.goya");
   if (!settingsPath.exists()) {
-    // .galerist directory doen't exists... Creating one
+    // .goya directory doen't exists... Creating one
     settingsPath.mkpath(settingsPath.absolutePath());
   }
 
@@ -148,9 +150,8 @@ QString Data::getSettingsPath() const
 
 ImageModel *Data::getImageModel()
 {
-  if (!m_imageModel) {
-    m_imageModel = new ImageModel(getGalleriesPath(), this);
-  }
+  if (!m_imageModel)
+    m_imageModel = new ImageModel(this);
 
   return m_imageModel;
 }
@@ -287,7 +288,6 @@ QString Data::getTranslationPath() const
 void Data::setMainWindow(QWidget *mainWindow)
 {
   m_mainWindow = mainWindow;
-  //setParent(m_mainWindow);
 }
 
 QWidget *Data::getMainWindow() const
@@ -378,9 +378,10 @@ QWidget* Data::getImageAddProgress() const
 
 void Data::processGalleryMove(bool successful)
 {
-  if (!successful) {
+  if (!successful)
     m_settings->setValue("GalleriesPath", m_backup.take("GalleriesPath"));
-  }
+  else
+    m_imageModel->reconstruct();
 }
 
 }

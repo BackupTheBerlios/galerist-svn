@@ -319,7 +319,6 @@ void PhotoView::rotateSelectedImageCW()
     return;
 
   m_currentEdited->rotateCW();
-  GCore::Data::self()->getImageModel()->rotate(m_currentEdited->getIndex(), GCore::ImageModel::ClockWise);
 }
 
 void PhotoView::rotateSelectedImageCCW()
@@ -328,7 +327,6 @@ void PhotoView::rotateSelectedImageCCW()
     return;
 
   m_currentEdited->rotateCCW();
-  GCore::Data::self()->getImageModel()->rotate(m_currentEdited->getIndex(), GCore::ImageModel::CounterClockWise);
 }
 
 void PhotoView::slotNextPhoto()

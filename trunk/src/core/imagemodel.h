@@ -85,23 +85,12 @@ class ImageModel : public QAbstractItemModel
   };
 
     /**
-     * Directions for rotating images.
-     */
-    enum Rotation
-    {
-      /** Clock-wise direction. */
-      ClockWise,
-      /** Counter clock-wise direction */
-      CounterClockWise
-  };
-
-    /**
      * A constructor.
      *
      * @param path Path of the galleries.
      * @param parent Parent of this model.
      */
-    ImageModel(const QString &path, QObject *parent = 0);
+    ImageModel(QObject *parent = 0);
     /**
      * A destructor.
      */
@@ -187,17 +176,7 @@ class ImageModel : public QAbstractItemModel
      * @param item Item's index.
      */
     QIcon fileIcon(const QModelIndex &item) const;
-    /**
-     * Adds photo t the queue for thumbing.
-     */
-    void queueIconMake(const QModelIndex &item);
 
-    /**
-     * Refreshes the model
-     *
-     * @param root Root item.
-     */
-    bool refresh(ImageItem *root = 0);
     /**
      * Remakes the model from 0.
      */
@@ -282,16 +261,6 @@ class ImageModel : public QAbstractItemModel
      */
     void stopCopy();
 
-    /**
-     * Rotates the image for 90 degress. Clocl-wise or counter clock-wise.
-     */
-    void rotate(const QModelIndex &index, int direction = ClockWise) const;
-
-    /**
-     * Crops the image.
-     */
-    void crop(const QModelIndex &crop, const QRect &area) const;
-
   protected:
 
   private:
@@ -300,7 +269,7 @@ class ImageModel : public QAbstractItemModel
      *
      * @param path Path of the data to be parsed.
      */
-    void setupModelData(const QString &path) const;
+    void setupModelData() const;
     /**
      * Parses a path and adds the items to a root.
      *
@@ -328,13 +297,10 @@ class ImageModel : public QAbstractItemModel
      */
     QModelIndex processGallerySearch(const QString &name, const QModelIndex &parent = QModelIndex());
 
-    QString m_path;
     mutable GCore::GJobs::ReadJob *m_currentJob;
-    //QModelIndex m_currentThumbnail;
     GCore::GJobs::CopyJob *m_currentCopyJob;
     QModelIndex m_currentCopyParent;
     bool m_delete;
-    QList<QModelIndex> m_pendingUpdate;
 
     ImageItem *m_rootItem;
 

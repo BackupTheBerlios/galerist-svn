@@ -52,10 +52,15 @@ class Data : public QObject
 {
     Q_OBJECT
   public:
-
+    /**
+     * Set of options for background type (PhotoView).
+     */
     enum BackgroundType {
+      /** Rectangls with round cornes. */
       Round,
+      /** Rectangle with rectangular corners. */
       Rectangular,
+      /** Undefined state. */
       NotDefined
   };
 

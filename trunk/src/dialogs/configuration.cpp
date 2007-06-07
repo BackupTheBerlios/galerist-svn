@@ -22,6 +22,7 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
+#include <QtCore/QThread>
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
@@ -36,7 +37,8 @@ namespace GDialogs
 {
 
 Configuration::Configuration(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent),
+    m_job(0)
 {
   // Initialises the GUI
   setupUi(this);
@@ -103,6 +105,12 @@ Configuration::Configuration(QWidget *parent)
   connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowse()));
 }
 
+Configuration::~Configuration()
+{
+  if (m_job)
+    static_cast<QThread*>(m_job)->wait();
+}
+
 void Configuration::accept()
 {
   bool wait = false;
@@ -111,11 +119,14 @@ void Configuration::accept()
       QObject *job = GCore::Data::self()->setGalleriesPath(dirEdit->text());
       job->setParent(this);
       moveGroup->show();
+      buttonBox->setDisabled(true);
 
       wait = true;
 
       connect(job, SIGNAL(directoryProgress(int, int, const QString&)), this, SLOT(updateGalleryProgress(int, int, const QString&)));
       connect(job, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(updateImagesProgress(int, int, const QString&, const QImage&)));
+      connect(job, SIGNAL(finished(bool)), this, SLOT(finish(bool)));
+      m_job = job;
     } else {
       return;
     }
@@ -159,9 +170,6 @@ void Configuration::slotBrowse()
     imageEditorEdit->setText(editorPath);
 }
 
-Configuration::~Configuration()
-{}
-
 void Configuration::updateGalleryProgress(int done, int total, const QString &name)
 {
   galleriesBar->setMaximum(total);
@@ -174,6 +182,17 @@ void Configuration::updateImagesProgress(int done, int total, const QString &nam
   imagesBar->setMaximum(total);
   imagesBar->setValue(done);
   imageLabel->setText(name);
+}
+
+void Configuration::finish(bool successful)
+{
+  if (successful)
+    QDialog::accept();
+
+  moveGroup->hide();
+  buttonBox->setDisabled(false);
+
+  m_job = 0;
 }
 
 }

@@ -42,19 +42,19 @@ AbstractJob::AbstractJob(QObject *parent)
   connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(terminate()));
 }
 
+void AbstractJob::stop()
+{
+  m_locker.lock();
+  m_stop = true;
+  m_locker.unlock();
+}
+
 AbstractJob::~AbstractJob()
 {}
 
 void AbstractJob::run()
 {
   job();
-}
-
-void AbstractJob::stop()
-{
-  m_locker.lock();
-  m_stop = true;
-  m_locker.unlock();
 }
 
 bool AbstractJob::getStop()

@@ -382,11 +382,13 @@ void PhotoItem::zoomScreen()
 
 void PhotoItem::rotateCW()
 {
+  m_item->rotateCW();
   rotate(90);
 }
 
 void PhotoItem::rotateCCW()
 {
+  m_item->rotateCCW();
   rotate(-90);
 }
 
