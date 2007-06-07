@@ -7,7 +7,6 @@ HEADERS += lineedit.h \
            gallerytreeview.h \
            imageaddprogress.h \
            photoview.h \
-           textedit.h \
            tooltip.h \
            searchbar.h \
            inputzoomdialog.h \
@@ -16,7 +15,6 @@ SOURCES += lineedit.cpp \
            gallerytreeview.cpp \
            imageaddprogress.cpp \
            photoview.cpp \
-           textedit.cpp \
            tooltip.cpp \
            searchbar.cpp \
            inputzoomdialog.cpp \

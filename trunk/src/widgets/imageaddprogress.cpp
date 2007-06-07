@@ -29,9 +29,11 @@ namespace GWidgets
 {
 
 ImageAddProgress::ImageAddProgress(QWidget *parent)
-    : QWidget(parent, Qt::Popup)
+    : QWidget(parent, Qt::ToolTip)
 {
   setupUi(this);
+
+  setWindowModality(Qt::NonModal);
 
   QPoint position;
   QRect desktop = QApplication::desktop()->screenGeometry();
@@ -48,6 +50,13 @@ ImageAddProgress::~ImageAddProgress()
 void ImageAddProgress::setProgress(int finished, int total, const QString &currentName, const QImage &currentPixmap)
 {
   show();
+
+  if (total == -1) {
+    nameLabel->setText(tr("Reading of pictures has been canceled."));
+    QTimer::singleShot(1000, this, SLOT(hide()));
+    return;
+  }
+
   progressBar->setMaximum(total);
   progressBar->setValue(finished);
   nameLabel->setText(currentName);

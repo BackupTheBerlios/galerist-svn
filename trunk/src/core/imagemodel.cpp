@@ -662,7 +662,7 @@ void ImageModel::slotRemoveCopyJob()
     endRemoveRows();
   }
 
-  // Delete the CopyJob!
+  // Delete the CopyJob
   disconnect(this, SLOT(slotRemoveCopyJob()));
   m_currentCopyJob->deleteLater();
   m_currentCopyJob = 0;

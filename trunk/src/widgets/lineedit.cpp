@@ -41,9 +41,12 @@ namespace GWidgets
 
 LineEdit::LineEdit(QWidget *parent, Types type)
     : QLineEdit(parent),
+    m_validationMethod(ValidStatesDefined),
+    m_inputAttribute(Readable),
     m_valid(false),
     m_canceling(false),
     m_testing(false),
+    m_needExisting(true),
     m_type(type)
 {
   // Wrapper slot, so we emit the data with it. No need subclassing keyPressEvent() method
@@ -164,7 +167,7 @@ void LineEdit::setValidMessage(const QString &message)
 
 void LineEdit::addValidValues(const QStringList &values)
 {
-  m_validValues = values;
+  m_validValues << values;
 }
 
 void LineEdit::addValidValue(const QString &value)
@@ -172,18 +175,64 @@ void LineEdit::addValidValue(const QString &value)
   m_validValues << value;
 }
 
+void LineEdit::addInvalidValues(const QStringList &values)
+{
+  m_invalidValues << values;
+}
+
+void LineEdit::addInvalidValue(const QString &value)
+{
+  m_invalidValues << value;
+}
+
 void LineEdit::setNeedTest(bool test)
 {
   m_testing = test;
 }
 
+void LineEdit::setValidationMethod(ValidationMethods method)
+{
+  m_validationMethod = method;
+}
+
+void LineEdit::setValidAttribute(Attributes attribute)
+{
+  m_inputAttribute = attribute;
+}
+
+void LineEdit::setNeedExisting(bool need)
+{
+  m_needExisting = need;
+}
+
 void LineEdit::checkValidity(const QString &text)
 {
-  if (m_validValues.contains(text)) {
-    setValidity(true, m_validMessage, !m_testing);
+  // We don't use internal verify with WithVerify and Default types
+  if (m_type == WithVerify || m_type == Default)
+    return;
+
+  QStringList comperisonList;
+  bool validationResult;
+
+
+  switch (m_validationMethod) {
+    case (ValidStatesDefined) : {
+      comperisonList = m_validValues;
+      validationResult = true;
+      break;
+    }
+    case (InvalidStatesDefined) : {
+      comperisonList = m_invalidValues;
+      validationResult = false;
+    }
+  }
+
+  // We check for valid/invalid values first
+  if (comperisonList.contains(text)) {
+    setValidity(validationResult, validationResult ? m_validMessage : m_errMessage, !m_testing);
     return;
   } else if (m_type == WithInternalVerify) {
-    setValidity(false, m_errMessage);
+    setValidity(!validationResult, !validationResult ? m_validMessage : m_errMessage, !m_testing);
     return;
   }
 
@@ -191,16 +240,53 @@ void LineEdit::checkValidity(const QString &text)
   bool isDir = info.isDir();
   bool isFile = info.isFile();
 
-  if (m_type == DirSelector)
-    if (isDir)
-      setValidity(true, m_validMessage, !m_testing);
-    else
-      setValidity(false, isFile ? tr("This is a file.") : QString());
-  else if (m_type == FileSelector)
-    if (isFile)
-      setValidity(true, m_validMessage, !m_testing);
-    else
-      setValidity(false, isDir ? tr("This is a directory.") : QString());
+  switch (m_type) {
+    case (DirSelector) : {
+      if (!isDir && m_needExisting) {
+        setValidity(false, isFile ? tr("This is a file.") : QString());
+        return;
+      }
+      break;
+    }
+    case (FileSelector) : {
+      if (!isFile && m_needExisting) {
+        setValidity(false, isDir ? tr("This is a directory.") : QString());
+        return;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+
+  if (!m_needExisting && !info.exists())
+    info = QFileInfo(info.dir().absolutePath());
+
+  switch (m_inputAttribute) {
+    case (Readable) : {
+      if (!info.isReadable()) {
+        setValidity(false, tr("Directory or file is not readable!"));
+        return;
+      }
+      break;
+    }
+    case (Writable) : {
+      if (!info.isWritable()) {
+        setValidity(false, tr("Directory or file is not writable!"));
+        return;
+      }
+      break;
+    }
+    case (Executable) : {
+      if (!info.isExecutable()) {
+        setValidity(false, tr("File is not executable!"));
+        return;
+      }
+      break;
+    }
+  }
+
+  setValidity(true, m_validMessage, !m_testing);
 }
 
 }

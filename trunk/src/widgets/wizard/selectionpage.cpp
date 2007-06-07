@@ -21,13 +21,7 @@
 
 #include "selectionpage.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-
 #include <QtGui/QFileDialog>
-#include <QtGui/QListWidgetItem>
-#include <QtGui/QIcon>
-#include <QtGui/QPixmap>
 
 #include "core/data.h"
 #include "core/imagemodel.h"
@@ -61,7 +55,10 @@ SelectionPage::SelectionPage()
 
 SelectionPage::~SelectionPage()
 {
-  imagesEdit->setType(GWidgets::LineEdit::Default);
+  if (m_readJob) {
+    static_cast<GCore::GJobs::ReadJob*> (m_readJob)->stop();
+    static_cast<QThread*> (m_readJob)->wait();
+  }
 }
 
 void SelectionPage::cleanupPage()
@@ -78,10 +75,13 @@ void SelectionPage::initializePage()
     // Add all available galleries
     parentBox->addItems(GCore::Data::self()->getImageModel()->getGalleriesList());
 
-    nameEdit->setType(GWidgets::LineEdit::WithVerify);
+    nameEdit->setType(GWidgets::LineEdit::WithInternalVerify);
+    nameEdit->setValidationMethod(GWidgets::LineEdit::InvalidStatesDefined);
+    nameEdit->addInvalidValues(GCore::Data::self()->getImageModel()->getGalleriesList());
+    nameEdit->setErrorMessage(tr("Gallery allready exists. Please select a different name."));
+
     imagesEdit->setType(GWidgets::LineEdit::DirSelector);
 
-    connect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
     connect(nameEdit, SIGNAL(validityChanged(bool)), this, SIGNAL(completeChanged()));
     connect(imagesEdit, SIGNAL(validityChanged(bool)), this, SIGNAL(completeChanged()));
     connect(imagesEdit, SIGNAL(validityChanged(bool)), this, SLOT(clearPreview(bool)));
@@ -136,16 +136,6 @@ void SelectionPage::slotBrowseClicked()
     m_readJob = 0;
     imagesEdit->setText(directory);
   }
-}
-
-void SelectionPage::slotCheckName(const QString &name)
-{
-  if (nameEdit->text().isEmpty())
-    nameEdit->setValidity(false);
-  else if (!nameEdit->text().isEmpty() && !GCore::Data::self()->getImageModel()->findGallery(name).isValid())
-    nameEdit->setValidity(true);
-  else
-    nameEdit->setValidity(false, tr("Gallery allready exists. Please select a different name."));
 }
 
 void SelectionPage::addImage(const QString&, const QImage &image, const QString&)

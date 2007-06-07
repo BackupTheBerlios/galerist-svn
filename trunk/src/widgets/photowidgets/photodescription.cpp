@@ -27,16 +27,40 @@
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QTextDocument>
 #include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QTextEdit>
 
 #include "core/imagemodel.h"
 
 #include "widgets/photoview.h"
-#include "widgets/textedit.h"
 
 #include "widgets/photowidgets/photoitem.h"
-
 namespace GWidgets
 {
+
+TextEdit::TextEdit(QWidget *parent)
+    : QTextEdit(parent)
+{
+  this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+}
+
+void TextEdit::keyPressEvent(QKeyEvent *event)
+{
+  if (event->key() == Qt::Key_Escape) {
+    emit editingCanceled();
+    event->ignore();
+    return;
+  }
+
+  QTextEdit::keyPressEvent(event);
+}
+
+void TextEdit::focusOutEvent(QFocusEvent*)
+{
+  if (isVisible()) {
+    emit editingFinished(toPlainText());
+  }
+}
 
 namespace GPhotoWidgets
 {

@@ -48,7 +48,10 @@ Configuration::Configuration(QWidget *parent)
 
   // Additional initialisations
   imageEditorEdit->setType(GWidgets::LineEdit::FileSelector);
+  imageEditorEdit->setValidAttribute(GWidgets::LineEdit::Executable);
   dirEdit->setType(GWidgets::LineEdit::DirSelector);
+  dirEdit->setValidAttribute(GWidgets::LineEdit::Writable);
+  dirEdit->setNeedExisting(false);
 
   moveGroup->hide();
 
@@ -114,7 +117,7 @@ Configuration::~Configuration()
 void Configuration::accept()
 {
   bool wait = false;
-  if (GCore::Data::self()->getGalleriesPath() != dirEdit->text())
+  if (GCore::Data::self()->getGalleriesPath() != dirEdit->text() && dirEdit->isValid())
     if (QMessageBox::question(this, tr("Confirm move"), tr("Are you sure you want to move all the galleries?"), tr("&Move"), tr("&No"), "", 1, 1) == 0) {
       QObject *job = GCore::Data::self()->setGalleriesPath(dirEdit->text());
       job->setParent(this);
@@ -137,7 +140,8 @@ void Configuration::accept()
     emit signalFailed(tr("You need to restart %1 for changes to take effect.").arg(GCore::Data::self()->getAppName()), GCore::ErrorHandler::Information);
   }
 
-  GCore::Data::self()->setPhotoEditor(imageEditorEdit->text());
+  if (imageEditorEdit->isValid())
+    GCore::Data::self()->setPhotoEditor(imageEditorEdit->text());
 
   if (translationBox->currentText() != GCore::Data::self()->getTranslationName()) {
     GCore::Data::self()->setTranslation(translationBox->currentText());

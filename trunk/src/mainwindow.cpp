@@ -42,24 +42,13 @@
 
 #include "widgets/photocontrol.h"
 
-
-#include "widgets/textedit.h"
-
-#include "core/jobs/movejob.h"
-
 MainWindow::MainWindow()
     : QMainWindow(), Ui::MainWindow()
 {
   setupUi(this);
 
-  /* GCore::GJobs::MoveJob *bu = new GCore::GJobs::MoveJob(QDir("/home/mastermind/.goya/galleries"), QDir("/home"), this);
-   bu->start();*/
-
   setWindowIcon(QIcon(":/images/galerist.png"));
   setWindowTitle(GCore::Data::self()->getAppName());
-
-  // FIXME This ugly, quick-fixing HACK needs to get OUT! pronto! <= Can't do it! It's killing meeee arrrgghhhghg... :S
-  GWidgets::TextEdit(this);
 
   startTimer(100);
 

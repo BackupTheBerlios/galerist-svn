@@ -96,13 +96,6 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
     void slotBrowseClicked();
 
     /**
-     * Checks if the name is valid.
-     *
-     * @param name Name to verify.
-     */
-    void slotCheckName(const QString &name);
-
-    /**
      * Adds images to the preview list.
      */
     void addImage(const QString&, const QImage &image, const QString&);

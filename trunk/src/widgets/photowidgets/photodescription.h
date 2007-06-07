@@ -23,6 +23,7 @@
 #define GWIDGETSPHOTODESCRIPTION_H
 
 #include <QtGui/QGraphicsItem>
+#include <QtGui/QTextEdit>
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -34,7 +35,47 @@ class QPainter;
 namespace GWidgets
 {
 
-class TextEdit;
+/**
+ * Class for text edits used in PhotoView.
+ * @short Text edit just for PhotoView.
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ */
+class TextEdit : public QTextEdit
+{
+    Q_OBJECT
+  signals:
+    /**
+     * Signals taht the editing has been finished.
+     *
+     * @param text The new text.
+     */
+    void editingFinished(const QString &text);
+    /**
+     * Signals that the editing has been canceled.
+     */
+    void editingCanceled();
+
+  public:
+    /**
+     * Default constructor.
+     */
+    TextEdit(QWidget *parent = 0);
+
+  protected:
+    /**
+     * Reimplemented method for defining what to do when it gets pressed.
+     *
+     * @param event The event :).
+     */
+    void keyPressEvent(QKeyEvent *event);
+    /**
+     * Reimplemented method for defining what to do when focus goes away.
+     */
+    void focusOutEvent(QFocusEvent*);
+
+  private:
+    QString m_previous;
+};
 
 namespace GPhotoWidgets
 {

@@ -26,6 +26,7 @@
 #include <QtCore/QMutex>
 
 #include <QtGui/QApplication>
+#include <QtGui/QImage>
 
 namespace GCore
 {
@@ -55,6 +56,8 @@ AbstractJob::~AbstractJob()
 void AbstractJob::run()
 {
   job();
+  if (m_stop)
+    emit signalProgress(0, -1, QString(), QImage());
 }
 
 bool AbstractJob::getStop()

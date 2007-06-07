@@ -63,11 +63,36 @@ class LineEdit : public QLineEdit
       WithVerify,
       /** LineEdit with internal checking enabled. */
       WithInternalVerify,
-      /** LineEdit optimised for selecting files. Includes verification, auto completion and in Windows conversion from / to \. (Maybe with browse button?) */
+      /** LineEdit optimised for selecting files. Includes verification and auto completion. */
       FileSelector,
       /** LineEdit like FileSelector, but doesn't complete with files. */
       DirSelector
   };
+
+    /**
+     * Validation methods.
+     */
+    enum ValidationMethods
+    {
+      /** Valid states are defined (Default). */
+      ValidStatesDefined,
+      /** Invalid states are defined. */
+      InvalidStatesDefined
+    };
+
+    /**
+     * Directory and file attributes.
+     */
+    enum Attributes
+    {
+      /** For valid directory/file it has to be readable (Default). */
+      Readable,
+      /** For valid directory/file it has to be writable. */
+      Writable,
+      /** For valid directory/file it has to be executable. */
+      Executable
+    };
+
     /**
      * Default constructor.
      * @param parent Parent widget.
@@ -137,12 +162,19 @@ class LineEdit : public QLineEdit
      */
     void addValidValue(const QString &value);
 
+    void addInvalidValues(const QStringList &values);
+    void addInvalidValue(const QString &value);
+
     /**
      * Sets the need of testing the data.
      *
      * @param test Defines if it needs to get tested or not.
      */
     void setNeedTest(bool test);
+
+    void setValidationMethod(ValidationMethods method);
+    void setValidAttribute(Attributes attribute);
+    void setNeedExisting(bool need);
 
   protected:
     /**
@@ -165,14 +197,18 @@ class LineEdit : public QLineEdit
     void focusOutEvent(QFocusEvent *event);
 
   private:
+    ValidationMethods m_validationMethod;
+    Attributes m_inputAttribute;
     bool m_valid;
     bool m_canceling;
     bool m_testing;
     bool m_tested;
+    bool m_needExisting;
     Types m_type;
     QString m_errMessage;
     QString m_validMessage;
     QStringList m_validValues;
+    QStringList m_invalidValues;
 
   private slots:
     /**
