@@ -23,6 +23,7 @@
 #define GWIDGETSGWIZARDSELECTIONPAGE_H
 
 #include <QtGui/QWizardPage>
+
 #include "ui_selectionpage.h"
 
 namespace GWidgets
@@ -105,6 +106,8 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
      * Adds images to the preview list.
      */
     void addImage(const QString&, const QImage &image, const QString&);
+
+    void clearPreview(bool isValid);
 
 };
 

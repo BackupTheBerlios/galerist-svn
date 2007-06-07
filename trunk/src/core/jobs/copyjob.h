@@ -56,13 +56,9 @@ class CopyJob : public GCore::GJobs::AbstractJob
      */
     enum CopyMode
     {
-      /**
-       * Copy only one image.
-       */
+      /** Copy only one image. */
       SingleMode,
-      /**
-       * Copy whole bunch of images.
-       */
+      /** Copy whole bunch of images. */
       MultiMode
   };
 

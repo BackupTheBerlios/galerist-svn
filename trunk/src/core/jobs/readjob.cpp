@@ -132,9 +132,13 @@ void ReadJob::readPath(const QDir &path)
     }
   }
 
-  QStringList images = path.entryList(QDir::Files);
+  QStringList images = path.entryList(GCore::Data::self()->getImageFormats(), QDir::Files);
   if (!m_images.isEmpty())
     images = m_images;
+
+  int totalImages = images.count();
+  int imagesDone = 1;
+
   foreach(QString image, images) {
     if (getStop())
       return;
@@ -145,6 +149,8 @@ void ReadJob::readPath(const QDir &path)
     imageThumbnail = QImage(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio);
 
     emit signalProgress(image, imageThumbnail, path.absolutePath());
+    emit AbstractJob::signalProgress(imagesDone, totalImages, image, imageThumbnail);
+    imagesDone++;
   }
 }
 

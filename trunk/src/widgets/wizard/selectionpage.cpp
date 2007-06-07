@@ -21,13 +21,6 @@
 
 #include "selectionpage.h"
 
-#include "core/data.h"
-#include "core/imagemodel.h"
-
-#include "core/jobs/readjob.h"
-
-#include "widgets/lineedit.h"
-
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
@@ -35,6 +28,13 @@
 #include <QtGui/QListWidgetItem>
 #include <QtGui/QIcon>
 #include <QtGui/QPixmap>
+
+#include "core/data.h"
+#include "core/imagemodel.h"
+
+#include "core/jobs/readjob.h"
+
+#include "widgets/lineedit.h"
 
 namespace GWidgets
 {
@@ -84,6 +84,7 @@ void SelectionPage::initializePage()
     connect(nameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotCheckName(const QString&)));
     connect(nameEdit, SIGNAL(validityChanged(bool)), this, SIGNAL(completeChanged()));
     connect(imagesEdit, SIGNAL(validityChanged(bool)), this, SIGNAL(completeChanged()));
+    connect(imagesEdit, SIGNAL(validityChanged(bool)), this, SLOT(clearPreview(bool)));
 
     // Insert the path to the home directory
     // Only if there is no predefined images!
@@ -97,14 +98,6 @@ void SelectionPage::initializePage()
 
 bool SelectionPage::isComplete() const
 {
-  m_readJob = 0;
-  previewList->clear();
-
-  if (imagesEdit->isValid())
-    makePreview(imagesEdit->text());
-  else
-    return false;
-
   if (nameEdit->isValid())
     return QWizardPage::isComplete();
 
@@ -128,6 +121,7 @@ void SelectionPage::makePreview(const QString &path, const QStringList &images) 
     GCore::GJobs::ReadJob *read = new GCore::GJobs::ReadJob((QObject*) this, QDir(path), images);
 
     connect(read, SIGNAL(signalProgress(const QString&, const QImage&, const QString&)), this, SLOT(addImage(const QString&, const QImage&, const QString&)));
+    connect(read, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getImageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
 
     read->start();
 
@@ -158,6 +152,15 @@ void SelectionPage::addImage(const QString&, const QImage &image, const QString&
 {
   if (!image.isNull())
     new QListWidgetItem(QIcon(QPixmap::fromImage(image)), "", previewList);
+}
+
+void SelectionPage::clearPreview(bool isValid)
+{
+  m_readJob = 0;
+  previewList->clear();
+
+  if (isValid)
+    makePreview(imagesEdit->text());
 }
 
 }
