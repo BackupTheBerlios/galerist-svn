@@ -39,6 +39,9 @@ UniUpdate::UniUpdate(QWidget *parent)
 {
   setupUi(this);
 
+  // Making sure it's going to be deleted upon close
+  setAttribute(Qt::WA_DeleteOnClose, true);
+
   changelogFrame->hide();
 
   layout()->setSizeConstraint(QLayout::SetFixedSize);

@@ -41,6 +41,9 @@ Configuration::Configuration(QWidget *parent)
   // Initialises the GUI
   setupUi(this);
 
+  // Making sure it's going to be closed upon deletion
+  setAttribute(Qt::WA_DeleteOnClose, true);
+
   // Additional initialisations
   imageEditorEdit->setType(GWidgets::LineEdit::FileSelector);
   dirEdit->setType(GWidgets::LineEdit::DirSelector);
@@ -49,23 +52,23 @@ Configuration::Configuration(QWidget *parent)
 
   QString pathString;
   QStringList environment = QProcess::systemEnvironment();
-  foreach (QString line, environment)
-    if (line.contains(QRegExp("^PATH="))) {
+  foreach(QString line, environment)
+  if (line.contains(QRegExp("^PATH="))) {
     pathString = line;
     continue;
-    }
+  }
 
 #ifdef Q_WS_WIN
-    QStringList path = pathString.remove("PATH=").split(';');
+  QStringList path = pathString.remove("PATH=").split(';');
 #else
-    QStringList path = pathString.remove("PATH=").split(':');
+  QStringList path = pathString.remove("PATH=").split(':');
 #endif
-    foreach (QString directory, path) {
-      foreach (QString executable, QDir(directory).entryList(QDir::Files)) {
-        executable.remove(".exe");
-        imageEditorEdit->addValidValue(executable);
-      }
+  foreach(QString directory, path) {
+    foreach(QString executable, QDir(directory).entryList(QDir::Files)) {
+      executable.remove(".exe");
+      imageEditorEdit->addValidValue(executable);
     }
+  }
 
   glRadio->setEnabled(QGLFormat::hasOpenGL());
 

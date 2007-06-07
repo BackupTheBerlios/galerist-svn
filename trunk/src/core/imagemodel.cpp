@@ -644,8 +644,6 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
     endRemoveRows();
   }
 
-  //reconstruct();
-
   return index(parentNum, 0);
 }
 

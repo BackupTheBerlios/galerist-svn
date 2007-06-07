@@ -123,10 +123,12 @@ QString Data::getGalleriesPath() const
   return QDir::toNativeSeparators(getGalleriesDir().absolutePath());
 }
 
-QObject *Data::setGalleriesPath(const QString &path) const
+QObject *Data::setGalleriesPath(const QString &path)
 {
   GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(getGalleriesDir(), QDir(path), m_mainWindow);
   job->start();
+
+  m_backup.insert("GalleriesPath", getGalleriesPath());
 
   m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));
 
@@ -364,14 +366,21 @@ void Data::setSearchBar(GWidgets::SearchBar* searchBar)
   m_searchBar = searchBar;
 }
 
+void Data::setImageAddProgress(QWidget* imageAddProgress)
+{
+  m_imageAddProgress = imageAddProgress;
+}
+
 QWidget* Data::getImageAddProgress() const
 {
   return m_imageAddProgress;
 }
 
-void Data::setImageAddProgress(QWidget* imageAddProgress)
+void Data::processGalleryMove(bool successful)
 {
-  m_imageAddProgress = imageAddProgress;
+  if (!successful) {
+    m_settings->setValue("GalleriesPath", m_backup.take("GalleriesPath"));
+  }
 }
 
 }

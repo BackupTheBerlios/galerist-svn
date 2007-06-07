@@ -52,9 +52,9 @@ MainWindow::MainWindow()
 {
   setupUi(this);
 
- /* GCore::GJobs::MoveJob *bu = new GCore::GJobs::MoveJob(QDir("/home/mastermind/.goya/galleries"), QDir("/home"), this);
-  bu->start();*/
-  
+  /* GCore::GJobs::MoveJob *bu = new GCore::GJobs::MoveJob(QDir("/home/mastermind/.goya/galleries"), QDir("/home"), this);
+   bu->start();*/
+
   setWindowIcon(QIcon(":/images/galerist.png"));
   setWindowTitle(GCore::Data::self()->getAppName());
 

@@ -56,6 +56,12 @@ class AbstractJob : public QThread
      * @param errorMessage Error string to show the user.
      */
     void signalFailed(const QString &errorMessage, int);
+    /**
+     * Reports that the job has been finished.
+     *
+     * @param successful Tells if the job has been successful.
+     */
+    void finished(bool successful);
 
   public:
     /**

@@ -92,6 +92,9 @@ void NewGalleryWizard::setupUi()
     setFixedSize(770, 570);
   else
     setFixedSize(580, 570);
+
+  // Making sure it's going to be deleted upon close
+  setAttribute(Qt::WA_DeleteOnClose, true);
 }
 
 }

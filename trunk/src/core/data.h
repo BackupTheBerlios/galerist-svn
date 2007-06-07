@@ -103,8 +103,10 @@ class Data : public QObject
      * Sets the new gallery path.
      *
      * @param path New gallery path.
+     *
+     * @return Job doing the move.
      */
-    QObject *setGalleriesPath(const QString &path) const;
+    QObject *setGalleriesPath(const QString &path);
 
     /**
      * Returns the path to the settings.
@@ -380,7 +382,13 @@ class Data : public QObject
     GWidgets::SearchBar *m_searchBar;
     QWidget *m_imageAddProgress;
 
+    // Backup data
+    QMap<QString, QVariant> m_backup;
+
     // Methods
+
+  private slots:
+    void processGalleryMove(bool successful);
 
 };
 
