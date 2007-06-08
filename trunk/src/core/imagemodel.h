@@ -191,7 +191,7 @@ class ImageModel : public QAbstractItemModel
      *
      * @return Reference to the job.
      */
-    QObject *addImages(const QModelIndex &parent, const QString &sourcePath, const QStringList &fileNames = QStringList());
+    QObject *addImages(const QModelIndex &parent, const QString &sourcePath, const QStringList &fileNames = QStringList(), bool deleteSource = false);
     /**
      * Creates a gallery and adds it into the model.
      *
@@ -202,7 +202,7 @@ class ImageModel : public QAbstractItemModel
      *
      * @return Reference to the job.
      */
-    QObject *createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent = QModelIndex(), const QStringList &fileNames = QStringList());
+    QObject *createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent = QModelIndex(), bool deleteSources = false, const QStringList &fileNames = QStringList());
 
     /**
      * Removes a gallery.

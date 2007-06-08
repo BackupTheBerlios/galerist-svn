@@ -49,6 +49,9 @@ SelectionPage::SelectionPage()
   registerField("GalleryName*", nameEdit);
   registerField("GalleryPath*", imagesEdit);
   registerField("ParentGallery", parentBox);
+  registerField("DeleteSourceImages", deleteSourceBox);
+
+  deleteSourceBox->setChecked(GCore::Data::self()->getDeleteSourceImagesDefault());
 
   connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowseClicked()));
 }

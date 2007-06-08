@@ -30,6 +30,8 @@
 #include "core/jobs/readjob.h"
 #include "core/jobs/copyjob.h"
 
+#include <QtDebug>
+
 namespace GCore
 {
 
@@ -301,7 +303,7 @@ void ImageModel::reconstruct()
   reset();
 }
 
-QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourcePath, const QStringList &fileNames)
+QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourcePath, const QStringList &fileNames, bool deleteSource)
 {
   if (!parent.isValid())
     return 0;
@@ -313,7 +315,7 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
   if (fileNames.isEmpty()) {
     if (!m_currentCopyJob) {
       m_currentCopyParent = parent;
-      m_currentCopyJob = new GCore::GJobs::CopyJob(sourcePath, gallery->getFilePath(), parent);
+      m_currentCopyJob = new GCore::GJobs::CopyJob(sourcePath, gallery->getFilePath(), parent, deleteSource, this);
       connect(m_currentCopyJob, SIGNAL(signalProcess(const QString&)), this, SLOT(slotProcess(const QString&)));
       connect(m_currentCopyJob, SIGNAL(finished()), this, SLOT(slotRemoveCopyJob()));
       m_currentCopyJob->start();
@@ -334,8 +336,9 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
   return 0;
 }
 
-QObject *ImageModel::createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent, const QStringList &fileNames)
+QObject *ImageModel::createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent, bool deleteSources, const QStringList &fileNames)
 {
+  qDebug() << deleteSources;
   QString path;
   if (parent.isValid())
     path = parent.data(ImageModel::ImageFilepathRole).toString();
@@ -372,7 +375,7 @@ QObject *ImageModel::createGallery(const QString &name, const QString &sourcePat
   endInsertRows();
   GCore::Data::self()->getModelProxy()->setSourceModel(this);
 
-  return addImages(parentIndex, sourcePath, fileNames);
+  return addImages(parentIndex, sourcePath, fileNames, deleteSources);
 }
 
 bool ImageModel::removeGallery(const QModelIndex &index)

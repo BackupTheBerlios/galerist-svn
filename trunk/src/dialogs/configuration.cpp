@@ -101,6 +101,8 @@ Configuration::Configuration(QWidget *parent)
 
   imageEditorEdit->setValidMessage(tr("Click Test button to verify the program."));
 
+  moveBox->setChecked(GCore::Data::self()->getDeleteSourceImagesDefault());
+
   // Connect all the slots
   connect(this, SIGNAL(signalFailed(const QString&, int)), GCore::Data::self()->getErrorHandler(), SLOT(slotReporter(const QString&, int)));
   connect(testButton, SIGNAL(clicked()), this, SLOT(slotTest()));
@@ -151,6 +153,8 @@ void Configuration::accept()
 #ifdef WANT_UPDATER
   GCore::Data::self()->setUpdateStartup(updateBox->isChecked());
 #endif
+
+  GCore::Data::self()->setDeleteSourceImagesDefault(moveBox->isChecked());
 
   GCore::Data::self()->saveChanges();
 

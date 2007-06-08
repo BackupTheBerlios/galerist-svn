@@ -137,6 +137,16 @@ QObject *Data::setGalleriesPath(const QString &path)
   return job;
 }
 
+bool Data::getDeleteSourceImagesDefault() const
+{
+  return m_settings->value("DeleteSourceImagesDefault", false).toBool();
+}
+
+void Data::setDeleteSourceImagesDefault(bool state) const
+{
+  m_settings->setValue("DeleteSourceImagesDefault", state);
+}
+
 QString Data::getSettingsPath() const
 {
   QDir settingsPath(QDir::homePath() + "/.goya");

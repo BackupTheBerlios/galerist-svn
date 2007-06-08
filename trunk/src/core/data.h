@@ -114,6 +114,16 @@ class Data : public QObject
     QObject *setGalleriesPath(const QString &path);
 
     /**
+     * Gets the default state of the "Delete source images" checkbox.
+     */
+    bool getDeleteSourceImagesDefault() const;
+
+    /**
+     * Sets the default state of the "Delete source images" checkbox.
+     */
+    void setDeleteSourceImagesDefault(bool state) const;
+
+    /**
      * Returns the path to the settings.
      *
      * @return Path of settings as a string.

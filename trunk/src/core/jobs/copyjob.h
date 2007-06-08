@@ -70,7 +70,7 @@ class CopyJob : public GCore::GJobs::AbstractJob
      * @param gallery Index of the gallery to which the images will be added.
      * @param parent Parent of this job.
      */
-    CopyJob(const QString &source, const QString &destination, const QModelIndex &gallery, QObject *parent = 0);
+    CopyJob(const QString &source, const QString &destination, const QModelIndex &gallery, bool deleteSource = false, QObject *parent = 0);
     /**
      * A constructor for copiing a list of images.
      *
@@ -124,10 +124,11 @@ class CopyJob : public GCore::GJobs::AbstractJob
      * The copy process for a list of files.
      */
     void singleCopy();
+
     /**
-     * A cleanup method.
+     * Deletes the copied images.
      */
-    void deleteCopied();
+    void deleteSourceImages(const QStringList &images);
 
     //Variables.
     QDir *m_source;
@@ -135,6 +136,7 @@ class CopyJob : public GCore::GJobs::AbstractJob
     QStringList m_fileNames;
     QModelIndex m_gallery;
     CopyMode m_mode;
+    bool m_deleteSource;
 
     bool m_paused;
 

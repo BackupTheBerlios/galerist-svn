@@ -57,7 +57,7 @@ void CopyPage::initializePage()
     parentGallery = GCore::Data::self()->getImageModel()->findGallery(field("ParentGallery").toString());
 
   // We copy the images to the right place
-  m_copyProcess = GCore::Data::self()->getImageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery);
+  m_copyProcess = GCore::Data::self()->getImageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery, field("DeleteSourceImages").toBool());
 
   // Connect the gallery handler.
   qRegisterMetaType<QImage>("QImage");
