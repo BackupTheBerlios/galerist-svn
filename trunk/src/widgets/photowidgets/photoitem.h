@@ -347,6 +347,14 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      */
     void initialiseTimer();
 
+    /**
+     * Calculates the needed scale factor to get the current pixmap size to the designated size.
+     *
+     * @param image Current pixmap image.
+     * @param size The destination size.
+     *
+     * @return Scale factor.
+     */
     qreal calculateScale(const QPixmap &image, const QSizeF &size) const;
 
   private slots:

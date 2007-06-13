@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -29,6 +29,8 @@
 
 #include <QtGui/QPixmap>
 
+using namespace GCore;
+
 namespace GWidgets
 {
 
@@ -54,10 +56,10 @@ void CopyPage::initializePage()
   // We determine which gallery is the parent
   QModelIndex parentGallery = QModelIndex();
   if (field("ParentGallery").toString() != "None")
-    parentGallery = GCore::Data::self()->getImageModel()->findGallery(field("ParentGallery").toString());
+    parentGallery = static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->findGallery(field("ParentGallery").toString());
 
   // We copy the images to the right place
-  m_copyProcess = GCore::Data::self()->getImageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery, field("DeleteSourceImages").toBool());
+  m_copyProcess = static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery, field("DeleteSourceImages").toBool());
 
   // Connect the gallery handler.
   qRegisterMetaType<QImage>("QImage");
@@ -75,7 +77,7 @@ void CopyPage::pauseCopy()
   if (!m_copyProcess)
     return;
 
-  GCore::GJobs::CopyJob *copyJob = static_cast<GCore::GJobs::CopyJob*>(m_copyProcess);
+  GJobs::CopyJob *copyJob = static_cast<GJobs::CopyJob*>(m_copyProcess);
   copyJob->pause();
 }
 
@@ -84,7 +86,7 @@ void CopyPage::resumeCopy()
   if (!m_copyProcess)
     return;
 
-  GCore::GJobs::CopyJob *copyJob = static_cast<GCore::GJobs::CopyJob*>(m_copyProcess);
+  GJobs::CopyJob *copyJob = static_cast<GJobs::CopyJob*>(m_copyProcess);
   copyJob->unpause();
 }
 
@@ -93,7 +95,7 @@ void CopyPage::stopCopy()
   if (!m_copyProcess)
     return;
 
-  GCore::GJobs::CopyJob *copyJob = static_cast<GCore::GJobs::CopyJob*>(m_copyProcess);
+  GJobs::CopyJob *copyJob = static_cast<GJobs::CopyJob*>(m_copyProcess);
   copyJob->stop();
   m_copyProcess = 0;
   copyJob = 0;

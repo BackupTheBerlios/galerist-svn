@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -82,7 +82,7 @@ void SearchBar::hide()
   QWidget::hide();
 }
 
-void SearchBar::setListFilter(QObject *filterList)
+void SearchBar::setListFilter(QWidget *filterList)
 {
   connect(this, SIGNAL(focusLost()), filterList, SLOT(slotRetakeFocus()));
   connect(this, SIGNAL(filterChanged(const QString&)), filterList, SLOT(setFilter(const QString&)));

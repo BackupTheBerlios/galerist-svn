@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -42,7 +42,7 @@ ImageModel::ImageModel(QObject *parent)
     m_currentCopyParent(QModelIndex()),
     m_delete(false)
 {
-  m_rootItem = new ImageItem(GCore::Data::self()->getGalleriesPath(), 0, ImageItem::Root);
+  m_rootItem = new ImageItem(Data::self()->value(Data::GalleriesPath).toString(), 0, ImageItem::Root);
   setupModelData();
 }
 
@@ -69,7 +69,7 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
       if (item->imageType() == ImageItem::Gallery) {
         return item->name();
       } else {
-        ExifManager exifData(item->getFilePath(), GCore::Data::self()->getImageModel());
+        ExifManager exifData(item->getFilePath(), static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>()));
 
         QString date;
         if (!exifData.getCreationDate().isValid())
@@ -295,7 +295,7 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
 void ImageModel::reconstruct()
 {
   ImageItem *temp = m_rootItem;
-  m_rootItem = new ImageItem(GCore::Data::self()->getGalleriesPath(), 0, ImageItem::Root);
+  m_rootItem = new ImageItem(Data::self()->value(Data::GalleriesPath).toString(), 0, ImageItem::Root);
   setupModelData();
 
   delete temp;
@@ -343,7 +343,7 @@ QObject *ImageModel::createGallery(const QString &name, const QString &sourcePat
   if (parent.isValid())
     path = parent.data(ImageModel::ImageFilepathRole).toString();
   else
-    path = GCore::Data::self()->getGalleriesPath();
+    path = Data::self()->value(Data::GalleriesPath).toString();
 
   // We create the destination directory
   QDir destPath(path);
@@ -373,7 +373,7 @@ QObject *ImageModel::createGallery(const QString &name, const QString &sourcePat
   }
 
   endInsertRows();
-  GCore::Data::self()->getModelProxy()->setSourceModel(this);
+  static_cast<QSortFilterProxyModel *>(Data::self()->value(Data::ModelProxy).value<QObject*>())->setSourceModel(this);
 
   return addImages(parentIndex, sourcePath, fileNames, deleteSources);
 }
@@ -384,9 +384,9 @@ bool ImageModel::removeGallery(const QModelIndex &index)
     return false;
 
   // Remove all child galleries first
-  foreach (QModelIndex child, childs(index))
-    if (child.data(GCore::ImageModel::ImageTypeRole) == GCore::ImageItem::Gallery)
-      removeGallery(child);
+  foreach(QModelIndex child, childs(index))
+  if (child.data(GCore::ImageModel::ImageTypeRole) == GCore::ImageItem::Gallery)
+    removeGallery(child);
 
   ImageItem *item = static_cast<ImageItem*>(index.internalPointer());
 
@@ -424,7 +424,7 @@ bool ImageModel::removeGallery(const QModelIndex &index)
 
   QDirIterator images(gallery.absolutePath(), QDir::Files | QDir::Hidden | QDir::System);
   while (images.hasNext())
-    if (!gallery.remove(images.next())){
+    if (!gallery.remove(images.next())) {
       ErrorHandler::reportMessage(tr("Cannot delete gallery. Images and ohter files in gallery cannot be deleted."), ErrorHandler::Critical);
       return false;
     }
@@ -454,7 +454,7 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
 
   ImageItem *parentItem = static_cast<ImageItem*>(parent.internalPointer());
 
-  foreach (QModelIndex index, indexList) {
+  foreach(QModelIndex index, indexList) {
     ImageItem *picture = static_cast<ImageItem*>(index.internalPointer());
 
     if (picture->imageType() != GCore::ImageItem::Image)
@@ -468,19 +468,19 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
 
     // Remove the picture's thumbnail
     if (!QFile::remove(gallery.absoluteFilePath(picture->getThumbName()))) {
-      qDebug() << "Cannot remove thumbnail: " << gallery.absoluteFilePath(picture->getThumbName()) << endl;
-      status = false;
-      break;
-    }
+        qDebug() << "Cannot remove thumbnail: " << gallery.absoluteFilePath(picture->getThumbName()) << endl;
+        status = false;
+        break;
+      }
 
     gallery.cdUp();
 
     // Remove the picture
     if (!QFile::remove(picture->getFilePath())) {
-      qDebug() << "Cannot remove image: " << picture->getFilePath() << endl;
-      status = false;
-      break;
-    }
+        qDebug() << "Cannot remove image: " << picture->getFilePath() << endl;
+        status = false;
+        break;
+      }
 
     // Remove the metadata
     if (!picture->remove()) {
@@ -549,7 +549,7 @@ void ImageModel::stopCopy()
 
 void ImageModel::setupModelData() const
 {
-  processPath(GCore::Data::self()->getGalleriesDir());
+  processPath(QDir(Data::self()->value(Data::GalleriesPath).toString()));
 }
 
 void ImageModel::processPath(const QDir &path, ImageItem *root) const
@@ -562,7 +562,7 @@ void ImageModel::processPath(const QDir &path, ImageItem *root) const
   items.removeAll("..");
   items.removeAll(".thumbnails");
 
-  foreach (QString item, items) {
+  foreach(QString item, items) {
     QDir temp = path;
     temp.cd(item);
     ImageItem *gallery = new ImageItem(item, root, ImageItem::Gallery);
@@ -573,8 +573,8 @@ void ImageModel::processPath(const QDir &path, ImageItem *root) const
   QStringList images = path.entryList(QDir::Files);
   images.removeAll(".metadata");
 
-  foreach (QString image, images)
-    root->appendChild(new ImageItem(image, root, ImageItem::Image));
+  foreach(QString image, images)
+  root->appendChild(new ImageItem(image, root, ImageItem::Image));
 }
 
 QStringList ImageModel::processGalleriesList(ImageItem *root)
@@ -600,7 +600,7 @@ QStringList ImageModel::processGalleriesList(ImageItem *root)
 
 QModelIndex ImageModel::processGallerySearch(const QString &name, const QModelIndex &parent)
 {
-  foreach (QModelIndex child, childs(parent)) {
+  foreach(QModelIndex child, childs(parent)) {
     // Check if the item is a gallery and has the name that we seek
     if (child.data(ImageModel::ImageTypeRole) == ImageItem::Gallery && child.data(ImageModel::ImageNameRole).toString() == name) {
       return child;
@@ -635,7 +635,7 @@ void ImageModel::slotProcess(const QString &fileName)
     endInsertRows();
 
     // Is there any better option?
-    Data::self()->getModelProxy()->setSourceModel(this);
+    static_cast<QSortFilterProxyModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>())->setSourceModel(this);
 
   } else if (fileName != "~ERROR~") {
     removeGallery(m_currentCopyParent);

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -34,6 +34,8 @@
 #include "core/imageitem.h"
 #include "core/data.h"
 
+using namespace GCore;
+
 namespace GWidgets
 {
 
@@ -45,17 +47,17 @@ GalleryTreeView::GalleryTreeView(QWidget *parent)
 
 void GalleryTreeView::contextMenuEvent(QContextMenuEvent *event)
 {
-  GCore::Data::self()->getGalleryContextMenu()->exec(event->globalPos());
+  static_cast<QMenu*>(Data::self()->value(Data::GalleryContextMenu).value<QWidget*>())->exec(event->globalPos());
 }
 
 void GalleryTreeView::slotDelete()
 {
-  QModelIndex selectedGallery = GCore::Data::self()->getModelProxy()->mapToSource(selectedIndexes().first());
+  QModelIndex selectedGallery = static_cast<QSortFilterProxyModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>())->mapToSource(selectedIndexes().first());
 
   emit clicked(QModelIndex());
 
   if (QMessageBox::question(0, tr("Confirm deletion"), tr("Are you sure you want to delete %1?").arg(selectedGallery.data().toString()), tr("Delete"), tr("Keep"), QString(), 1, 1) == 0)
-    static_cast<GCore::ImageModel*>(static_cast<QSortFilterProxyModel*>(model())->sourceModel())->removeGallery(selectedGallery);
+    static_cast<ImageModel*>(static_cast<QSortFilterProxyModel*>(model())->sourceModel())->removeGallery(selectedGallery);
 }
 
 void GalleryTreeView::slotCheckSelection(const QModelIndex &selected)

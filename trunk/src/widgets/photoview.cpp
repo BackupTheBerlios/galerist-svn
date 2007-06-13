@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -58,6 +58,8 @@
 
 #include "dialogs/newgallerywizard.h"
 
+using namespace GCore;
+
 namespace GWidgets
 {
 
@@ -79,7 +81,7 @@ PhotoView::PhotoView(QWidget *parent)
   setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
   setInteractive(true);
 
-  if (GCore::Data::self()->getOpengl() && QGLFormat::hasOpenGL())
+  if (Data::self()->value(Data::OpenGL).toBool() && QGLFormat::hasOpenGL())
     setViewport(new QGLWidget(QGLFormat(QGL::DirectRendering | QGL::SampleBuffers | QGL::DoubleBuffer)));
 
   // Loading item
@@ -129,7 +131,7 @@ void PhotoView::setModel(QAbstractItemModel *model)
 
 void PhotoView::setRootIndex(const QModelIndex &index)
 {
-  QModelIndex mappedIndex = GCore::Data::self()->getModelProxy()->mapToSource(index);
+  QModelIndex mappedIndex = static_cast<QSortFilterProxyModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>())->mapToSource(index);
 
   if (!mappedIndex.isValid() || mappedIndex.model() != m_model || mappedIndex == m_rootIndex)
     return;
@@ -201,7 +203,7 @@ void PhotoView::initiateOperation(int operation)
     return;
 
   switch (operation) {
-    case (GCore::GJobs::TransformationJob::Crop) : {
+    case (GJobs::TransformationJob::Crop) : {
       m_needRubberBand = true;
 
       connect(this, SIGNAL(areaSelected(const QRect&)), this, SLOT(cropSelection(const QRect&)));
@@ -222,7 +224,7 @@ void PhotoView::cancelOperation(int operation)
     return;
 
   switch (operation) {
-    case (GCore::GJobs::TransformationJob::Crop) : {
+    case (GJobs::TransformationJob::Crop) : {
       // We disable rubberband
       m_needRubberBand = false;
 
@@ -231,15 +233,15 @@ void PhotoView::cancelOperation(int operation)
       viewport()->setCursor(Qt::OpenHandCursor);
       break;
     }
-    case (GCore::GJobs::TransformationJob::Blur) : {
+    case (GJobs::TransformationJob::Blur) : {
       m_currentEdited->cancelTransformations();
       break;
     }
-    case (GCore::GJobs::TransformationJob::Sharpen) : {
+    case (GJobs::TransformationJob::Sharpen) : {
       m_currentEdited->cancelTransformations();
       break;
     }
-    case (GCore::GJobs::TransformationJob::Resize) : {
+    case (GJobs::TransformationJob::Resize) : {
       m_currentEdited->cancelTransformations();
       break;
     }
@@ -258,7 +260,7 @@ void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
     return;
 
   switch (operation) {
-    case (GCore::GJobs::TransformationJob::Crop) : {
+    case (GJobs::TransformationJob::Crop) : {
       // We enable rubberband
       m_needRubberBand = false;
 
@@ -269,15 +271,15 @@ void PhotoView::saveOperation(int operation, const QMap<int, QVariant> &params)
       m_currentEdited->saveCrop();
       break;
     }
-    case (GCore::GJobs::TransformationJob::Blur) : {
+    case (GJobs::TransformationJob::Blur) : {
       m_currentEdited->saveBlur();
       break;
     }
-    case (GCore::GJobs::TransformationJob::Sharpen) : {
+    case (GJobs::TransformationJob::Sharpen) : {
       m_currentEdited->saveSharpen();
       break;
     }
-    case (GCore::GJobs::TransformationJob::Resize) : {
+    case (GJobs::TransformationJob::Resize) : {
       m_currentEdited->saveResize();
       break;
     }
@@ -294,16 +296,16 @@ void PhotoView::previewOperation(int operation, const QMap<int, QVariant> &param
     return;
 
   switch (operation) {
-    case (GCore::GJobs::TransformationJob::Blur) : {
-      m_currentEdited->blurPreview(params.value(GCore::GJobs::TransformationJob::NumberFilter).toInt());
+    case (GJobs::TransformationJob::Blur) : {
+      m_currentEdited->blurPreview(params.value(GJobs::TransformationJob::NumberFilter).toInt());
       break;
     }
-    case (GCore::GJobs::TransformationJob::Sharpen) : {
-      m_currentEdited->sharpenPreview(params.value(GCore::GJobs::TransformationJob::NumberFilter).toInt());
+    case (GJobs::TransformationJob::Sharpen) : {
+      m_currentEdited->sharpenPreview(params.value(GJobs::TransformationJob::NumberFilter).toInt());
       break;
     }
-    case (GCore::GJobs::TransformationJob::Resize) : {
-      m_currentEdited->resizePreview(params.value(GCore::GJobs::TransformationJob::Size).toSize());
+    case (GJobs::TransformationJob::Resize) : {
+      m_currentEdited->resizePreview(params.value(GJobs::TransformationJob::Size).toSize());
       break;
     }
     default : {
@@ -342,13 +344,13 @@ void PhotoView::slotNextPhoto()
 
   emit photoEditSelectionChanged(newIndex, m_itemVector.count());
 
-  disconnect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+  disconnect(m_currentEdited->getIndex().data(ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   m_currentEdited = m_itemVector.at(newIndex);
 
-  connect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+  connect(m_currentEdited->getIndex().data(ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
-  emit imageSwitched(m_currentEdited->getIndex().data(GCore::ImageModel::ImagePictureRole).value<QImage>().size());
+  emit imageSwitched(m_currentEdited->getIndex().data(ImageModel::ImagePictureRole).value<QImage>().size());
 
   updateScene();
 }
@@ -366,13 +368,13 @@ void PhotoView::slotPreviousPhoto()
 
   emit photoEditSelectionChanged(newIndex, m_itemVector.count());
 
-  disconnect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+  disconnect(m_currentEdited->getIndex().data(ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   m_currentEdited = m_itemVector.at(newIndex);
 
-  connect(m_currentEdited->getIndex().data(GCore::ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
+  connect(m_currentEdited->getIndex().data(ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
-  emit imageSwitched(m_currentEdited->getIndex().data(GCore::ImageModel::ImagePictureRole).value<QImage>().size());
+  emit imageSwitched(m_currentEdited->getIndex().data(ImageModel::ImagePictureRole).value<QImage>().size());
 
   updateScene();
 }
@@ -422,12 +424,12 @@ void PhotoView::slotZoomInputPhoto()
 
 void PhotoView::slotEditPhoto()
 {
-  QString photo = m_currentEdited->getIndex().data(GCore::ImageModel::ImageFilepathRole).toString();
+  QString photo = m_currentEdited->getIndex().data(ImageModel::ImageFilepathRole).toString();
 
   QStringList arguments;
   arguments << QDir::toNativeSeparators(photo);
 
-  if (!QProcess::startDetached(GCore::Data::self()->getPhotoEditor(), arguments))
+  if (!QProcess::startDetached(Data::self()->value(Data::EditorPath).toString(), arguments))
     QMessageBox::critical(this, tr("External edit failed"), tr("The external editor, which was specified in configuration, couldn't be run."));
 }
 
@@ -468,7 +470,7 @@ void PhotoView::readModel()
     QModelIndex row = m_model->index(i, 0, m_rootIndex);
 
     // We don't want to show directories(galleries), don't we?
-    if (row.data(GCore::ImageModel::ImageTypeRole).toInt() == GCore::ImageItem::Gallery)
+    if (row.data(ImageModel::ImageTypeRole).toInt() == ImageItem::Gallery)
       continue;
 
     GPhotoWidgets::PhotoItem *item = new GPhotoWidgets::PhotoItem(this, row);
@@ -501,7 +503,7 @@ void PhotoView::slotModelRowsInserted(const QModelIndex &parent, int start, int 
 
   for (int count = start; count < end; count++) {
     QModelIndex row = m_model->index(count, 0, index);
-    if (row.data(GCore::ImageModel::ImageTypeRole) != GCore::ImageItem::Image)
+    if (row.data(ImageModel::ImageTypeRole) != ImageItem::Image)
       continue;
 
     GPhotoWidgets::PhotoItem *item = new GPhotoWidgets::PhotoItem(this, row);
@@ -550,8 +552,8 @@ void PhotoView::slotModelDataChanged(const QModelIndex &start, const QModelIndex
       GPhotoWidgets::PhotoItem *item;
       int scrollbarPosition = verticalScrollBar()->value();
       if ((item = itemForIndex(picture))) {
-        item->setText(picture.data(GCore::ImageModel::ImageNameRole).toString(), picture.data(GCore::ImageModel::ImageDescriptionRole).toString());
-        item->setPixmap(picture.data(GCore::ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(128, 128));
+        item->setText(picture.data(ImageModel::ImageNameRole).toString(), picture.data(ImageModel::ImageDescriptionRole).toString());
+        item->setPixmap(picture.data(ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(128, 128));
         item->setToolTip(picture.data(Qt::ToolTipRole).toString());
       }
       verticalScrollBar()->setValue(scrollbarPosition);
@@ -744,9 +746,9 @@ void PhotoView::mouseReleaseEvent(QMouseEvent *event)
 void PhotoView::contextMenuEvent(QContextMenuEvent *event)
 {
   if (!m_editMode)
-    GCore::Data::self()->getPhotoContextMenu()->exec(event->globalPos());
+    static_cast<QMenu*>(Data::self()->value(Data::PhotoContextMenu).value<QWidget*>())->exec(event->globalPos());
   else
-    GCore::Data::self()->getPhotoEditingContextMenu()->exec(event->globalPos());
+    static_cast<QMenu*>(Data::self()->value(Data::PhotoContextMenu).value<QWidget*>())->exec(event->globalPos());
 }
 
 void PhotoView::dragEnterEvent(QDragEnterEvent *event)
@@ -758,7 +760,7 @@ void PhotoView::dragEnterEvent(QDragEnterEvent *event)
 
   for (QList<QUrl>::const_iterator count = imageUrls.constBegin(); count != end; count++) {
     QString path = (*count).toLocalFile();
-    if (path.contains(GCore::Data::self()->getSupportedFormats())) {
+    if (path.contains(Data::self()->value(Data::SupportedFormats).toRegExp())) {
       haveImages = true;
       break;
     }
@@ -788,7 +790,7 @@ void PhotoView::dropEvent(QDropEvent *event)
 
   for (QList<QUrl>::const_iterator count = imageUrls.constBegin(); count != end; count++) {
     QString path = (*count).toLocalFile();
-    if (!path.isEmpty() && path.contains(GCore::Data::self()->getSupportedFormats()))
+    if (!path.isEmpty() && path.contains(Data::self()->value(Data::SupportedFormats).toRegExp()))
       imagePaths << path;
   }
 
@@ -803,12 +805,12 @@ void PhotoView::dropEvent(QDropEvent *event)
   QMenu dropdownMenu(tr("Dropped images"), this);
   QAction *newDestination = dropdownMenu.addAction(QIcon(":/images/new.png"), tr("New gallery"));
   newDestination->setStatusTip(tr("Create a new gallery with the dropped in images."));
-  newDestination->setParent(GCore::Data::self()->getMainWindow());
+  newDestination->setParent(Data::self()->value(Data::MainWindow).value<QWidget*>());
   QAction *existing = dropdownMenu.addAction(QIcon(":/images/add-existing.png"), tr("Existing gallery"));
   existing->setStatusTip(tr("Insert the dropped in images into the selected gallery."));
-  existing->setParent(GCore::Data::self()->getMainWindow());
+  existing->setParent(Data::self()->value(Data::MainWindow).value<QWidget*>());
 
-  if (m_rootIndex.data(GCore::ImageModel::ImageTypeRole).toInt() != GCore::ImageItem::Gallery)
+  if (m_rootIndex.data(ImageModel::ImageTypeRole).toInt() != ImageItem::Gallery)
     existing->setEnabled(false);
 
   QAction *choice = dropdownMenu.exec(mapToGlobal(event->pos()));
@@ -817,7 +819,7 @@ void PhotoView::dropEvent(QDropEvent *event)
     GDialogs::NewGalleryWizard *wizard = new GDialogs::NewGalleryWizard(path, pictures, this);
     wizard->show();
   } else if (choice == existing) {
-    connect(GCore::Data::self()->getImageModel()->addImages(m_rootIndex, path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getImageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+    connect(static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->addImages(m_rootIndex, path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->value(Data::ImageAddProgress).value<QObject*>(), SLOT(setProgress(int, int, const QString&, const QImage&)));
   }
 
   event->acceptProposedAction();
@@ -825,12 +827,13 @@ void PhotoView::dropEvent(QDropEvent *event)
 
 void PhotoView::keyPressEvent(QKeyEvent *event)
 {
+  SearchBar *searchBar = static_cast<SearchBar*>(Data::self()->value(Data::SearchBar).value<QWidget*>());
   // If a normal text has been pressed... Then we start a search
   if (!event->text().isEmpty() && event->key() != Qt::Key_Escape && event->key() != Qt::Key_Return && !m_editMode && (event->modifiers() == Qt::NoModifier || event->matches(QKeySequence::Find))) {
     if (event->matches(QKeySequence::Find))
-      GCore::Data::self()->getSearchBar()->addLetter("");
+      searchBar->addLetter("");
     else
-      GCore::Data::self()->getSearchBar()->addLetter(event->text());
+      searchBar->addLetter(event->text());
     return;
   }
 
@@ -895,7 +898,7 @@ void PhotoView::keyPressEvent(QKeyEvent *event)
       break;
     }
     case(Qt::Key_Escape): {
-      GCore::Data::self()->getSearchBar()->hide();
+      searchBar->hide();
       break;
     }
     default: {
@@ -985,7 +988,7 @@ void PhotoView::slotRemove()
       if (index.isValid()) {
         selectedIndexes << index;
 
-        static_cast<GCore::ImageModel*>(m_model)->removeImages(selectedIndexes);
+        static_cast<ImageModel*>(m_model)->removeImages(selectedIndexes);
         selectedIndexes.clear();
       }
     }
@@ -994,7 +997,7 @@ void PhotoView::slotRemove()
 
 void PhotoView::slotConnectNavButtons()
 {
-  GCore::Data::self()->getSearchBar()->setListFilter(this);
+  static_cast<SearchBar*>(Data::self()->value(Data::SearchBar).value<QWidget*>())->setListFilter(this);
 }
 
 void PhotoView::cropSelection(const QRect &area)
@@ -1031,7 +1034,7 @@ void PhotoView::setEditMode(bool editMode, GWidgets::GPhotoWidgets::PhotoItem *s
   emit signalEditMode(editMode);
 
   if (editMode) {
-    emit imageSwitched(m_currentEdited->getIndex().data(GCore::ImageModel::ImagePictureRole).value<QImage>().size());
+    emit imageSwitched(m_currentEdited->getIndex().data(ImageModel::ImagePictureRole).value<QImage>().size());
     emit photoEditSelectionChanged(m_itemVector.indexOf(m_currentEdited), m_itemVector.count());
     setDragMode(QGraphicsView::ScrollHandDrag);
     viewport()->setCursor(Qt::OpenHandCursor);

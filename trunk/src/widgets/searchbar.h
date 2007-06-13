@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -32,7 +32,7 @@ class LineEdit;
 
 /**
  * @short A search bar for an easier way of search.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
  */
 class SearchBar : public QWidget
 {
@@ -68,7 +68,7 @@ class SearchBar : public QWidget
     /**
      * Set filter output.
      */
-    void setListFilter(QObject *filterList);
+    void setListFilter(QWidget *filterList);
 
   public slots:
     /**

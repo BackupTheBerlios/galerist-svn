@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -42,17 +42,19 @@
 
 #include "widgets/photocontrol.h"
 
+using namespace GCore;
+
 MainWindow::MainWindow()
     : QMainWindow(), Ui::MainWindow()
 {
   setupUi(this);
 
   setWindowIcon(QIcon(":/images/galerist.png"));
-  setWindowTitle(GCore::Data::self()->getAppName());
+  setWindowTitle(Data::self()->value(Data::AppName).toString());
 
   startTimer(100);
 
-  GCore::Data::self()->setSearchBar(searchBar);
+  Data::self()->setValue(Data::SearchBar, QVariant::fromValue<QWidget*>(searchBar));
 
   connect(imageList, SIGNAL(signalEditMode(bool)), this, SLOT(setEditMode(bool)));
 
@@ -61,14 +63,14 @@ MainWindow::MainWindow()
   initDocks();
 
   // Check if the user has the required Sql driver
-  if (!GCore::MetaDataManager::driverAvailable()) {
-    QMessageBox::critical(this, tr("Fatal error"), tr("Qt doesn't have Sql driver for Sqlite3! %1 cannot operate without it! %1 will now close.").arg(GCore::Data::self()->getAppName()));
+  if (!MetaDataManager::driverAvailable()) {
+    QMessageBox::critical(this, tr("Fatal error"), tr("Qt doesn't have Sql driver for Sqlite3! %1 cannot operate without it! %1 will now close.").arg(Data::self()->value(Data::AppName).toString()));
     QTimer::singleShot(1, qApp, SLOT(quit()));
   }
 
 #ifdef WANT_UPDATER
   // Lets check for updates
-  if (GCore::Data::self()->getUpdateStartup())
+  if (Data::self()->getUpdateStartup())
     GDialogs::UniUpdate::checkUpdatesStartup(this);
 #endif
 }
@@ -109,7 +111,7 @@ void MainWindow::initActionButtons()
 
   // Connect Help menu
   connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-  actionAbout->setText(tr("&About %1").arg(GCore::Data::self()->getAppName()));
+  actionAbout->setText(tr("&About %1").arg(Data::self()->value(Data::AppName).toString()));
   connect(actionAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
 #ifdef WANT_UPDATER
@@ -124,7 +126,7 @@ void MainWindow::initActionButtons()
   QMenu *contextMenu = new QMenu(this);
   contextMenu->addAction(actionNew);
   contextMenu->addAction(actionRemoveGallery);
-  GCore::Data::self()->setGalleryContextMenu(contextMenu);
+  Data::self()->setValue(Data::GalleryContextMenu, QVariant::fromValue(static_cast<QWidget*>(contextMenu)));
 
   // Store photo view context menu
   contextMenu = new QMenu(this);
@@ -135,7 +137,7 @@ void MainWindow::initActionButtons()
   contextMenu->addAction(actionRemove);
   contextMenu->addSeparator();
   contextMenu->addMenu(menuSelection);
-  GCore::Data::self()->setPhotoContextMenu(contextMenu);
+  Data::self()->setValue(Data::PhotoContextMenu, QVariant::fromValue(static_cast<QWidget*>(contextMenu)));
 
 
   photoControl->connectView(imageList);
@@ -145,8 +147,8 @@ void MainWindow::initToolbar()
 {
   // Load the configuration
 
-  switch (GCore::Data::self()->getBackgroundType()) {
-    case (GCore::Data::Round) : {
+  switch (Data::self()->value(Data::BackgroundType).toInt()) {
+    case (Data::Round) : {
       actionRoundBackground->setChecked(true);
       break;
     }
@@ -160,8 +162,8 @@ void MainWindow::initToolbar()
 void MainWindow::initDocks()
 {
   albumView->header()->setVisible(false);
-  albumView->setModel(GCore::Data::self()->getModelProxy());
-  imageList->setModel(GCore::Data::self()->getImageModel());
+  albumView->setModel(static_cast<QAbstractItemModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>()));
+  imageList->setModel(static_cast<QAbstractItemModel*>(Data::self()->value(Data::ImageModel).value<QObject*>()));
   imageControlWidget->setVisible(false);
 
   connect(imageList, SIGNAL(signalOneSelected(bool)), actionPreview, SLOT(setEnabled(bool)));
@@ -178,8 +180,8 @@ void MainWindow::initDocks()
 
 void MainWindow::about()
 {
-  QString about = tr("With %1 you can create your own galleries of pictures, comment all pictures and upload them to a gallery site.\n\nCurrent version: %2\nAuthor name: Gregor Kališnik\nAuthor email: gregor@unimatrix-one.org").arg(GCore::Data::self()->getAppName()).arg(GCore::Data::self()->getAppVersion());
-  QMessageBox::about(this, tr("About %1").arg(GCore::Data::self()->getAppName()), about);
+  QString about = tr("With %1 you can create your own galleries of pictures, comment all pictures and upload them to a gallery site.\n\nCurrent version: %2 %3\nAuthor name: Gregor KaliÅ¡nik\nAuthor email: gregor@unimatrix-one.org").arg(Data::self()->value(Data::AppName).toString()).arg(Data::self()->value(Data::AppVersion).toString()).arg(Data::self()->value(Data::AppBranch).toString());
+  QMessageBox::about(this, tr("About %1").arg(Data::self()->value(Data::AppName).toString()), about);
 }
 
 void MainWindow::slotNew()
@@ -192,7 +194,7 @@ void MainWindow::slotNew()
 void MainWindow::slotRectangularBackground(bool checked)
 {
   if (checked) {
-    GCore::Data::self()->setBackgroundType(GCore::Data::Rectangular);
+    Data::self()->setValue(Data::BackgroundType, Data::Rectangular);
     actionRoundBackground->setChecked(false);
     imageList->viewport()->update();
   } else {
@@ -203,7 +205,7 @@ void MainWindow::slotRectangularBackground(bool checked)
 void MainWindow::slotRoundBackground(bool checked)
 {
   if (checked) {
-    GCore::Data::self()->setBackgroundType(GCore::Data::Round);
+    Data::self()->setValue(Data::BackgroundType, Data::Round);
     actionRectangularBackground->setChecked(false);
     imageList->viewport()->update();
   } else {
@@ -213,7 +215,7 @@ void MainWindow::slotRoundBackground(bool checked)
 
 void MainWindow::slotQuit()
 {
-  GCore::Data::self()->clear();
+  Data::self()->clear();
 }
 
 void MainWindow::slotUpdateEditButtons(bool selected)
@@ -240,7 +242,7 @@ void MainWindow::slotAddImages()
   QStringList images = pictures;
   images.replaceInStrings(path, QString());
 
-  connect(GCore::Data::self()->getImageModel()->addImages(imageList->rootIndex(), path, images), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getImageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+  connect(static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->addImages(imageList->rootIndex(), path, images), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->value(Data::ImageAddProgress).value<QWidget*>(), SLOT(setProgress(int, int, const QString&, const QImage&)));
 }
 
 void MainWindow::startUpdater()

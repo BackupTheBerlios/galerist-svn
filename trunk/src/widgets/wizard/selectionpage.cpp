@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -30,6 +30,8 @@
 
 #include "widgets/lineedit.h"
 
+using namespace GCore;
+
 namespace GWidgets
 {
 
@@ -51,7 +53,7 @@ SelectionPage::SelectionPage()
   registerField("ParentGallery", parentBox);
   registerField("DeleteSourceImages", deleteSourceBox);
 
-  deleteSourceBox->setChecked(GCore::Data::self()->getDeleteSourceImagesDefault());
+  deleteSourceBox->setChecked(Data::self()->value(Data::DeleteSource).toBool());
 
   connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowseClicked()));
 }
@@ -59,8 +61,8 @@ SelectionPage::SelectionPage()
 SelectionPage::~SelectionPage()
 {
   if (m_readJob) {
-    static_cast<GCore::GJobs::ReadJob*> (m_readJob)->stop();
-    static_cast<QThread*> (m_readJob)->wait();
+    static_cast<GJobs::ReadJob*>(m_readJob)->stop();
+    static_cast<QThread*>(m_readJob)->wait();
   }
 }
 
@@ -76,11 +78,11 @@ void SelectionPage::initializePage()
     setField("GalleryName", "");
 
     // Add all available galleries
-    parentBox->addItems(GCore::Data::self()->getImageModel()->getGalleriesList());
+    parentBox->addItems(static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->getGalleriesList());
 
     nameEdit->setType(GWidgets::LineEdit::WithInternalVerify);
     nameEdit->setValidationMethod(GWidgets::LineEdit::InvalidStatesDefined);
-    nameEdit->addInvalidValues(GCore::Data::self()->getImageModel()->getGalleriesList());
+    nameEdit->addInvalidValues(static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->getGalleriesList());
     nameEdit->setErrorMessage(tr("Gallery allready exists. Please select a different name."));
 
     imagesEdit->setType(GWidgets::LineEdit::DirSelector);
@@ -121,10 +123,10 @@ void SelectionPage::makePreview(const QString &path, const QStringList &images) 
 {
   if (!m_readJob) {
     previewList->clear();
-    GCore::GJobs::ReadJob *read = new GCore::GJobs::ReadJob((QObject*) this, QDir(path), images);
+    GJobs::ReadJob *read = new GJobs::ReadJob((QObject*) this, QDir(path), images);
 
     connect(read, SIGNAL(signalProgress(const QString&, const QImage&, const QString&)), this, SLOT(addImage(const QString&, const QImage&, const QString&)));
-    connect(read, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->getImageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+    connect(read, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->value(Data::ImageAddProgress).value<QWidget*>(), SLOT(setProgress(int, int, const QString&, const QImage&)));
 
     read->start();
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -35,6 +35,11 @@ ErrorHandler::ErrorHandler(QObject *parent)
 
 void ErrorHandler::slotReporter(const QString &message, int type)
 {
+  reportMessage(message, type);
+}
+
+void ErrorHandler::reportMessage(const QString &message, int type)
+{
   switch (type) {
     case (Information) : {
       QMessageBox::information(0, tr("Information"), message);
@@ -53,34 +58,6 @@ void ErrorHandler::slotReporter(const QString &message, int type)
       break;
     }
   }
-  //reportMessage(errorMessage, type);
-}
-
-void ErrorHandler::reportMessage(const QString &meessage, int type)
-{
-  /*switch (type) {
-    case (Information) :
-    {
-      QMessageBox::information(0, tr("Information"), message);
-      break;
-    }
-    case (Warning) :
-    {
-      QMessageBox::warning(0, tr("Warning"), message);
-      break;
-    }
-    case (Critical) :
-    {
-      QMessageBox::critical(0, tr("Error"), message);
-      break;
-    }
-    default:
-    {
-      QMessageBox::critical(0, tr("Bug in error handling"), tr("Error handler doesn't know the error type."));
-      break;
-    }
-  }*/
-  emit GCore::Data::self()->getErrorHandler()->signalMessage(meessage, type);
 }
 
 ErrorHandler::~ErrorHandler()

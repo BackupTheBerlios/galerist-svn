@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -83,7 +83,7 @@ void CopyJob::multiCopy()
   bool failure = false;
   // Get the list of images we need to copy.
   QStringList imageFiles;
-  imageFiles = m_source->entryList(Data::self()->getImageFormats());
+  imageFiles = m_source->entryList(Data::self()->value(Data::ImageFormats).toStringList());
 
   // Count how many images we need to copy.
   int numberImages = imageFiles.count() - 1;
@@ -115,7 +115,7 @@ void CopyJob::multiCopy()
     }
 
     // If the file is 0 in size, it's a fake (need to get a better verification process)
-    if (QFileInfo(*m_source, imageFiles.at(count)).size() == 0 || !imageFiles.at(count).contains(Data::self()->getSupportedFormats())) {
+    if (QFileInfo(*m_source, imageFiles.at(count)).size() == 0 || !imageFiles.at(count).contains(Data::self()->value(Data::SupportedFormats).toRegExp())) {
       emit signalProgress(count, numberImages, imageFiles.at(count), QImage());
       continue;
     }
@@ -150,8 +150,8 @@ void CopyJob::multiCopy()
     return;
 
   QStringList images;
-  foreach (QString image, imageFiles)
-    images << m_source->absoluteFilePath(image);
+  foreach(QString image, imageFiles)
+  images << m_source->absoluteFilePath(image);
 
   deleteSourceImages(images);
 }
@@ -176,7 +176,7 @@ void CopyJob::singleCopy()
     }
 
     // If the file is 0 in size, it's a fake (need to get a better verification process)
-    if (QFileInfo(*m_source, *count).size() == 0 || !(*count).contains(Data::self()->getSupportedFormats())) {
+    if (QFileInfo(*m_source, *count).size() == 0 || !(*count).contains(Data::self()->value(Data::SupportedFormats).toRegExp())) {
       emit signalProgress(processed, numberImages, *count, QImage());
       processed++;
       continue;
@@ -241,8 +241,8 @@ void CopyJob::unpause()
 
 void CopyJob::deleteSourceImages(const QStringList &images)
 {
-  foreach (QString image, images)
-    QFile::remove(image);
+  foreach(QString image, images)
+  QFile::remove(image);
 }
 
 }

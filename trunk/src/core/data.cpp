@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -22,6 +22,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
+#include <QtCore/QMetaType>
 
 #include <QtGui/QApplication>
 #include <QtGui/QDirModel>
@@ -60,6 +61,22 @@ Data::Data(QObject *parent)
   m_fileCompleter = new QCompleter(this);
   m_fileCompleter->setModel(new QDirModel(QStringList(), QDir::AllEntries, QDir::Name, m_fileCompleter));
 
+  m_errorHandler = new GCore::ErrorHandler(this);
+
+  m_imageModel = new GCore::ImageModel(this);
+
+  m_modelProxy = new QSortFilterProxyModel(this);
+  m_modelProxy->setFilterRole(ImageModel::ImageTypeRole);
+  m_modelProxy->setFilterWildcard(QString::number(ImageItem::Gallery));
+  m_modelProxy->setSourceModel(m_imageModel);
+
+  QMenu *temp = new QMenu(m_mainWindow);
+  temp->addAction(tr("Nothing available"))->setDisabled(true);
+
+  m_galleryContextMenu = temp;
+  m_photoEditContextMenu = temp;
+  m_photoContextMenu = temp;
+
   // Setting up supported image formats
   m_imageFormats << "*.jpg"; //JPEG
   m_imageFormats << "*.jpeg"; //JPEG
@@ -90,24 +107,155 @@ Data *Data::self()
   return m_self;
 }
 
-ErrorHandler *Data::getErrorHandler()
+QObject *Data::setValue(int type, const QVariant &value)
 {
-  // We create the Error handler if necessary
-  if (!m_errorHandler)
-    m_errorHandler = new ErrorHandler(this);
+  switch (type) {
+    case (GalleriesPath) : {
+      GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(galleriesDir(), value.toString(), m_mainWindow);
+      job->start();
 
-  // Return it's pointer
-  return m_errorHandler;
+      connect(job, SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
+
+      m_backup.insert("GalleriesPath", galleriesDir().absolutePath());
+
+      m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(value.toString()));
+
+      return job;
+    }
+    case (PhotoEditContextMenu) : {
+      m_photoEditContextMenu = value.value<QWidget*>();
+      break;
+    }
+    case (PhotoContextMenu) : {
+      m_photoContextMenu = value.value<QWidget*>();
+      break;
+    }
+    case (GalleryContextMenu) : {
+      m_galleryContextMenu = value.value<QWidget*>();
+      break;
+    }
+    case (MainWindow) : {
+      m_mainWindow = value.value<QWidget*>();
+      break;
+    }
+    case (AppVersion) : {
+      m_appVersion = value.toString();
+      break;
+    }
+    case (AppBranch) : {
+      m_branch = value.toString();
+      break;
+    }
+    case (SearchBar) : {
+      m_searchBar = value.value<QWidget*>();
+      break;
+    }
+    case (DeleteSource) : {
+      m_settings->setValue("DeleteSource", value);
+      break;
+    }
+    case (BackgroundType) : {
+      m_settings->setValue("BackgroundType", value);
+      break;
+    }
+    case (OpenGL) : {
+      m_settings->setValue("OpenGlRendering", value);
+      break;
+    }
+    case (UpdateStartup) : {
+      m_settings->setValue("UpdateAtStartup", value);
+      break;
+    }
+    case (EditorPath) : {
+      m_settings->setValue("EditorPath", value);
+      break;
+    }
+    case (TranslationName) : {
+      m_settings->setValue("TranslationName", value);
+      break;
+    }
+    case (TranslationPath) : {
+      m_settings->setValue("TranslationPath", value);
+      break;
+    }
+    case (DisableVisualEffects) : {
+      m_settings->setValue("DisableVisualEffects", value);
+      break;
+    }
+    case (ImageAddProgress) : {
+      m_imageAddProgress = value.value<QWidget*>();
+      break;
+    }
+  }
+
+  return 0;
 }
 
-QStringList Data::getImageFormats() const
+QVariant Data::value(int type)
 {
-  return m_imageFormats;
+  switch (type) {
+    case (ErrorHandler) :
+            return qVariantFromValue(m_errorHandler);
+    case (ImageFormats) :
+            return qVariantFromValue(m_imageFormats);
+    case (GalleriesPath) :
+            return QDir::toNativeSeparators(galleriesDir().absolutePath());
+    case (SettingsPath) :
+            return settingsPath();
+    case (ImageModel) :
+            return QVariant::fromValue<QObject*>(m_imageModel);
+    case (DirCompleter) :
+            return QVariant::fromValue<QObject*>(m_dirCompleter);
+    case (FileCompleter) :
+            return QVariant::fromValue<QObject*>(m_fileCompleter);
+    case (PhotoContextMenu) :
+            return QVariant::fromValue<QWidget*>(m_photoContextMenu);
+    case (PhotoEditContextMenu) :
+            return QVariant::fromValue<QWidget*>(m_photoEditContextMenu);
+    case (GalleryContextMenu) :
+            return QVariant::fromValue<QWidget*>(m_galleryContextMenu);
+    case (MainWindow) :
+            return QVariant::fromValue<QWidget*>(m_mainWindow);
+    case (ModelProxy) :
+            return QVariant::fromValue<QObject*>(m_modelProxy);
+    case (AppName) :
+            return qApp->applicationName();
+    case (AppVersion) :
+            return m_appVersion;
+    case (AppBranch) :
+            return m_branch;
+    case (SupportedFormats) :
+            return m_supportedFormats;
+    case (SearchBar) :
+            return QVariant::fromValue<QWidget*>(m_searchBar);
+    case (ImageAddProgress) :
+            return QVariant::fromValue<QWidget*>(m_imageAddProgress);
+    case (DeleteSource) :
+            return m_settings->value("DeleteSource", false);
+    case (BackgroundType) :
+            return m_settings->value("BackgroundType", Round);
+    case (OpenGL) :
+            return m_settings->value("OpenGlRendering", false);
+    case (UpdateStartup) :
+            return m_settings->value("UpdateAtStartup", true);
+    case (EditorPath) :
+            return QDir::toNativeSeparators(m_settings->value("EditorPath").toString());
+    case (Translations) :
+            return QStringList(m_availableTranslations.keys());
+    case (TranslationName) :
+            return m_settings->value("TranslationName");
+    case (TranslationPath) :
+            return QDir::toNativeSeparators(m_settings->value("TranslationPath").toString());
+    case (DisableVisualEffects) :
+            return m_settings->value("DisableVisualEffects", false);
+  }
+
+  return QVariant();
 }
 
-QDir Data::getGalleriesDir() const
+QDir Data::galleriesDir() const
 {
-  QString galleriesPath = m_settings->value("GalleriesPath", getSettingsPath() + "/galleries").toString();
+  QString galleriesPath = m_settings->value("GalleriesPath", settingsPath() + "/galleries").toString();
 
   QDir galleriesDir(galleriesPath);
   if (!galleriesDir.exists()) {
@@ -118,36 +266,7 @@ QDir Data::getGalleriesDir() const
   return galleriesDir.absolutePath();
 }
 
-QString Data::getGalleriesPath() const
-{
-  return QDir::toNativeSeparators(getGalleriesDir().absolutePath());
-}
-
-QObject *Data::setGalleriesPath(const QString &path)
-{
-  GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(getGalleriesDir(), QDir(path), m_mainWindow);
-  job->start();
-
-  connect(job, SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
-
-  m_backup.insert("GalleriesPath", getGalleriesPath());
-
-  m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));
-
-  return job;
-}
-
-bool Data::getDeleteSourceImagesDefault() const
-{
-  return m_settings->value("DeleteSourceImagesDefault", false).toBool();
-}
-
-void Data::setDeleteSourceImagesDefault(bool state) const
-{
-  m_settings->setValue("DeleteSourceImagesDefault", state);
-}
-
-QString Data::getSettingsPath() const
+QString Data::settingsPath() const
 {
   QDir settingsPath(QDir::homePath() + "/.goya");
   if (!settingsPath.exists()) {
@@ -156,197 +275,6 @@ QString Data::getSettingsPath() const
   }
 
   return QDir::toNativeSeparators(settingsPath.absolutePath());
-}
-
-ImageModel *Data::getImageModel()
-{
-  if (!m_imageModel)
-    m_imageModel = new ImageModel(this);
-
-  return m_imageModel;
-}
-
-QCompleter *Data::getDirCompleter() const
-{
-  return m_dirCompleter;
-}
-
-QCompleter *Data::getFileCompleter() const
-{
-  return m_fileCompleter;
-}
-
-void Data::setBackgroundType(BackgroundType type) const
-{
-  m_settings->setValue("BackgroundType", type);
-}
-
-GCore::Data::BackgroundType Data::getBackgroundType() const
-{
-  return static_cast<BackgroundType>(m_settings->value("BackgroundType", Round).toInt());
-}
-
-void Data::setOpengl(bool enable) const
-{
-  m_settings->setValue("OpenGlRendering", enable);
-}
-
-bool Data::getOpengl() const
-{
-  return m_settings->value("OpenGlRendering", false).toBool();
-}
-
-void Data::setUpdateStartup(bool enable) const
-{
-  m_settings->setValue("UpdateAtStartup", enable);
-}
-
-bool Data::getUpdateStartup() const
-{
-  return m_settings->value("UpdateAtStartup", true).toBool();
-}
-
-void Data::setPhotoEditor(const QString &filePath) const
-{
-  m_settings->setValue("EditorPath", filePath);
-}
-
-QString Data::getPhotoEditor() const
-{
-  return QDir::toNativeSeparators(m_settings->value("EditorPath").toString());
-}
-
-void Data::setPhotoContextMenu(QMenu *contextMenu)
-{
-  m_photoContextMenu = contextMenu;
-}
-
-QMenu *Data::getPhotoContextMenu()
-{
-  if (m_photoContextMenu) {
-    return m_photoContextMenu;
-  } else {
-    QMenu *temp = new QMenu(m_mainWindow);
-    temp->addAction(tr("Nothing available"))->setDisabled(true);
-    return temp;
-  }
-}
-
-void Data::setPhotoEditingContextMenu(QMenu *contextMenu)
-{
-  m_photoEditContextMenu = contextMenu;
-}
-
-QMenu *Data::getPhotoEditingContextMenu()
-{
-  if (m_photoEditContextMenu) {
-    return m_photoEditContextMenu;
-  } else {
-    QMenu *temp = new QMenu(m_mainWindow);
-    temp->addAction(tr("Nothing available"))->setDisabled(true);
-    return temp;
-  }
-}
-
-void Data::setGalleryContextMenu(QMenu *contextMenu)
-{
-  m_galleryContextMenu = contextMenu;
-}
-
-QMenu *Data::getGalleryContextMenu()
-{
-  if (m_galleryContextMenu) {
-    return m_galleryContextMenu;
-  } else {
-    QMenu *temp = new QMenu(m_mainWindow);
-    temp->addAction(tr("Nothing available"))->setDisabled(true);
-    return temp;
-  }
-}
-
-QStringList Data::getAvailableTranslations() const
-{
-  return QStringList(m_availableTranslations.keys());
-}
-
-void Data::setTranslation(const QString &name) const
-{
-  m_settings->setValue("TranslationName", name);
-  m_settings->setValue("TranslationFilepath", m_availableTranslations.value(name));
-}
-
-QString Data::getTranslationName() const
-{
-  return m_settings->value("TranslationName", "English").toString();
-}
-
-QString Data::getTranslationFilePath() const
-{
-  return QDir::toNativeSeparators(m_settings->value("TranslationFilepath", QString()).toString());
-}
-
-QString Data::getTranslationFileName() const
-{
-  return getTranslationName().toLower().append(".qm");
-}
-
-QString Data::getTranslationPath() const
-{
-  return QDir::toNativeSeparators(getTranslationFilePath().remove(getTranslationName().toLower().append(".qm")));
-}
-
-void Data::setMainWindow(QWidget *mainWindow)
-{
-  m_mainWindow = mainWindow;
-}
-
-QWidget *Data::getMainWindow() const
-{
-  return m_mainWindow;
-}
-
-QSortFilterProxyModel *Data::getModelProxy()
-{
-  if (!m_modelProxy) {
-    m_modelProxy = new QSortFilterProxyModel(this);
-    m_modelProxy->setFilterRole(GCore::ImageModel::ImageTypeRole);
-    m_modelProxy->setFilterWildcard(QString::number(GCore::ImageItem::Gallery));
-    m_modelProxy->setSourceModel(getImageModel());
-  }
-
-  return m_modelProxy;
-}
-
-QString Data::getAppName() const
-{
-  return qApp->applicationName();
-}
-
-void Data::setAppVersion(const QString &version, const QString &branch)
-{
-  m_appVersion = version;
-  m_branch = branch;
-}
-
-QString Data::getAppVersion() const
-{
-  return m_appVersion;
-}
-
-QString Data::getBranch() const
-{
-  return m_branch;
-}
-
-void Data::setSupportedFormats(const QRegExp &supportedFormats)
-{
-  m_supportedFormats = supportedFormats;
-  m_supportedFormats.setCaseSensitivity(Qt::CaseInsensitive);
-}
-
-QRegExp Data::getSupportedFormats() const
-{
-  return m_supportedFormats;
 }
 
 void Data::saveChanges() const
@@ -366,42 +294,12 @@ Data::~Data()
   saveChanges();
 }
 
-GWidgets::SearchBar* Data::getSearchBar() const
-{
-  return m_searchBar;
-}
-
-void Data::setSearchBar(GWidgets::SearchBar* searchBar)
-{
-  m_searchBar = searchBar;
-}
-
-void Data::setImageAddProgress(QWidget* imageAddProgress)
-{
-  m_imageAddProgress = imageAddProgress;
-}
-
-QWidget* Data::getImageAddProgress() const
-{
-  return m_imageAddProgress;
-}
-
 void Data::processGalleryMove(bool successful)
 {
   if (!successful)
     m_settings->setValue("GalleriesPath", m_backup.take("GalleriesPath"));
   else
     m_imageModel->reconstruct();
-}
-
-bool Data::isVisualEffectsDisabled() const
-{
-  return m_settings->value("DisableVisualEffects", false).toBool();
-}
-
-void Data::setVisualEffects(bool disable) const
-{
-  m_settings->setValue("DisableVisualEffects", disable);
 }
 
 }

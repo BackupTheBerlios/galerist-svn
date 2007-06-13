@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -42,19 +42,20 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
   app.setOrganizationName("Unimatrix-One");
   app.setApplicationName("Goya");
-  GCore::Data::self()->setAppVersion("0.2.0", "unstable");
-  GCore::Data::self()->setSupportedFormats(QRegExp("gif|jpg|jpeg|png"));
+  GCore::Data::self()->setValue(GCore::Data::AppVersion, "0.3.0");
+  GCore::Data::self()->setValue(GCore::Data::AppBranch, "unstable");
+  GCore::Data::self()->setValue(GCore::Data::SupportedFormats, QRegExp("gif|jpg|jpeg|png"));
 
   QTranslator translation;
-  translation.load(GCore::Data::self()->getTranslationFileName(), GCore::Data::self()->getTranslationPath());
+  translation.load(GCore::Data::self()->value(GCore::Data::TranslationName).toString(), GCore::Data::self()->value(GCore::Data::TranslationPath).toString());
 
   app.installTranslator(&translation);
 
   MainWindow *mainWindow = new MainWindow();
   mainWindow->show();
 
-  GCore::Data::self()->setMainWindow(mainWindow);
-  GCore::Data::self()->setImageAddProgress(new GWidgets::ImageAddProgress(mainWindow));
+  GCore::Data::self()->setValue(GCore::Data::MainWindow, QVariant::fromValue<QWidget*>(mainWindow));
+  GCore::Data::self()->setValue(GCore::Data::ImageAddProgress, QVariant::fromValue<QWidget*>(new GWidgets::ImageAddProgress(mainWindow)));
 
   return app.exec();
 }

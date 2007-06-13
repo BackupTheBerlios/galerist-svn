@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -32,6 +32,7 @@
 #include "core/data.h"
 #include "core/errorhandler.h"
 
+using namespace GCore;
 
 namespace GDialogs
 {
@@ -77,36 +78,36 @@ Configuration::Configuration(QWidget *parent)
 
   glRadio->setEnabled(QGLFormat::hasOpenGL());
 
-  translationBox->addItems(GCore::Data::self()->getAvailableTranslations());
-  translationBox->setCurrentIndex(translationBox->findText(GCore::Data::self()->getTranslationName()));
+  translationBox->addItems(Data::self()->value(Data::Translations).toStringList());
+  translationBox->setCurrentIndex(translationBox->findText(Data::self()->value(Data::TranslationName).toString()));
 
   // Set the configuration
-  if (GCore::Data::self()->getOpengl())
+  if (Data::self()->value(Data::OpenGL).toBool())
     glRadio->setChecked(true);
   else
     nonGlRadio->setChecked(true);
 
-  imageEditorEdit->setText(GCore::Data::self()->getPhotoEditor());
+  imageEditorEdit->setText(Data::self()->value(Data::EditorPath).toString());
   imageEditorEdit->setNeedTest(true);
 
-  dirEdit->setText(GCore::Data::self()->getGalleriesPath());
+  dirEdit->setText(Data::self()->value(Data::GalleriesPath).toString());
 
 #ifdef WANT_UPDATER
-  updateBox->setChecked(GCore::Data::self()->getUpdateStartup());
+  updateBox->setChecked(GCore::Data::self()->value(Data::UpdateStartup).toBool());
   updateBox->setEnabled(true);
 #else
   updateBox->setChecked(false);
   updateBox->setEnabled(false);
 #endif
 
-  effectsBox->setChecked(GCore::Data::self()->isVisualEffectsDisabled());
+  effectsBox->setChecked(GCore::Data::self()->value(Data::DisableVisualEffects).toBool());
 
   imageEditorEdit->setValidMessage(tr("Click Test button to verify the program."));
 
-  moveBox->setChecked(GCore::Data::self()->getDeleteSourceImagesDefault());
+  moveBox->setChecked(GCore::Data::self()->value(Data::DeleteSource).toBool());
 
   // Connect all the slots
-  connect(this, SIGNAL(signalFailed(const QString&, int)), GCore::Data::self()->getErrorHandler(), SLOT(slotReporter(const QString&, int)));
+  connect(this, SIGNAL(signalFailed(const QString&, int)), GCore::Data::self()->value(Data::ErrorHandler).value<QObject*>(), SLOT(slotReporter(const QString&, int)));
   connect(testButton, SIGNAL(clicked()), this, SLOT(slotTest()));
   connect(imageEditorEdit, SIGNAL(validityChanged(bool)), testButton, SLOT(setEnabled(bool)));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowse()));
@@ -121,9 +122,9 @@ Configuration::~Configuration()
 void Configuration::accept()
 {
   bool wait = false;
-  if (GCore::Data::self()->getGalleriesPath() != dirEdit->text() && dirEdit->isValid())
+  if (GCore::Data::self()->value(Data::GalleriesPath).toString() != dirEdit->text() && dirEdit->isValid())
     if (QMessageBox::question(this, tr("Confirm move"), tr("Are you sure you want to move all the galleries?"), tr("&Move"), tr("&No"), "", 1, 1) == 0) {
-      QObject *job = GCore::Data::self()->setGalleriesPath(dirEdit->text());
+      QObject *job = GCore::Data::self()->setValue(Data::GalleriesPath, dirEdit->text());
       job->setParent(this);
       moveGroup->show();
       buttonBox->setDisabled(true);
@@ -138,27 +139,29 @@ void Configuration::accept()
       return;
     }
 
+  QString restartMessage = tr("You need to restart %1 for changes to take effect.").arg(GCore::Data::self()->value(Data::AppName).toString());
+
   // We save the changes
-  if (glRadio->isChecked() != GCore::Data::self()->getOpengl()) {
-    GCore::Data::self()->setOpengl(glRadio->isChecked());
-    emit signalFailed(tr("You need to restart %1 for changes to take effect.").arg(GCore::Data::self()->getAppName()), GCore::ErrorHandler::Information);
+  if (glRadio->isChecked() != GCore::Data::self()->value(Data::OpenGL).toBool()) {
+    GCore::Data::self()->setValue(Data::OpenGL, glRadio->isChecked());
+    emit signalFailed(restartMessage, GCore::ErrorHandler::Information);
   }
 
   if (imageEditorEdit->isValid())
-    GCore::Data::self()->setPhotoEditor(imageEditorEdit->text());
+    GCore::Data::self()->setValue(Data::EditorPath, imageEditorEdit->text());
 
-  if (translationBox->currentText() != GCore::Data::self()->getTranslationName()) {
-    GCore::Data::self()->setTranslation(translationBox->currentText());
-    emit signalFailed(tr("You need to restart %1 for changes to take effect.").arg(GCore::Data::self()->getAppName()), GCore::ErrorHandler::Information);
+  if (translationBox->currentText() != GCore::Data::self()->value(Data::TranslationName).toString()) {
+    GCore::Data::self()->setValue(Data::TranslationName, translationBox->currentText());
+    emit signalFailed(restartMessage, GCore::ErrorHandler::Information);
   }
 
 #ifdef WANT_UPDATER
   GCore::Data::self()->setUpdateStartup(updateBox->isChecked());
 #endif
 
-  GCore::Data::self()->setVisualEffects(effectsBox->isChecked());
+  GCore::Data::self()->setValue(Data::DisableVisualEffects, effectsBox->isChecked());
 
-  GCore::Data::self()->setDeleteSourceImagesDefault(moveBox->isChecked());
+  GCore::Data::self()->setValue(Data::DeleteSource, moveBox->isChecked());
 
   GCore::Data::self()->saveChanges();
 

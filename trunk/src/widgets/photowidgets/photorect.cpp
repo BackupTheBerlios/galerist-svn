@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -24,6 +24,8 @@
 
 #include "core/data.h"
 
+using namespace GCore;
+
 namespace GWidgets
 {
 
@@ -40,8 +42,8 @@ void PhotoRect::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidge
   painter->setPen(pen());
   painter->setBrush(brush());
 
-  switch (GCore::Data::self()->getBackgroundType()) {
-    case (GCore::Data::Round) : {
+  switch (Data::self()->value(Data::BackgroundType).toInt()) {
+    case (Data::Round) : {
       painter->drawRoundRect(rect());
 
       if (isSelected()) {

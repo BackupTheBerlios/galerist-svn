@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÃÂ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÃÂÃÂ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -24,6 +24,7 @@
 #include "core/errorhandler.h"
 
 #include <QtCore/QMutex>
+#include <QtCore/QVariant>
 
 #include <QtGui/QApplication>
 #include <QtGui/QImage>
@@ -39,7 +40,7 @@ AbstractJob::AbstractJob(QObject *parent)
     m_stop(false)
 {
   // Connect with the error handler.
-  connect(this, SIGNAL(signalFailed(const QString&, int)), Data::self()->getErrorHandler(), SLOT(slotReporter(const QString&, int)));
+  connect(this, SIGNAL(signalFailed(const QString&, int)), Data::self()->value(Data::ErrorHandler).value<QObject*>(), SLOT(slotReporter(const QString&, int)));
   connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(terminate()));
 }
 

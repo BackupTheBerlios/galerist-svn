@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor Kališnik                                 *
+ *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -35,6 +35,8 @@
 #include "core/data.h"
 
 #include "widgets/tooltip.h"
+
+using namespace GCore;
 
 namespace GWidgets
 {
@@ -110,9 +112,9 @@ void LineEdit::setType(Types type)
   // If this lineedit is a file selector, then we activate the translation function.
   if (m_type == FileSelector) {
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(slotTranslate()));
-    setCompleter(GCore::Data::self()->getFileCompleter());
+    setCompleter(static_cast<QCompleter*>(Data::self()->value(Data::FileCompleter).value<QObject*>()));
   } else if (m_type == DirSelector) {
-    setCompleter(GCore::Data::self()->getDirCompleter());
+    setCompleter(static_cast<QCompleter*>(Data::self()->value(Data::DirCompleter).value<QObject*>()));
   } else {
     disconnect(this, SIGNAL(textChanged(const QString&)), this, SLOT(slotTranslate()));
     setCompleter(0);
