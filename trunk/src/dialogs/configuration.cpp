@@ -99,6 +99,8 @@ Configuration::Configuration(QWidget *parent)
   updateBox->setEnabled(false);
 #endif
 
+  effectsBox->setChecked(GCore::Data::self()->isVisualEffectsDisabled());
+
   imageEditorEdit->setValidMessage(tr("Click Test button to verify the program."));
 
   moveBox->setChecked(GCore::Data::self()->getDeleteSourceImagesDefault());
@@ -153,6 +155,8 @@ void Configuration::accept()
 #ifdef WANT_UPDATER
   GCore::Data::self()->setUpdateStartup(updateBox->isChecked());
 #endif
+
+  GCore::Data::self()->setVisualEffects(effectsBox->isChecked());
 
   GCore::Data::self()->setDeleteSourceImagesDefault(moveBox->isChecked());
 

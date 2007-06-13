@@ -394,5 +394,15 @@ void Data::processGalleryMove(bool successful)
     m_imageModel->reconstruct();
 }
 
+bool Data::isVisualEffectsDisabled() const
+{
+  return m_settings->value("DisableVisualEffects", false).toBool();
+}
+
+void Data::setVisualEffects(bool disable) const
+{
+  m_settings->setValue("DisableVisualEffects", disable);
+}
+
 }
 

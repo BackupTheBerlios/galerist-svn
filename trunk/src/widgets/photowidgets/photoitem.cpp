@@ -263,6 +263,11 @@ void PhotoItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void PhotoItem::setPos(qreal x, qreal y)
 {
+  if (GCore::Data::self()->isVisualEffectsDisabled()) {
+    QGraphicsItemGroup::setPos(x, y);
+    return;
+  }
+
   initialiseTimer();
 
   m_animation->setPosAt(1, QPointF(x, y));
@@ -286,98 +291,117 @@ QModelIndex PhotoItem::getIndex()
   return m_index;
 }
 
-QPointF PhotoItem::getScaledSize()
+QSizeF PhotoItem::getScaledSize()
 {
   if (!m_editMode || !m_fullsizePixmap)
-    return QPointF(m_view->width(), m_view->height());
+    return QSizeF(m_view->viewport()->width(), m_view->viewport()->height());
 
   qreal scaledWidth;
   qreal scaledHeight;
 
-  if (!m_fullsize) {
-    qreal scaleFullscreenMultiplier;
+  scaledWidth = m_fullsizePixmap->width() * m_scaleMultiplier;
+  scaledHeight = m_fullsizePixmap->height() * m_scaleMultiplier;
 
-    if (m_fullsizePixmap->width() > m_fullsizePixmap->height())
-      scaleFullscreenMultiplier = ((qreal) m_view->width() - 20) / (qreal) m_fullsizePixmap->width();
-    else
-      scaleFullscreenMultiplier = ((qreal) m_view->height() - 20) / (qreal) m_fullsizePixmap->height();
-
-    scaledWidth = m_fullsizePixmap->width() * scaleFullscreenMultiplier;
-    scaledHeight = m_fullsizePixmap->height() * scaleFullscreenMultiplier;
-  } else {
-    scaledWidth = m_fullsizePixmap->width() * m_scaleMultiplier;
-    scaledHeight = m_fullsizePixmap->height() * m_scaleMultiplier;
-  }
-
-  return QPointF(scaledWidth, scaledHeight);
+  return QSizeF(scaledWidth, scaledHeight);
 }
 
 void PhotoItem::fullSizePixmap()
 {
   if (!m_fullsizePixmap) {
-    m_view->showLoading(true, tr("Sharpening image, please wait"));
+    if (!GCore::Data::self()->isVisualEffectsDisabled())
+      m_view->showLoading(true, tr("Sharpening image, please wait"));
+
     QPixmap pixmap = QPixmap::fromImage(m_index.data(GCore::ImageModel::ImagePictureRole).value<QImage>());
 
     m_fullsizePixmap = new QPixmap(pixmap);
+
+    if (GCore::Data::self()->isVisualEffectsDisabled()) {
+      qreal scaleFactor = calculateScale(*m_fullsizePixmap, m_view->viewport()->size());
+      m_scaleMultiplier = scaleFactor;
+      scale(scaleFactor, scaleFactor);
+      m_pixmap->setPixmap(*m_fullsizePixmap);
+      m_fullsize = true;
+    }
   }
 }
 
 void PhotoItem::zoomIn()
 {
   // Calculate new scale
-  QPointF scaledSize = getScaledSize();
-  qreal newScale = (scaledSize.x() + (qreal) ItemZoomStep) / (qreal) m_fullsizePixmap->width();
+  QSizeF scaledSize = getScaledSize();
+  qreal newScale = calculateScale(*m_fullsizePixmap, scaledSize + QSizeF(ItemZoomStep, ItemZoomStep));
 
   m_scaleMultiplier = newScale;
 
-  initialiseTimer();
-  m_animation->setScaleAt(0.1, m_scaleMultiplier, m_scaleMultiplier);
-  m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  if (GCore::Data::self()->isVisualEffectsDisabled()) {
+    resetTransform();
+    scale(m_scaleMultiplier, m_scaleMultiplier);
+  } else {
+    initialiseTimer();
+    m_animation->setScaleAt(0.1, m_scaleMultiplier, m_scaleMultiplier);
+    m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  }
 }
 
 void PhotoItem::zoomOut()
 {
   // Calculate new scale
-  QPointF scaledSize = getScaledSize();
-  qreal newScale = (scaledSize.x() - (qreal) ItemZoomStep) / (qreal) m_fullsizePixmap->width();
+  QSizeF scaledSize = getScaledSize();
+  qreal newScale = calculateScale(*m_fullsizePixmap, scaledSize - QSizeF(ItemZoomStep, ItemZoomStep));
 
   m_scaleMultiplier = newScale;
 
-  initialiseTimer();
-  m_animation->setScaleAt(0.1, m_scaleMultiplier, m_scaleMultiplier);
-  m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  if (GCore::Data::self()->isVisualEffectsDisabled()) {
+    resetTransform();
+    scale(m_scaleMultiplier, m_scaleMultiplier);
+  } else {
+    initialiseTimer();
+    m_animation->setScaleAt(0.1, m_scaleMultiplier, m_scaleMultiplier);
+    m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  }
 }
 
 void PhotoItem::setZoom(float zoomLevel)
 {
   m_scaleMultiplier = zoomLevel;
 
-  initialiseTimer();
-  m_animation->setScaleAt(0.1, m_scaleMultiplier, m_scaleMultiplier);
-  m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  if (GCore::Data::self()->isVisualEffectsDisabled()) {
+    resetTransform();
+    scale(m_scaleMultiplier, m_scaleMultiplier);
+  } else {
+    initialiseTimer();
+    m_animation->setScaleAt(0.1, m_scaleMultiplier, m_scaleMultiplier);
+    m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  }
 }
 
 void PhotoItem::zoomActual()
 {
   m_scaleMultiplier = 1;
 
-  initialiseTimer();
-  m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  if (GCore::Data::self()->isVisualEffectsDisabled()) {
+    resetTransform();
+    scale(m_scaleMultiplier, m_scaleMultiplier);
+  } else {
+    initialiseTimer();
+    m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  }
 }
 
 void PhotoItem::zoomScreen()
 {
   // Calculate new scale
-  qreal newScale;
-  if (m_view->width() < m_view->height())
-    newScale = ((qreal) m_view->width() - 20) / (qreal) m_fullsizePixmap->width();
-  else
-    newScale = ((qreal) m_view->height() - 20) / (qreal) m_fullsizePixmap->height();
+  qreal newScale = calculateScale(*m_fullsizePixmap, m_view->viewport()->size());
 
   m_scaleMultiplier = newScale;
 
-  initialiseTimer();
-  m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  if (GCore::Data::self()->isVisualEffectsDisabled()) {
+    resetTransform();
+    scale(m_scaleMultiplier, m_scaleMultiplier);
+  } else {
+    initialiseTimer();
+    m_animation->setScaleAt(1, m_scaleMultiplier, m_scaleMultiplier);
+  }
 }
 
 void PhotoItem::rotateCW()
@@ -626,7 +650,7 @@ void PhotoItem::slotEdit(bool edit)
   if (!m_item)
     return;
 
-  m_zooming = true;
+  m_zooming = !GCore::Data::self()->isVisualEffectsDisabled();
   m_editMode = edit;
 
   // Make changes to go to or out of edit
@@ -648,6 +672,14 @@ void PhotoItem::slotEdit(bool edit)
   } else {
     // Item is selectable and focusable again
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
+
+    if (GCore::Data::self()->isVisualEffectsDisabled()) {
+      setPixmap(m_index.data(GCore::ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(128, 128));
+      resetTransform();
+      m_text->show();
+      m_description->show();
+      m_rect->show();
+    }
 
     if (m_new) {
       delete m_new;
@@ -734,17 +766,11 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
       oldScaleMultiplier = m_scaleMultiplier;
 
       // We calculate how much spreading is needed for photo to fit the view
-      if (m_view->width() < m_view->height())
-        scaleMultiplier = static_cast<qreal>(m_view->width() - 20) / static_cast<qreal>(m_pixmap->pixmap().width());
-      else
-        scaleMultiplier = static_cast<qreal>(m_view->height() - 20) / static_cast<qreal>(m_pixmap->pixmap().height());
+      scaleMultiplier = calculateScale(m_pixmap->pixmap(), m_view->viewport()->size());
 
       // And calculation for fullsized photo to fit the view
       if (m_fullsizePixmap) {
-        if (m_view->width() < m_view->height())
-          scaleFullscreenMultiplier = static_cast<qreal>(m_view->width() - 20) / static_cast<qreal>(m_fullsizePixmap->width());
-        else
-          scaleFullscreenMultiplier = static_cast<qreal>(m_view->height() - 20) / static_cast<qreal>(m_fullsizePixmap->height());
+        scaleFullscreenMultiplier = calculateScale(*m_fullsizePixmap, m_view->viewport()->size());
 
         m_fullsize = true;
 
@@ -774,6 +800,18 @@ void PhotoItem::slotSetFullsizePixmap(qreal step)
     m_pixmap->setPixmap(*m_fullsizePixmap);
     m_zooming = false;
   }
+}
+
+qreal PhotoItem::calculateScale(const QPixmap &image, const QSizeF &size) const
+{
+  qreal scale;
+
+  if (size.width() < size.height())
+    scale = static_cast<qreal>(size.width() - 20) / static_cast<qreal>(image.width());
+  else
+    scale = static_cast<qreal>(size.height() - 20) / static_cast<qreal>(image.height());
+
+  return scale;
 }
 
 void PhotoItem::changeImage(const QImage &image)

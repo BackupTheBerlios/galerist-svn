@@ -122,6 +122,13 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0" >
+           <widget class="QCheckBox" name="effectsBox" >
+            <property name="text" >
+             <string>Disable visual effects</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

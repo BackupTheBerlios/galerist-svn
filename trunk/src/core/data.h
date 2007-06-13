@@ -367,11 +367,20 @@ class Data : public QObject
      */
     void setImageAddProgress(QWidget* imageAddProgress);
 
-
     /**
      * Gets and creates if neccesary ImageAddProgress.
      */
     QWidget *getImageAddProgress() const;
+
+    /**
+     * Get the Visual effects disabling flag.
+     */
+    bool isVisualEffectsDisabled() const;
+
+    /**
+     * Sets the Visual effects disabling flag.
+     */
+    void setVisualEffects(bool disable) const;
 
 
 

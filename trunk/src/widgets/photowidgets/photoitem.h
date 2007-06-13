@@ -157,9 +157,9 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
     /**
      * Returns the actual scaled size.
      *
-     * @return Absolute size. X is width and y is height.
+     * @return Absolute size.
      */
-    QPointF getScaledSize();
+    QSizeF getScaledSize();
 
     /**
      * Returns the scale multiplier.
@@ -346,6 +346,8 @@ class PhotoItem : public QObject, public QGraphicsItemGroup
      * Initialise timer.
      */
     void initialiseTimer();
+
+    qreal calculateScale(const QPixmap &image, const QSizeF &size) const;
 
   private slots:
     /**

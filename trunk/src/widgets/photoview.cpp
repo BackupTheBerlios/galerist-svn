@@ -137,7 +137,7 @@ void PhotoView::setRootIndex(const QModelIndex &index)
   setFocus();
 
   m_rootIndex = mappedIndex;
-  setEditMode(false);
+  //setEditMode(false);
   m_currentEdited = 0;
 
   // Read items
@@ -568,8 +568,8 @@ int PhotoView::rearrangeItems(bool update)
   int rows = 1;
   int count = 0;
 
-  qreal y = m_zero.y() + m_spacing;
-  qreal x = m_zero.x() + m_spacing;
+  qreal y = m_spacing;
+  qreal x = m_spacing;
 
   if (m_editMode && m_currentEdited)
     x = - (5000) * m_itemVector.indexOf(m_currentEdited);
@@ -594,10 +594,10 @@ int PhotoView::rearrangeItems(bool update)
       if (item->pos() != QPointF(x, y))
         change = true;
 
+      item->setPos(x, y);
+
       if (m_currentEdited == item)
         item->fullSizePixmap();
-
-      item->setPos(x, y);
 
       if (m_editMode)
         x += 5000;
@@ -947,15 +947,7 @@ void PhotoView::updateScene()
 
 void PhotoView::updateScrollBars()
 {
-
-  if (m_currentEdited->getScaledSize().x() > width() && m_currentEdited->getScaledSize().y() > height())
-    setSceneRect(-m_spacing, -m_spacing, m_currentEdited->getScaledSize().x(), m_currentEdited->getScaledSize().y());
-  else if (m_currentEdited->getScaledSize().x() > width())
-    setSceneRect(-m_spacing, -m_spacing, m_currentEdited->getScaledSize().x(), height());
-  else if (m_currentEdited->getScaledSize().y() > height())
-    setSceneRect(-m_spacing, -m_spacing, width(), m_currentEdited->getScaledSize().y());
-  else
-    setSceneRect(-m_spacing, -m_spacing, width(), height());
+  setSceneRect(-m_spacing, 0, m_currentEdited->getScaledSize().width() + m_spacing *2, m_currentEdited->getScaledSize().height() + m_spacing*2);
 
   // To stay in center of zoom
   verticalScrollBar()->setSliderPosition(((verticalScrollBar()->maximum() - m_oldVerticalScrollMaximum) / 2) + verticalScrollBar()->sliderPosition());
@@ -1010,8 +1002,13 @@ void PhotoView::cropSelection(const QRect &area)
   if (!m_editMode)
     return;
 
+  // Remove the spacing
+  QRect temp = area;
+  temp.setTop(temp.top() - m_spacing);
+  temp.setBottom(temp.bottom() - m_spacing);
+
   // Crops the image
-  m_currentEdited->crop(mapToScene(area).boundingRect().toRect());
+  m_currentEdited->crop(mapToScene(temp).boundingRect().toRect());
 }
 
 QAbstractItemModel *PhotoView::model()
@@ -1038,8 +1035,8 @@ void PhotoView::setEditMode(bool editMode, GWidgets::GPhotoWidgets::PhotoItem *s
     emit photoEditSelectionChanged(m_itemVector.indexOf(m_currentEdited), m_itemVector.count());
     setDragMode(QGraphicsView::ScrollHandDrag);
     viewport()->setCursor(Qt::OpenHandCursor);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   } else if (m_currentEdited) {
     // We have our own Rubber band defined!
     setDragMode(QGraphicsView::NoDrag);
