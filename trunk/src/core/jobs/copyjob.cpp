@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -41,8 +41,7 @@ CopyJob::CopyJob(const QString &source, const QString &destination, const QModel
     m_destination(new QDir(destination)),
     m_gallery(gallery),
     m_mode(MultiMode),
-    m_deleteSource(deleteSource),
-    m_paused(false)
+    m_deleteSource(deleteSource)
 {}
 
 CopyJob::CopyJob(const QString &source, const QStringList &fileNames, const QString &destination, const QModelIndex &gallery, QObject *parent)
@@ -139,7 +138,7 @@ void CopyJob::multiCopy()
       emit signalProgress(count, numberImages, QString("failed"), QImage());
       stop();
       failure = true;
-      break;
+      //break;
     }
 
     // We finished with this picture. Notifying the model class
@@ -223,20 +222,6 @@ CopyJob::~CopyJob()
 {
   delete m_destination;
   delete m_source;
-}
-
-void CopyJob::pause()
-{
-  m_locker.lock();
-  m_paused = true;
-  m_locker.unlock();
-}
-
-void CopyJob::unpause()
-{
-  m_locker.lock();
-  m_paused = false;
-  m_locker.unlock();
 }
 
 void CopyJob::deleteSourceImages(const QStringList &images)

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -39,7 +39,7 @@ class CopyJob;
 
 /**
  * @short The model with images and all of its data.
- * @author Gregor KaliÅ¡nik <gregor@unimatrix-one.org>
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class ImageModel : public QAbstractItemModel
 {
@@ -80,8 +80,6 @@ class ImageModel : public QAbstractItemModel
       ImageThumbnailPathRole = Qt::UserRole + 7,
       /** Returns the actual image. */
       ImagePictureRole       = Qt::UserRole + 8,
-      /** Returns the pointer to the object */
-      ObjectRole             = Qt::UserRole + 9
   };
 
     /**
@@ -312,19 +310,11 @@ class ImageModel : public QAbstractItemModel
      */
     void slotProcess(const QString &fileName);
     /**
-     * Removes a finished read job.
-     */
-    void slotRemoveJob();
-    /**
      * Changes the data (or just reports it?).
      *
      * @param item Item's index.
      */
     void slotChange(const QModelIndex &item);
-    /**
-     * Removes a finished copy job.
-     */
-    void slotRemoveCopyJob();
 
 };
 

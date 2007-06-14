@@ -94,20 +94,6 @@ class CopyJob : public GCore::GJobs::AbstractJob
      */
     ~CopyJob();
 
-    /**
-     * Pauses the copy. Usable only when using multi copy option.
-     *
-     * @see CopyJob#unpause()
-     */
-    void pause();
-
-    /**
-     * Unpauses the copy process. Usable only when in MultiCopy mode.
-     *
-     * @see CopyJob#pause()
-     */
-    void unpause();
-
   protected:
     /**
      * Reimplemented method to define the work process.
@@ -137,8 +123,6 @@ class CopyJob : public GCore::GJobs::AbstractJob
     QModelIndex m_gallery;
     CopyMode m_mode;
     bool m_deleteSource;
-
-    bool m_paused;
 
 };
 

@@ -155,7 +155,7 @@ QVariant MetaDataManager::query(const QString &rawQuery) const
 
   QSqlQuery query(m_metadataFile);
   if (!query.exec(rawQuery)) {
-    qDebug() << query.lastError().text() << endl;
+    qCritical() << query.lastError().text() << endl;
     output = false;
   } else {
     if (query.next())

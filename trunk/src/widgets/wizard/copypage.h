@@ -89,7 +89,6 @@ class CopyPage : public QWizardPage, private Ui::CopyPage
 
   private:
     bool m_finished;
-    QObject *m_copyProcess;
     QString m_predefinedPath;
     QStringList m_prefedinedImages;
 

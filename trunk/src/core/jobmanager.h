@@ -18,89 +18,103 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GWIDGETSSEARCHBAR_H
-#define GWIDGETSSEARCHBAR_H
+#ifndef GCOREJOBMANAGER_H
+#define GCOREJOBMANAGER_H
 
-#include <QtGui/QWidget>
+#include <QtCore/QThread>
+#include <QtCore/QHash>
+#include <QtCore/QMutex>
+#include <QtCore/QStringList>
 
-class QHBoxLayout;
-
-namespace GWidgets
+namespace GCore
 {
 
-class LineEdit;
+namespace GJobs
+{
+class AbstractJob;
+}
 
 /**
- * @short A search bar for an easier way of search.
+ * @short Manages the jobs and acts as a job storage class.
  * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
-class SearchBar : public QWidget
+class JobManager : public QThread
 {
     Q_OBJECT
-  signals:
-    /**
-     * Emited when SearchBar loses focus (aka gets hidden).
-     */
-    void focusLost();
-    /**
-     * Emited when filter changes.
-     */
-    void filterChanged(const QString &newFilter);
-
   public:
     /**
      * A constructor.
-     *
-     * @param parent Parent widget.
      */
-    SearchBar(QWidget *parent = 0);
+    JobManager();
 
     /**
      * A destructor.
      */
-    ~SearchBar();
+    ~JobManager();
 
     /**
-     * Adds the selected letter and shows the bar if neccessary.
+     * Registers the job with the manager.
+     *
+     * @param jobName Name to use to access this job.
+     * @param job The actual job.
+     *
+     * @return Pointer to the job.
      */
-    void addLetter(const QString &letter);
+    QObject *registerJob(const QString &jobName, GJobs::AbstractJob *job);
+    QObject *registerJob(const QString &jobName, QObject *job);
 
     /**
-     * Set filter output.
+     * Starts the job.
      */
-    void setListFilter(QWidget *filterList);
+    void startJob(const QString &jobName);
 
-  public slots:
     /**
-     * Reimplemented method.
-     * Hides and deletes the content.
+     * Stops the job.
      */
-    void hide();
+    void stopJob(const QString &jobName);
+
+    /**
+     * Method to stop the JobManager.
+     */
+    void stop();
+
+    /**
+     * Checks if the job is running.
+     */
+    bool isRunning(const QString &jobName);
+
+    /**
+     * Gets the job.
+     */
+    GJobs::AbstractJob *job(const QString &jobName);
+
+    /**
+     * Pauses the job.
+     */
+    void pauseJob(const QString &jobName);
+
+    /**
+     * Unpauses the job.
+     */
+    void unpauseJob(const QString &jobName);
+
+    /**
+     * Static self method.
+     */
+    static JobManager *self();
 
   protected:
     /**
      * Reimplemented method.
-     * Hides the bar when Escape key is pressed.
+     * @overload
      */
-    void keyPressEvent(QKeyEvent *event);
-
-    /**
-     * Reimplemented method.
-     * Hides the bar when nothing is present in the search line edit.
-     */
-    void timerEvent(QTimerEvent *event);
+    void run();
 
   private:
-    QHBoxLayout *m_layout;
-    LineEdit *m_searchLine;
-    int m_timerId;
-
-  private slots:
-    /**
-     * Checks if the search line is empty. If it is, initiates the hide timer. If the search line gets a text before hiding, timer is stopped.
-     */
-    void checkSearch(const QString &text);
-
+    QHash<QString, GJobs::AbstractJob*> m_jobHash;
+    QMutex m_mutex;
+    bool m_stop;
+    static JobManager *m_self;
 };
 
 }

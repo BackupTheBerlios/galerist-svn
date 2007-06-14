@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -26,6 +26,7 @@
 #include "core/metadatamanager.h"
 #include "core/exifmanager.h"
 #include "core/data.h"
+#include "core/jobmanager.h"
 
 #include "core/jobs/readjob.h"
 #include "core/jobs/copyjob.h"
@@ -37,8 +38,7 @@ namespace GCore
 
 ImageModel::ImageModel(QObject *parent)
     : QAbstractItemModel(parent),
-    m_currentJob(0),
-    m_currentCopyJob(0),
+    //m_currentCopyJob(0),
     m_currentCopyParent(QModelIndex()),
     m_delete(false)
 {
@@ -122,9 +122,6 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
     }
     case (ImageModel::ImagePictureRole) : {
       return QImage(item->getFilePath());
-    }
-    case ImageModel::ObjectRole : {
-      return qVariantFromValue(static_cast<QObject*>(item));
     }
     default:
       return QVariant();
@@ -271,17 +268,13 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
 
     if (!thumbPath.cd(".thumbnails") || !QFile::exists(thumbPath.absoluteFilePath(item.data(ImageModel::ImageThumbnailPathRole).toString()))) {
 
-      if (!m_currentJob) {
-        m_currentJob = new GJobs::ReadJob(this);
-        connect(m_currentJob, SIGNAL(finished()), this, SLOT(slotRemoveJob()));
-        connect(m_currentJob, SIGNAL(signalThumb(const QString&)), this, SIGNAL(signalThumb(const QString&)));
-        qRegisterMetaType<QModelIndex>("QModelIndex");
-        connect(m_currentJob, SIGNAL(signalProcessed(const QModelIndex&)), this, SLOT(slotChange(const QModelIndex&)));
-      }
-
-      m_currentJob->queuePhoto(item);
-
-      m_currentJob->start();
+      GJobs::ReadJob *job = new GJobs::ReadJob(this);
+      job->queuePhoto(item);
+      JobManager::self()->registerJob("ThumbnailJob-" + item.data(ImageFilenameRole).toString(), job);
+      connect(job, SIGNAL(signalThumb(const QString&)), this, SIGNAL(signalThumb(const QString&)));
+      qRegisterMetaType<QModelIndex>("QModelIndex");
+      connect(job, SIGNAL(signalProcessed(const QModelIndex&)), this, SLOT(slotChange(const QModelIndex&)));
+      JobManager::self()->startJob("ThumbnailJob-" + item.data(ImageFilenameRole).toString());
 
       icon.addFile(":/images/image-big.png");
     } else {
@@ -313,24 +306,22 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
 
   // Copy the whole directory
   if (fileNames.isEmpty()) {
-    if (!m_currentCopyJob) {
+    if (!JobManager::self()->job("CopyImages")) {
       m_currentCopyParent = parent;
-      m_currentCopyJob = new GCore::GJobs::CopyJob(sourcePath, gallery->getFilePath(), parent, deleteSource, this);
-      connect(m_currentCopyJob, SIGNAL(signalProcess(const QString&)), this, SLOT(slotProcess(const QString&)));
-      connect(m_currentCopyJob, SIGNAL(finished()), this, SLOT(slotRemoveCopyJob()));
-      m_currentCopyJob->start();
-      return m_currentCopyJob;
+      QObject *job = JobManager::self()->registerJob("CopyImages", new GJobs::CopyJob(sourcePath, gallery->getFilePath(), parent, deleteSource, this));
+      connect(job, SIGNAL(signalProcess(const QString&)), this, SLOT(slotProcess(const QString&)));
+      JobManager::self()->startJob("CopyImages");
+      return job;
     }
-  }
-
+  } else {
   // Copy only the fileNames
   if (!m_currentCopyJob) {
     m_currentCopyParent = parent;
-    m_currentCopyJob = new GCore::GJobs::CopyJob(sourcePath, fileNames, gallery->getFilePath(), parent);
-    connect(m_currentCopyJob, SIGNAL(signalProcess(const QString&)), this, SLOT(slotProcess(const QString&)));
-    connect(m_currentCopyJob, SIGNAL(finished()), this, SLOT(slotRemoveCopyJob()));
-    m_currentCopyJob->start();
-    return m_currentCopyJob;
+    QObject *job = JobManager::self()->registerJob("CopyImages", new GJobs::CopyJob(sourcePath, fileNames, gallery->getFilePath(), parent));
+    connect(job, SIGNAL(signalProcess(const QString&)), this, SLOT(slotProcess(const QString&)));
+    JobManager::self()->startJob("CopyImages");
+    return job;
+  }
   }
 
   return 0;
@@ -338,7 +329,6 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
 
 QObject *ImageModel::createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent, bool deleteSources, const QStringList &fileNames)
 {
-  qDebug() << deleteSources;
   QString path;
   if (parent.isValid())
     path = parent.data(ImageModel::ImageFilepathRole).toString();
@@ -359,7 +349,7 @@ QObject *ImageModel::createGallery(const QString &name, const QString &sourcePat
     // Notify the viewers we are making a new gallery
     beginInsertRows(QModelIndex(), m_rootItem->childCount(), m_rootItem->childCount() + 1);
 
-    m_rootItem->appendChild(new GCore::ImageItem(name, m_rootItem, GCore::ImageItem::Gallery));
+    m_rootItem->appendChild(new GCore::ImageItem(name, m_rootItem, ImageItem::Gallery));
 
     parentIndex = index(m_rootItem->childCount() - 1, 0);
   } else {
@@ -468,7 +458,7 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
 
     // Remove the picture's thumbnail
     if (!QFile::remove(gallery.absoluteFilePath(picture->getThumbName()))) {
-        qDebug() << "Cannot remove thumbnail: " << gallery.absoluteFilePath(picture->getThumbName()) << endl;
+        qWarning() << "Cannot remove thumbnail: " << gallery.absoluteFilePath(picture->getThumbName()) << endl;
         status = false;
         break;
       }
@@ -477,7 +467,7 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
 
     // Remove the picture
     if (!QFile::remove(picture->getFilePath())) {
-        qDebug() << "Cannot remove image: " << picture->getFilePath() << endl;
+        qWarning() << "Cannot remove image: " << picture->getFilePath() << endl;
         status = false;
         break;
       }
@@ -541,10 +531,7 @@ QModelIndex ImageModel::findGallery(const QString &name)
 
 void ImageModel::stopCopy()
 {
-  if (m_currentCopyJob) {
-    m_currentCopyJob->stop();
-    m_delete = true;
-  }
+  JobManager::self()->stopJob("CopyImages");
 }
 
 void ImageModel::setupModelData() const
@@ -619,7 +606,7 @@ QModelIndex ImageModel::processGallerySearch(const QString &name, const QModelIn
 
 void ImageModel::slotProcess(const QString &fileName)
 {
-  if (!m_currentCopyJob && !m_currentCopyParent.isValid())
+  if (!m_currentCopyParent.isValid())
     return;
 
   ImageItem *gallery = static_cast<ImageItem*>(m_currentCopyParent.internalPointer());
@@ -642,35 +629,10 @@ void ImageModel::slotProcess(const QString &fileName)
   }
 }
 
-void ImageModel::slotRemoveJob()
-{
-  // Delete the ReadJob!
-  disconnect(this, SLOT(slotRemoveJob()));
-  m_currentJob->deleteLater();
-  m_currentJob = 0;
-}
-
 void ImageModel::slotChange(const QModelIndex &item)
 {
   QModelIndex currentItem = item;
   emit dataChanged(currentItem, currentItem);
-}
-
-void ImageModel::slotRemoveCopyJob()
-{
-  if (m_delete) {
-    beginRemoveRows(QModelIndex(), m_rootItem->childCount() - 1, 1);
-    ImageItem *gallery = static_cast<ImageItem*>(m_currentCopyParent.internalPointer());
-    gallery->parent()->removeChild(gallery);
-    endRemoveRows();
-  }
-
-  // Delete the CopyJob
-  disconnect(this, SLOT(slotRemoveCopyJob()));
-  m_currentCopyJob->deleteLater();
-  m_currentCopyJob = 0;
-  m_currentCopyParent = QModelIndex();
-  m_delete = false;
 }
 
 }

@@ -21,9 +21,9 @@ CONFIG += warn_on \
           opengl \
           thread
 TEMPLATE = app
-LIBS += core/libcore.a \
+LIBS += dialogs/libdialogs.a \
+        core/libcore.a \
         core/jobs/libjobs.a \
-        dialogs/libdialogs.a \
         core/network/libnetwork.a \
         widgets/libwidgets.a \
         widgets/photowidgets/libphotowidgets.a \

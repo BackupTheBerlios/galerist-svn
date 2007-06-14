@@ -67,7 +67,6 @@ class Configuration : public QDialog, private Ui::Configuration
     void accept();
 
   private:
-    QObject *m_job;
 
   private slots:
     /**

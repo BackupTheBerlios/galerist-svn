@@ -37,7 +37,8 @@ namespace GJobs
 
 AbstractJob::AbstractJob(QObject *parent)
     : QThread(parent),
-    m_stop(false)
+    m_stop(false),
+    m_paused(false)
 {
   // Connect with the error handler.
   connect(this, SIGNAL(signalFailed(const QString&, int)), Data::self()->value(Data::ErrorHandler).value<QObject*>(), SLOT(slotReporter(const QString&, int)));
@@ -51,8 +52,24 @@ void AbstractJob::stop()
   m_locker.unlock();
 }
 
+void AbstractJob::pause()
+{
+  m_locker.lock();
+  m_paused = true;
+  m_locker.unlock();
+}
+
+void AbstractJob::unpause()
+{
+  m_locker.lock();
+  m_paused = false;
+  m_locker.unlock();
+}
+
 AbstractJob::~AbstractJob()
-{}
+{
+  qDebug("bu");
+}
 
 void AbstractJob::run()
 {

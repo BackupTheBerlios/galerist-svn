@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -344,11 +344,7 @@ void PhotoView::slotNextPhoto()
 
   emit photoEditSelectionChanged(newIndex, m_itemVector.count());
 
-  disconnect(m_currentEdited->getIndex().data(ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
-
   m_currentEdited = m_itemVector.at(newIndex);
-
-  connect(m_currentEdited->getIndex().data(ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   emit imageSwitched(m_currentEdited->getIndex().data(ImageModel::ImagePictureRole).value<QImage>().size());
 
@@ -368,11 +364,7 @@ void PhotoView::slotPreviousPhoto()
 
   emit photoEditSelectionChanged(newIndex, m_itemVector.count());
 
-  disconnect(m_currentEdited->getIndex().data(ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
-
   m_currentEdited = m_itemVector.at(newIndex);
-
-  connect(m_currentEdited->getIndex().data(ImageModel::ObjectRole).value<QObject*>(), SIGNAL(imageChanged(const QImage&)), m_currentEdited, SLOT(changeImage(const QImage&)));
 
   emit imageSwitched(m_currentEdited->getIndex().data(ImageModel::ImagePictureRole).value<QImage>().size());
 

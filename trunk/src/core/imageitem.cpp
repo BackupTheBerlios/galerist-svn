@@ -47,18 +47,13 @@ ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
   if (m_type == Image)
     m_id = metadata()->imageId(getFileName());
   else
-    m_metadata = new MetaDataManager(getFilePath());
+    m_metadata = new MetaDataManager(getFilePath(), this);
 }
 
 ImageItem::~ImageItem()
 {
   if (!m_childItems.isEmpty() && m_type != Image)
     qDeleteAll(m_childItems.begin(), m_childItems.end());
-
-  if (m_metadata && m_type != Image) {
-    delete m_metadata;
-    m_metadata = 0;
-  }
 
   if (m_transformator) {
     m_transformator->stop();

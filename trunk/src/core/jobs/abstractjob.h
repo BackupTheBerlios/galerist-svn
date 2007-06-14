@@ -76,6 +76,19 @@ class AbstractJob : public QThread
      */
     void stop();
 
+    /**
+     * Pauses the thread.
+     */
+    void pause();
+
+    /**
+     * Unpauses the thread.
+     */
+    void unpause();
+
+    /**
+     * A destructor.
+     */
     ~AbstractJob();
 
   protected:
@@ -96,6 +109,7 @@ class AbstractJob : public QThread
     bool getStop();
 
     bool m_stop;
+    bool m_paused;
     QMutex m_locker;
 
   private slots:

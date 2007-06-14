@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -31,6 +31,7 @@
 
 #include "core/data.h"
 #include "core/errorhandler.h"
+#include "core/jobmanager.h"
 
 using namespace GCore;
 
@@ -38,8 +39,7 @@ namespace GDialogs
 {
 
 Configuration::Configuration(QWidget *parent)
-    : QDialog(parent),
-    m_job(0)
+    : QDialog(parent)
 {
   // Initialises the GUI
   setupUi(this);
@@ -114,17 +114,14 @@ Configuration::Configuration(QWidget *parent)
 }
 
 Configuration::~Configuration()
-{
-  if (m_job)
-    static_cast<QThread*>(m_job)->wait();
-}
+{}
 
 void Configuration::accept()
 {
   bool wait = false;
   if (GCore::Data::self()->value(Data::GalleriesPath).toString() != dirEdit->text() && dirEdit->isValid())
     if (QMessageBox::question(this, tr("Confirm move"), tr("Are you sure you want to move all the galleries?"), tr("&Move"), tr("&No"), "", 1, 1) == 0) {
-      QObject *job = GCore::Data::self()->setValue(Data::GalleriesPath, dirEdit->text());
+      QObject *job = GCore::JobManager::self()->registerJob("MoveGallery", Data::self()->setValue(Data::GalleriesPath, dirEdit->text()));
       job->setParent(this);
       moveGroup->show();
       buttonBox->setDisabled(true);
@@ -134,7 +131,6 @@ void Configuration::accept()
       connect(job, SIGNAL(directoryProgress(int, int, const QString&)), this, SLOT(updateGalleryProgress(int, int, const QString&)));
       connect(job, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(updateImagesProgress(int, int, const QString&, const QImage&)));
       connect(job, SIGNAL(finished(bool)), this, SLOT(finish(bool)));
-      m_job = job;
     } else {
       return;
     }
@@ -206,8 +202,6 @@ void Configuration::finish(bool successful)
 
   moveGroup->hide();
   buttonBox->setDisabled(false);
-
-  m_job = 0;
 }
 
 }

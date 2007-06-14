@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -180,7 +180,7 @@ void MainWindow::initDocks()
 
 void MainWindow::about()
 {
-  QString about = tr("With %1 you can create your own galleries of pictures, comment all pictures and upload them to a gallery site.\n\nCurrent version: %2 %3\nAuthor name: Gregor KaliÅ¡nik\nAuthor email: gregor@unimatrix-one.org").arg(Data::self()->value(Data::AppName).toString()).arg(Data::self()->value(Data::AppVersion).toString()).arg(Data::self()->value(Data::AppBranch).toString());
+  QString about = tr("With %1 you can create your own galleries of pictures, comment all pictures and upload them to a gallery site.\n\nCurrent version: %2 %3\nAuthor name: Gregor Kališnik\nAuthor email: gregor@unimatrix-one.org").arg(Data::self()->value(Data::AppName).toString()).arg(Data::self()->value(Data::AppVersion).toString()).arg(Data::self()->value(Data::AppBranch).toString());
   QMessageBox::about(this, tr("About %1").arg(Data::self()->value(Data::AppName).toString()), about);
 }
 

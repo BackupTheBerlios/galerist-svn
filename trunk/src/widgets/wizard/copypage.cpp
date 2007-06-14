@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Gregor KaliÅ¡nik                                 *
+ *   Copyright (C) 2006 by Gregor Kališnik                                 *
  *   Copyright (C) 2006 by Jernej Kos                                      *
  *   Copyright (C) 2006 by Unimatrix-One                                   *
  *                                                                         *
@@ -22,8 +22,7 @@
 
 #include "core/data.h"
 #include "core/imagemodel.h"
-
-#include "core/jobs/copyjob.h"
+#include "core/jobmanager.h"
 
 #include <QtCore/QDir>
 
@@ -39,8 +38,7 @@ namespace GWizard
 
 CopyPage::CopyPage()
     : QWizardPage(),
-    m_finished(false),
-    m_copyProcess(0)
+    m_finished(false)
 {
   setTitle(tr("Copy"));
   setSubTitle(tr("Creation progress"));
@@ -59,12 +57,12 @@ void CopyPage::initializePage()
     parentGallery = static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->findGallery(field("ParentGallery").toString());
 
   // We copy the images to the right place
-  m_copyProcess = static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery, field("DeleteSourceImages").toBool());
+  QObject *job = static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery, field("DeleteSourceImages").toBool());
 
   // Connect the gallery handler.
   qRegisterMetaType<QImage>("QImage");
 
-  connect(m_copyProcess, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(slotProgress(int, int, const QString&, const QImage&)));
+  connect(job, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), this, SLOT(slotProgress(int, int, const QString&, const QImage&)));
 }
 
 bool CopyPage::isComplete() const
@@ -74,31 +72,17 @@ bool CopyPage::isComplete() const
 
 void CopyPage::pauseCopy()
 {
-  if (!m_copyProcess)
-    return;
-
-  GJobs::CopyJob *copyJob = static_cast<GJobs::CopyJob*>(m_copyProcess);
-  copyJob->pause();
+  JobManager::self()->pauseJob("CopyImages");
 }
 
 void CopyPage::resumeCopy()
 {
-  if (!m_copyProcess)
-    return;
-
-  GJobs::CopyJob *copyJob = static_cast<GJobs::CopyJob*>(m_copyProcess);
-  copyJob->unpause();
+  JobManager::self()->unpauseJob("CopyImages");
 }
 
 void CopyPage::stopCopy()
 {
-  if (!m_copyProcess)
-    return;
-
-  GJobs::CopyJob *copyJob = static_cast<GJobs::CopyJob*>(m_copyProcess);
-  copyJob->stop();
-  m_copyProcess = 0;
-  copyJob = 0;
+  JobManager::self()->stopJob("CopyImages");
 }
 
 void CopyPage::setPredefinedImages(const QString &path, const QStringList &images)
@@ -122,7 +106,6 @@ void CopyPage::slotProgress(int finished, int total, const QString &current, con
     //The copy has finished!
     progressLabel->setText(tr("Copy finished"));
     m_finished = true;
-    m_copyProcess = 0;
     emit completeChanged();
     wizard()->next();
   }
