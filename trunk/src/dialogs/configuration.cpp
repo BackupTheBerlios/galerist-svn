@@ -152,7 +152,7 @@ void Configuration::accept()
   }
 
 #ifdef WANT_UPDATER
-  GCore::Data::self()->setUpdateStartup(updateBox->isChecked());
+  GCore::Data::self()->setValue(Data::UpdateStartup, updateBox->isChecked());
 #endif
 
   GCore::Data::self()->setValue(Data::DisableVisualEffects, effectsBox->isChecked());

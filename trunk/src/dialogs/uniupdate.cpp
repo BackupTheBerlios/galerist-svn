@@ -31,6 +31,8 @@
 
 #include "core/network/uniupdatemanager.h"
 
+using namespace GCore;
+
 namespace GDialogs
 {
 
@@ -46,7 +48,7 @@ UniUpdate::UniUpdate(QWidget *parent)
 
   layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-  m_updateManager = new GCore::GNetwork::UniUpdateManager(this);
+  m_updateManager = new GNetwork::UniUpdateManager(this);
 
   connect(m_updateManager, SIGNAL(updateAvailability(int, const QString&)), this, SLOT(updateProcess(int, const QString&)));
   connect(m_updateManager, SIGNAL(downloadProgress(int, int)), this, SLOT(updateDownloadProgress(int, int)));
@@ -58,7 +60,7 @@ UniUpdate::UniUpdate(QWidget *parent)
   statusLabel->setText(tr("Retrieving changelog..."));
 
   // TODO: need to get changed...
-  m_updateManager->checkUpdate(GCore::Data::self()->getAppName(), "windows", "unstable", GCore::Data::self()->getAppVersion(), GCore::Data::self()->getBranch());
+  m_updateManager->checkUpdate(Data::self()->value(Data::AppName).toString(), "windows", "unstable", Data::self()->value(Data::AppVersion).toString(), Data::self()->value(Data::AppBranch).toString());
 }
 
 UniUpdate::~UniUpdate()
@@ -80,28 +82,28 @@ void UniUpdate::updateProcess(int availability, const QString &changelog)
 {
   progressBar->setMaximum(1);
   switch (availability) {
-    case (GCore::GNetwork::UniUpdateManager::CannotConnect) : {
+    case (GNetwork::UniUpdateManager::CannotConnect) : {
       statusLabel->setText(tr("Cannot contact UniUpdate server."));
       break;
     }
-    case (GCore::GNetwork::UniUpdateManager::ApplicationUnsupported) : {
+    case (GNetwork::UniUpdateManager::ApplicationUnsupported) : {
       statusLabel->setText(tr("This application is not supported by the UniUpdate service."));
       break;
     }
-    case (GCore::GNetwork::UniUpdateManager::PlatformUnsupported) : {
+    case (GNetwork::UniUpdateManager::PlatformUnsupported) : {
       statusLabel->setText(tr("This platform is not supported by the UniUpdate service."));
       break;
     }
-    case (GCore::GNetwork::UniUpdateManager::BranchUnsupported) : {
+    case (GNetwork::UniUpdateManager::BranchUnsupported) : {
       statusLabel->setText(tr("Selected branch does not exist on UniUpdate server. You could change the preferred branch in the configuration."));
       break;
     }
-    case (GCore::GNetwork::UniUpdateManager::Latest) : {
-      statusLabel->setText(tr("You already have the latest %1 installed.").arg(GCore::Data::self()->getAppName()));
+    case (GNetwork::UniUpdateManager::Latest) : {
+      statusLabel->setText(tr("You already have the latest %1 installed.").arg(Data::self()->value(Data::AppName).toString()));
       break;
     }
-    case (GCore::GNetwork::UniUpdateManager::Available) : {
-      statusLabel->setText(tr("A new version of %1 is available.").arg(GCore::Data::self()->getAppName()));
+    case (GNetwork::UniUpdateManager::Available) : {
+      statusLabel->setText(tr("A new version of %1 is available.").arg(Data::self()->value(Data::AppName).toString()));
       changelogOutput->setPlainText(changelog);
 
       // Lets show ourselfs!

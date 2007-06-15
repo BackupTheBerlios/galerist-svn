@@ -70,7 +70,7 @@ MainWindow::MainWindow()
 
 #ifdef WANT_UPDATER
   // Lets check for updates
-  if (Data::self()->getUpdateStartup())
+  if (Data::self()->value(Data::UpdateStartup).toBool())
     GDialogs::UniUpdate::checkUpdatesStartup(this);
 #endif
 }
