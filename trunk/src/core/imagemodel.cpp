@@ -77,16 +77,16 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
         else
           date = exifData.getCreationDate().toString(Qt::SystemLocaleDate);
 
-        QString message = tr("EXIF information:") + "<table>";
-        message += "<tr><td>" + tr("Camera manufacturer:") + " </td><td> " + exifData.getCameraMaker() + "</td></tr>";
-        message += "<tr><td>" + tr("Camera model:") + " </td><td> " + exifData.getCameraModel() + "</td></tr>";
-        message += "<tr><td>" + tr("Aperture:") + " </td><td> " + exifData.getAperture() + "</td></tr>";
-        message += "<tr><td>" + tr("Creation Date:") + " </td><td> " + date + "</td></tr>";
-        message += "<tr><td>" + tr("Shutter speed:") + " </td><td> " + exifData.getShutterSpeed() + "</td></tr>";
-        message += "<tr><td>" + tr("Exposure time:") + " </td><td> " + exifData.getExposureTime() + "</td></tr>";
-        message += "<tr><td>" + tr("Focal length:") + " </td><td> " + exifData.getFocalLength() + "</td></tr>";
-        message += "<tr><td>" + tr("Flash: ") + " </td><td> " + exifData.getFlash() + "</td></tr></table>";
-        return item->name() + ": <i>" + item->description().replace('\n', "<br/>") + "</i>" + "<p>" + message + "</p>";
+        QString message = "<u>" + tr("EXIF information:") + "</u><table>";
+        message += "<tr><td><b>" + tr("Camera manufacturer:") + "</b> </td><td> " + exifData.getCameraMaker() + "</td></tr>";
+        message += "<tr><td><b>" + tr("Camera model:") + "</b> </td><td> " + exifData.getCameraModel() + "</td></tr>";
+        message += "<tr><td><b>" + tr("Aperture:") + "</b> </td><td> " + exifData.getAperture() + "</td></tr>";
+        message += "<tr><td><b>" + tr("Creation Date:") + "</b> </td><td> " + date + "</td></tr>";
+        message += "<tr><td><b>" + tr("Shutter speed:") + "</b> </td><td> " + exifData.getShutterSpeed() + "</td></tr>";
+        message += "<tr><td><b>" + tr("Exposure time:") + "</b> </td><td> " + exifData.getExposureTime() + "</td></tr>";
+        message += "<tr><td><b>" + tr("Focal length:") + "</b> </td><td> " + exifData.getFocalLength() + "</td></tr>";
+        message += "<tr><td><b>" + tr("Flash: ") + "</b> </td><td> " + exifData.getFlash() + "</td></tr></table>";
+        return "<b>" + item->name() + ":</b> <i>" + item->description().replace('\n', "<br/>") + "</i>" + "<p>" + message + "</p>";
       }
     }
     case Qt::DecorationRole : {

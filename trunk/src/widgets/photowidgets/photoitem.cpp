@@ -91,7 +91,7 @@ PhotoItem::PhotoItem(PhotoView *view, const QModelIndex &index)
   // Connect the elements
   connect(m_itemTimeLine, SIGNAL(valueChanged(qreal)), this, SLOT(slotSetFullsizePixmap(qreal)));
   connect(view, SIGNAL(signalEditMode(bool)), this, SLOT(slotEdit(bool)));
-  connect(view, SIGNAL(signalEditMode(bool)), static_cast<ImageItem*>(index.internalPointer()), SLOT(prepareForEdit(bool)));
+  //connect(view, SIGNAL(signalEditMode(bool)), static_cast<ImageItem*>(index.internalPointer()), SLOT(prepareForEdit(bool)));
   connect(m_text, SIGNAL(editingFinished(const QString&)), this, SLOT(slotSaveName(const QString&)));
   connect(m_description, SIGNAL(editingFinished(const QString&)), this, SLOT(slotSaveDescription(const QString&)));
 
@@ -316,6 +316,8 @@ void PhotoItem::fullSizePixmap()
     QPixmap pixmap = QPixmap::fromImage(m_index.data(ImageModel::ImagePictureRole).value<QImage>());
 
     m_fullsizePixmap = new QPixmap(pixmap);
+
+    m_item->loadImage();
 
     if (Data::self()->value(Data::DisableVisualEffects).toBool()) {
       qreal scaleFactor = calculateScale(*m_fullsizePixmap, m_view->viewport()->size());

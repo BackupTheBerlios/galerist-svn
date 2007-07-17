@@ -94,7 +94,7 @@ void PhotoName::setText(const QString &text)
 void PhotoName::setEdit()
 {
   m_editing = true;
-  m_editor->move(QPoint(m_view->mapFromScene(mapToScene(mapFromParent(15, 140)))));
+  m_editor->move(QPoint(m_view->mapFromScene(mapToScene(mapFromParent(14, 139)))));
   m_editor->show();
   m_editor->setFocus();
   slotCheck(m_text);

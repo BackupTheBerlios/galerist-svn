@@ -43,6 +43,8 @@
 
 #include <QtOpenGL/QGLWidget>
 
+#include <math.h>
+
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
@@ -568,7 +570,8 @@ int PhotoView::rearrangeItems(bool update)
   if (m_editMode && m_currentEdited)
     x = - (5000) * m_itemVector.indexOf(m_currentEdited);
 
-  int itemsPerRow = width() / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing);
+  //int itemsPerRow = width() / (GPhotoWidgets::PhotoItem::ItemWidth + (m_spacing * 2));
+  int itemsPerRow = viewport()->width() / (GPhotoWidgets::PhotoItem::ItemWidth + (m_spacing));
 
   QList<GPhotoWidgets::PhotoItem*> items = m_itemVector.toList();
   QList<GPhotoWidgets::PhotoItem*>::iterator end = items.end();
@@ -925,9 +928,9 @@ void PhotoView::updateScene()
     int scrollbarWidth = verticalScrollBar()->width();
     qreal sceneWidth = viewport()->width() - scrollbarWidth;
 
-    int rows = qRound(static_cast<qreal>(m_itemVector.count()) / static_cast<int>(sceneWidth / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing * 2)));
+    int rows = ceil(m_itemVector.count() / (sceneWidth / (GPhotoWidgets::PhotoItem::ItemWidth + m_spacing)));
 
-    qreal sceneHeight = rows * (GPhotoWidgets::PhotoItem::ItemHeight + (m_spacing * 2));
+    qreal sceneHeight = rows * (GPhotoWidgets::PhotoItem::ItemHeight + (m_spacing)) + m_spacing;
 
     if (sceneHeight < viewport()->height())
       sceneHeight = viewport()->height();

@@ -67,9 +67,7 @@ void AbstractJob::unpause()
 }
 
 AbstractJob::~AbstractJob()
-{
-  qDebug("bu");
-}
+{}
 
 void AbstractJob::run()
 {
