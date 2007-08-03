@@ -31,7 +31,7 @@ include_directories(../ ${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDES})
 
 add_library(core STATIC ${core_SRCS} ${core_MOC_SRCS})
 
-TARGET_LINK_LIBRARIES(core jobs network ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(core jobs network -lexif ${QT_LIBRARIES})
 
 ADD_DEPENDENCIES(core jobs network)
 

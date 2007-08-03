@@ -1,3 +1,8 @@
+if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+  ADD_DEFINITIONS(-DWANT_UPDATER)
+  set(UPDATER true)
+endif(CMAKE_SYSTEM_NAME STREQUAL Windows)
+
 add_subdirectory(core)
 add_subdirectory(dialogs)
 add_subdirectory(widgets)
@@ -41,6 +46,6 @@ ENDIF( MINGW )
 
 add_executable(../bin/goya ${goya_SRCS} ${goya_UIS_H} ${goya_MOC_SRCS} ${goya_RC_SRCS})
 
-TARGET_LINK_LIBRARIES(../bin/goya core dialogs -lMagick++ -lexif ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(../bin/goya dialogs core ${QT_LIBRARIES})
 
 ADD_DEPENDENCIES(../bin/goya core dialogs)
