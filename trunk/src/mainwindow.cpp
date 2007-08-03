@@ -40,8 +40,6 @@
 #include "dialogs/configuration.h"
 #include "dialogs/uniupdate.h"
 
-#include "widgets/photocontrol.h"
-
 using namespace GCore;
 
 MainWindow::MainWindow()
@@ -140,7 +138,7 @@ void MainWindow::initActionButtons()
   Data::self()->setValue(Data::PhotoContextMenu, QVariant::fromValue(static_cast<QWidget*>(contextMenu)));
 
 
-  photoControl->connectView(imageList);
+//  photoControl->connectView(imageList);
 }
 
 void MainWindow::initToolbar()
@@ -164,7 +162,6 @@ void MainWindow::initDocks()
   albumView->header()->setVisible(false);
   albumView->setModel(static_cast<QAbstractItemModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>()));
   imageList->setModel(static_cast<QAbstractItemModel*>(Data::self()->value(Data::ImageModel).value<QObject*>()));
-  imageControlWidget->setVisible(false);
 
   connect(imageList, SIGNAL(signalOneSelected(bool)), actionPreview, SLOT(setEnabled(bool)));
   connect(imageList, SIGNAL(signalOneSelected(bool)), actionRename, SLOT(setEnabled(bool)));
@@ -263,7 +260,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::setEditMode(bool edit)
 {
-  imageControlWidget->setVisible(edit);
   galleryDock->setVisible(!edit);
   galleryDock->toggleViewAction()->setEnabled(!edit);
 

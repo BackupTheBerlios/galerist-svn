@@ -26,7 +26,6 @@ LIBS += dialogs/libdialogs.a \
         core/jobs/libjobs.a \
         core/network/libnetwork.a \
         widgets/libwidgets.a \
-        widgets/photowidgets/libphotowidgets.a \
         widgets/wizard/libwizard.a \
         -lMagick++ \
         -lexif
@@ -35,8 +34,7 @@ TARGETDEPS += core/network/libnetwork.a \
               core/libcore.a \
               widgets/libwidgets.a \
               widgets/wizard/libwizard.a \
-              dialogs/libdialogs.a \
-              widgets/photowidgets/libphotowidgets.a
+              dialogs/libdialogs.a
 
 unix{
 target.path = $${PREFIX}/bin

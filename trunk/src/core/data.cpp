@@ -146,6 +146,10 @@ QObject *Data::setValue(int type, const QVariant &value)
       m_branch = value.toString();
       break;
     }
+    case (SupportedFormats) : {
+      m_supportedFormats = value.toRegExp();
+      break;
+    }
     case (SearchBar) : {
       m_searchBar = value.value<QWidget*>();
       break;

@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
   app.setApplicationName("Goya");
   GCore::Data::self()->setValue(GCore::Data::AppVersion, "0.3.0");
   GCore::Data::self()->setValue(GCore::Data::AppBranch, "unstable");
-  GCore::Data::self()->setValue(GCore::Data::SupportedFormats, QRegExp("gif|jpg|jpeg|png"));
+  GCore::Data::self()->setValue(GCore::Data::SupportedFormats, QRegExp("gif|jpg|jpeg|png", Qt::CaseInsensitive));
 
   QTranslator translation;
   translation.load(GCore::Data::self()->value(GCore::Data::TranslationName).toString(), GCore::Data::self()->value(GCore::Data::TranslationPath).toString());

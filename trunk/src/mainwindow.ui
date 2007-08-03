@@ -17,11 +17,21 @@
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QGridLayout" >
-    <item row="0" column="0" >
-     <widget class="GWidgets::PhotoView" name="imageList" />
-    </item>
     <item row="1" column="0" >
      <widget class="GWidgets::SearchBar" native="1" name="searchBar" />
+    </item>
+    <item row="0" column="0" >
+     <widget class="GWidgets::ListView" name="imageList" >
+      <property name="acceptDrops" >
+       <bool>true</bool>
+      </property>
+      <property name="movement" >
+       <enum>QListView::Static</enum>
+      </property>
+      <property name="viewMode" >
+       <enum>QListView::IconMode</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -139,52 +149,6 @@
    <addaction name="actionAdd" />
    <addaction name="actionRemove" />
    <addaction name="separator" />
-  </widget>
-  <widget class="QDockWidget" name="imageControlWidget" >
-   <property name="features" >
-    <set>QDockWidget::DockWidgetVerticalTitleBar</set>
-   </property>
-   <property name="allowedAreas" >
-    <set>Qt::AllDockWidgetAreas</set>
-   </property>
-   <property name="windowTitle" >
-    <string>Image transformation control</string>
-   </property>
-   <attribute name="dockWidgetArea" >
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2" >
-    <layout class="QGridLayout" >
-     <property name="leftMargin" >
-      <number>0</number>
-     </property>
-     <property name="topMargin" >
-      <number>0</number>
-     </property>
-     <property name="rightMargin" >
-      <number>0</number>
-     </property>
-     <property name="bottomMargin" >
-      <number>0</number>
-     </property>
-     <property name="horizontalSpacing" >
-      <number>1</number>
-     </property>
-     <property name="verticalSpacing" >
-      <number>1</number>
-     </property>
-     <item row="2" column="0" >
-      <widget class="GWidgets::PhotoControl" native="1" name="photoControl" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
   </widget>
   <action name="actionAbout" >
    <property name="icon" >
@@ -406,11 +370,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GWidgets::PhotoView</class>
-   <extends>QGraphicsView</extends>
-   <header>widgets/photoview.h</header>
-  </customwidget>
-  <customwidget>
    <class>GWidgets::GalleryTreeView</class>
    <extends>QTreeView</extends>
    <header>widgets/gallerytreeview.h</header>
@@ -422,10 +381,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>GWidgets::PhotoControl</class>
-   <extends>QWidget</extends>
-   <header>widgets/photocontrol.h</header>
-   <container>1</container>
+   <class>GWidgets::ListView</class>
+   <extends>QListView</extends>
+   <header location="global" >widgets/listview.h</header>
   </customwidget>
  </customwidgets>
  <resources>
