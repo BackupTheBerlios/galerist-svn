@@ -62,14 +62,12 @@ class Data : public QObject
       ImageFormats,
       GalleriesPath,
       SettingsPath,
-      ImageModel,
       DirCompleter,
       FileCompleter,
       PhotoContextMenu,
       PhotoEditContextMenu,
       GalleryContextMenu,
       MainWindow,
-      ModelProxy,
       AppName,
       AppVersion,
       AppBranch,
@@ -133,6 +131,21 @@ class Data : public QObject
      */
     ~Data();
 
+    /**
+     * Gets proxy model for ListView.
+     */
+    QSortFilterProxyModel *imageProxy();
+
+    /**
+     * Gets proxy model for GalleryView.
+     */
+    QSortFilterProxyModel *galleryProxy();
+
+    /**
+     * Gets image model.
+     */
+    ImageModel *imageModel();
+
 
 
   private:
@@ -141,7 +154,7 @@ class Data : public QObject
     QSettings *m_settings;
     QObject *m_errorHandler;
     QStringList m_imageFormats;
-    GCore::ImageModel *m_imageModel;
+    ImageModel *m_imageModel;
     QCompleter *m_dirCompleter;
     QCompleter *m_fileCompleter;
     QWidget *m_photoContextMenu;
@@ -151,7 +164,8 @@ class Data : public QObject
     QString m_appVersion;
     QString m_branch;
     QWidget *m_mainWindow;
-    QSortFilterProxyModel *m_modelProxy;
+    QSortFilterProxyModel *m_galleryProxy;
+    QSortFilterProxyModel *m_imageProxy;
     QRegExp m_supportedFormats;
 
     QWidget *m_searchBar;

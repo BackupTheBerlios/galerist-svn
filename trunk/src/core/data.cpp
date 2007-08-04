@@ -49,7 +49,8 @@ Data::Data(QObject *parent)
     m_photoEditContextMenu(0),
     m_galleryContextMenu(0),
     m_mainWindow(0),
-    m_modelProxy(0),
+    m_imageProxy(0),
+                 m_galleryProxy(0),
     m_imageAddProgress(0)
 
 {
@@ -62,13 +63,6 @@ Data::Data(QObject *parent)
   m_fileCompleter->setModel(new QDirModel(QStringList(), QDir::AllEntries, QDir::Name, m_fileCompleter));
 
   m_errorHandler = new GCore::ErrorHandler(this);
-
-  m_imageModel = new GCore::ImageModel(this);
-
-  m_modelProxy = new QSortFilterProxyModel(this);
-  m_modelProxy->setFilterRole(ImageModel::ImageTypeRole);
-  m_modelProxy->setFilterWildcard(QString::number(ImageItem::Gallery));
-  m_modelProxy->setSourceModel(m_imageModel);
 
   QMenu *temp = new QMenu(m_mainWindow);
   temp->addAction(tr("Nothing available"))->setDisabled(true);
@@ -206,8 +200,6 @@ QVariant Data::value(int type)
             return QDir::toNativeSeparators(galleriesDir().absolutePath());
     case (SettingsPath) :
             return settingsPath();
-    case (ImageModel) :
-            return QVariant::fromValue<QObject*>(m_imageModel);
     case (DirCompleter) :
             return QVariant::fromValue<QObject*>(m_dirCompleter);
     case (FileCompleter) :
@@ -220,8 +212,6 @@ QVariant Data::value(int type)
             return QVariant::fromValue<QWidget*>(m_galleryContextMenu);
     case (MainWindow) :
             return QVariant::fromValue<QWidget*>(m_mainWindow);
-    case (ModelProxy) :
-            return QVariant::fromValue<QObject*>(m_modelProxy);
     case (AppName) :
             return qApp->applicationName();
     case (AppVersion) :
@@ -296,6 +286,40 @@ void Data::clear()
 Data::~Data()
 {
   saveChanges();
+}
+
+QSortFilterProxyModel *Data::imageProxy()
+{
+  if (!m_imageProxy) {
+    m_imageProxy = new QSortFilterProxyModel(this);
+    m_imageProxy->setSourceModel(imageModel());
+
+    m_imageProxy->setFilterRole(ImageModel::ImageTypeRole);
+    m_imageProxy->setFilterWildcard(QString::number(ImageItem::Image));
+  }
+
+  return m_imageProxy;
+}
+
+QSortFilterProxyModel *Data::galleryProxy()
+{
+  if (!m_galleryProxy) {
+    m_galleryProxy = new QSortFilterProxyModel(this);
+    m_galleryProxy->setSourceModel(imageModel());
+
+    m_galleryProxy->setFilterRole(ImageModel::ImageTypeRole);
+    m_galleryProxy->setFilterWildcard(QString::number(ImageItem::Gallery));
+  }
+
+  return m_galleryProxy;
+}
+
+ImageModel *Data::imageModel()
+{
+  if (!m_imageModel)
+    m_imageModel = new ImageModel(this);
+
+  return m_imageModel;
 }
 
 void Data::processGalleryMove(bool successful)

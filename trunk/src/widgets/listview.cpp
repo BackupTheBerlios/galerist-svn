@@ -18,108 +18,90 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #include "listview.h"
 
-#include <QtCore/QUrl>
+#include <QtCore/QModelIndex>
 
-#include <QtGui/QDragEnterEvent>
-#include <QtGui/QDragMoveEvent>
-#include <QtGui/QDragLeaveEvent>
-#include <QtGui/QDropEvent>
+#include <QtGui/QContextMenuEvent>
 #include <QtGui/QMenu>
+#include <QtGui/QAction>
+#include <QtGui/QMessageBox>
+#include <QtGui/QSortFilterProxyModel>
 
-#include "core/data.h"
-#include "core/imageitem.h"
+#include <QtDebug>
+
 #include "core/imagemodel.h"
+#include "core/data.h"
 
-#include "dialogs/newgallerywizard.h"
+#include "widgets/imagedelegate.h"
 
 using namespace GCore;
-using namespace GDialogs;
 
-namespace GWidgets
-{
+namespace GWidgets {
 
 ListView::ListView(QWidget *parent)
-    : QListView(parent)
-{}
+  : QListView(parent)
+{
+  viewport()->setAttribute(Qt::WA_Hover, true);
+
+  setItemDelegate(new ImageDelegate(this));
+
+  connect(this, SIGNAL(pressed(const QModelIndex&)), this, SLOT(slotSelect(const QModelIndex&)));
+}
+
+void ListView::contextMenuEvent(QContextMenuEvent *event)
+{
+  QMenu menu;
+
+  QAction *properties = menu.addAction(tr("Properties"));
+  QAction *remove = menu.addAction(tr("Remove picture"), this, SLOT(slotRemove()));
+
+  if (selectedIndexes().isEmpty()) {
+    properties->setEnabled(false);
+    remove->setEnabled(false);
+  }
+
+  menu.exec(event->globalPos());
+}
+
+void ListView::slotSelect(const QModelIndex &selectedIndex)
+{
+  QModelIndexList imagesList = selectedIndexes();
+  QModelIndexList::const_iterator finish = imagesList.constEnd();
+
+  for (QModelIndexList::const_iterator count = imagesList.constBegin(); count != finish; count++) {
+    if (*count == selectedIndex)
+      return;
+  }
+
+  clearSelection();
+
+  setCurrentIndex(selectedIndex);
+}
+
+void ListView::slotRemove()
+{
+  if (QMessageBox::question(0, tr("Confirm remove"), tr("Are you sure you want to remove %1 picture/s?").arg(selectedIndexes().count()), tr("Remove"), tr("Keep"), QString(), 1, 1) == 0)
+    setRootIndex(static_cast<GCore::ImageModel*> (model())->removeImages(selectedIndexes()));
+}
+
+void ListView::setRootIndex(const QModelIndex &index)
+{
+  QListView::setRootIndex(Data::self()->galleryProxy()->mapToSource(index));
+}
+
+void ListView::mouseReleaseEvent(QMouseEvent *event)
+{
+  if (selectedIndexes().isEmpty())
+    emit signalSelected(false);
+  else
+    emit signalSelected(true);
+
+  QListView::mouseReleaseEvent(event);
+}
 
 ListView::~ListView()
 {}
-
-void ListView::dragEnterEvent(QDragEnterEvent *event)
-{
-  QList<QUrl> imageUrls = event->mimeData()->urls();
-  QList<QUrl>::const_iterator end = imageUrls.constEnd();
-
-  bool haveImages = false;
-
-  for (QList<QUrl>::const_iterator count = imageUrls.constBegin(); count != end; count++) {
-    QString path = (*count).toLocalFile();
-    if (path.contains(Data::self()->value(Data::SupportedFormats).toRegExp())) {
-      haveImages = true;
-      break;
-    }
-  }
-
-  if (haveImages)
-    event->acceptProposedAction();
-}
-
-void ListView::dragMoveEvent(QDragMoveEvent *event)
-{
-  event->acceptProposedAction();
-}
-
-void ListView::dragLeaveEvent(QDragLeaveEvent *event)
-{
-  event->accept();
-}
-
-void ListView::dropEvent(QDropEvent *event)
-{
-  const QMimeData *mimeData = event->mimeData();
-
-  QStringList imagePaths;
-  QList<QUrl> imageUrls = mimeData->urls();
-  QList<QUrl>::const_iterator end = imageUrls.constEnd();
-
-  for (QList<QUrl>::const_iterator count = imageUrls.constBegin(); count != end; count++) {
-    QString path = (*count).toLocalFile();
-    if (!path.isEmpty() && path.contains(Data::self()->value(Data::SupportedFormats).toRegExp()))
-      imagePaths << path;
-  }
-
-  QString image = imagePaths.first();
-  image.remove(QRegExp("^.+/"));
-  QString path = imagePaths.first();
-  path.remove(image);
-
-  QStringList pictures = imagePaths;
-  pictures.replaceInStrings(path, QString());
-
-  QMenu dropdownMenu(tr("Dropped images"), this);
-  QAction *newDestination = dropdownMenu.addAction(QIcon(":/images/new.png"), tr("New gallery"));
-  newDestination->setStatusTip(tr("Create a new gallery with the dropped in images."));
-  newDestination->setParent(Data::self()->value(Data::MainWindow).value<QWidget*>());
-  QAction *existing = dropdownMenu.addAction(QIcon(":/images/add-existing.png"), tr("Existing gallery"));
-  existing->setStatusTip(tr("Insert the dropped in images into the selected gallery."));
-  existing->setParent(Data::self()->value(Data::MainWindow).value<QWidget*>());
-
-  if (rootIndex().data(ImageModel::ImageTypeRole).toInt() != ImageItem::Gallery)
-    existing->setEnabled(false);
-
-  QAction *choice = dropdownMenu.exec(mapToGlobal(event->pos()));
-
-  if (choice == newDestination) {
-    NewGalleryWizard *wizard = new NewGalleryWizard(path, pictures, this);
-    wizard->show();
-  } else if (choice == existing) {
-    connect(static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->addImages(rootIndex(), path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->value(Data::ImageAddProgress).value<QObject*>(), SLOT(setProgress(int, int, const QString&, const QImage&)));
-  }
-
-  event->acceptProposedAction();
-}
-
 
 }

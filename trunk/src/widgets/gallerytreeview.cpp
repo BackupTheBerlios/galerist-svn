@@ -52,7 +52,7 @@ void GalleryTreeView::contextMenuEvent(QContextMenuEvent *event)
 
 void GalleryTreeView::slotDelete()
 {
-  QModelIndex selectedGallery = static_cast<QSortFilterProxyModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>())->mapToSource(selectedIndexes().first());
+  QModelIndex selectedGallery = Data::self()->galleryProxy()->mapToSource(selectedIndexes().first());
 
   emit clicked(QModelIndex());
 

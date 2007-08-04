@@ -54,10 +54,10 @@ void CopyPage::initializePage()
   // We determine which gallery is the parent
   QModelIndex parentGallery = QModelIndex();
   if (field("ParentGallery").toString() != "None")
-    parentGallery = static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->findGallery(field("ParentGallery").toString());
+    parentGallery = Data::self()->imageModel()->findGallery(field("ParentGallery").toString());
 
   // We copy the images to the right place
-  QObject *job = static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>())->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery, field("DeleteSourceImages").toBool());
+  QObject *job = Data::self()->imageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery, field("DeleteSourceImages").toBool());
 
   // Connect the gallery handler.
   qRegisterMetaType<QImage>("QImage");

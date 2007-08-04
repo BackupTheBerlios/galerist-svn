@@ -69,7 +69,7 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
       if (item->imageType() == ImageItem::Gallery) {
         return item->name();
       } else {
-        ExifManager exifData(item->getFilePath(), static_cast<ImageModel*>(Data::self()->value(Data::ImageModel).value<QObject*>()));
+        ExifManager exifData(item->getFilePath(), Data::self()->imageModel());
 
         QString date;
         if (!exifData.getCreationDate().isValid())
@@ -363,7 +363,7 @@ QObject *ImageModel::createGallery(const QString &name, const QString &sourcePat
   }
 
   endInsertRows();
-  static_cast<QSortFilterProxyModel *>(Data::self()->value(Data::ModelProxy).value<QObject*>())->setSourceModel(this);
+  //static_cast<QSortFilterProxyModel *>(Data::self()->value(Data::ModelProxy).value<QObject*>())->setSourceModel(this);
 
   return addImages(parentIndex, sourcePath, fileNames, deleteSources);
 }
@@ -622,7 +622,7 @@ void ImageModel::slotProcess(const QString &fileName)
     endInsertRows();
 
     // Is there any better option?
-    static_cast<QSortFilterProxyModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>())->setSourceModel(this);
+//    static_cast<QSortFilterProxyModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>())->setSourceModel(this);
 
   } else if (fileName != "~ERROR~") {
     removeGallery(m_currentCopyParent);

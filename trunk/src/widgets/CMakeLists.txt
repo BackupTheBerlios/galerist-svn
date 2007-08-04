@@ -9,6 +9,7 @@ set(widgets_SRCS
   tooltip.cpp
   searchbar.cpp
   listview.cpp
+  imagedelegate.cpp
 )
 
 SET(widgets_UIS
@@ -22,6 +23,7 @@ SET(widgets_MOC_HDRS
 #  tooltip.h
   searchbar.h
   listview.h
+  imagedelegate.h
 )
 
 QT4_WRAP_CPP(widgets_MOC_SRCS ${widgets_MOC_HDRS})

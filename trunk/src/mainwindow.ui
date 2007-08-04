@@ -22,14 +22,23 @@
     </item>
     <item row="0" column="0" >
      <widget class="GWidgets::ListView" name="imageList" >
-      <property name="acceptDrops" >
+      <property name="selectionMode" >
+       <enum>QAbstractItemView::ExtendedSelection</enum>
+      </property>
+      <property name="isWrapping" stdset="0" >
        <bool>true</bool>
       </property>
-      <property name="movement" >
-       <enum>QListView::Static</enum>
+      <property name="resizeMode" >
+       <enum>QListView::Adjust</enum>
+      </property>
+      <property name="spacing" >
+       <number>10</number>
       </property>
       <property name="viewMode" >
        <enum>QListView::IconMode</enum>
+      </property>
+      <property name="uniformItemSizes" >
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -389,5 +398,22 @@
  <resources>
   <include location="resources.qrc" />
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>albumView</sender>
+   <signal>clicked(QModelIndex)</signal>
+   <receiver>imageList</receiver>
+   <slot>setRootIndex(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>167</x>
+     <y>268</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>459</x>
+     <y>265</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

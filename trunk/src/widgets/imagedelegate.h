@@ -18,41 +18,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GWIDGETSLISTVIEW_H_
-#define GWIDGETSLISTVIEW_H_
+#ifndef GWIDGETSIMAGEDELEGATE_H_
+#define GWIDGETSIMAGEDELEGATE_H_
 
-#include <QtGui/QListView>
+#include <QtGui/QItemDelegate>
+#include <QtGui/QPen>
 
-class QContextMenuEvent;
-class QAction;
-class QEvent;
-class QMouseEvent;
+class QPainter;
+class QStyleOptionViewItem;
+class QModelIndex;
 
 namespace GWidgets
 {
-class ListView : public QListView
+
+class ImageDelegate : public QItemDelegate
 {
     Q_OBJECT
-  signals:
-    void signalSelected(bool selected);
-
   public:
-    ListView(QWidget *parent);
+    ImageDelegate(QObject *parent = 0);
 
-    ~ListView();
+    ~ImageDelegate();
 
-  public slots:
-    void slotRemove();
-    void setRootIndex(const QModelIndex &index);
-
-  protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
   private:
+    QLinearGradient m_normalGradient;
+    QLinearGradient m_hoverGradient;
+    QPen m_normalBorder;
+    QPen m_hoverBorder;
 
-  private slots:
-    void slotSelect(const QModelIndex &selectedIndex);
+    void drawBackground(QPainter *painter, const QStyleOptionViewItem &option) const;
+    void drawPixmap(QPainter *painter, const QStyleOptionViewItem &option, const QPixmap &pixmap) const;
+
+    QRect textRect(const QString &text, const QRect &position) const;
 };
 
 }
