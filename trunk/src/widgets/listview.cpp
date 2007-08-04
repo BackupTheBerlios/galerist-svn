@@ -46,8 +46,6 @@ ListView::ListView(QWidget *parent)
   viewport()->setAttribute(Qt::WA_Hover, true);
 
   setItemDelegate(new ImageDelegate(this));
-
-  connect(this, SIGNAL(pressed(const QModelIndex&)), this, SLOT(slotSelect(const QModelIndex&)));
 }
 
 void ListView::contextMenuEvent(QContextMenuEvent *event)
@@ -63,21 +61,6 @@ void ListView::contextMenuEvent(QContextMenuEvent *event)
   }
 
   menu.exec(event->globalPos());
-}
-
-void ListView::slotSelect(const QModelIndex &selectedIndex)
-{
-  QModelIndexList imagesList = selectedIndexes();
-  QModelIndexList::const_iterator finish = imagesList.constEnd();
-
-  for (QModelIndexList::const_iterator count = imagesList.constBegin(); count != finish; count++) {
-    if (*count == selectedIndex)
-      return;
-  }
-
-  clearSelection();
-
-  setCurrentIndex(selectedIndex);
 }
 
 void ListView::slotRemove()
@@ -99,6 +82,14 @@ void ListView::mouseReleaseEvent(QMouseEvent *event)
     emit signalSelected(true);
 
   QListView::mouseReleaseEvent(event);
+}
+
+void ListView::mousePressEvent(QMouseEvent *event)
+{
+  if (!(event->modifiers() & Qt::ControlModifier) && !(event->modifiers() & Qt::ShiftModifier) && !indexAt(event->pos()).isValid())
+    clearSelection();
+
+  QListView::mousePressEvent(event);
 }
 
 ListView::~ListView()

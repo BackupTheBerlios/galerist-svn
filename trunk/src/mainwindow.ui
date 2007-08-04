@@ -22,6 +22,9 @@
     </item>
     <item row="0" column="0" >
      <widget class="GWidgets::ListView" name="imageList" >
+      <property name="editTriggers" >
+       <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
+      </property>
       <property name="selectionMode" >
        <enum>QAbstractItemView::ExtendedSelection</enum>
       </property>

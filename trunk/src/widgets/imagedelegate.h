@@ -51,6 +51,7 @@ class ImageDelegate : public QItemDelegate
 
     void drawBackground(QPainter *painter, const QStyleOptionViewItem &option) const;
     void drawPixmap(QPainter *painter, const QStyleOptionViewItem &option, const QPixmap &pixmap) const;
+    void drawMask(QPainter *painter, const QRect &rect) const;
 
     QRect textRect(const QString &text, const QRect &position) const;
 };

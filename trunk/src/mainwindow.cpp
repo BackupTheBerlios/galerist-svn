@@ -54,8 +54,6 @@ MainWindow::MainWindow()
 
   Data::self()->setValue(Data::SearchBar, QVariant::fromValue<QWidget*>(searchBar));
 
-  //connect(imageList, SIGNAL(signalEditMode(bool)), this, SLOT(setEditMode(bool)));
-
   initActionButtons();
   initToolbar();
   initDocks();
@@ -84,19 +82,19 @@ void MainWindow::initActionButtons()
   // Connect edit menu
   connect(actionAdd, SIGNAL(triggered()), this, SLOT(slotAddImages()));
   actionAdd->setShortcut(Qt::Key_Insert);
-  //connect(actionPreview, SIGNAL(triggered()), imageList, SLOT(slotEdit()));
-  //connect(actionRename, SIGNAL(triggered()), imageList, SLOT(slotRename()));
+  connect(actionPreview, SIGNAL(triggered()), imageList, SLOT(slotEdit()));
+  connect(actionRename, SIGNAL(triggered()), imageList, SLOT(slotRename()));
   actionRename->setShortcut(Qt::Key_F2);
-  //connect(actionDescribe, SIGNAL(triggered()), imageList, SLOT(slotDescribe()));
+  connect(actionDescribe, SIGNAL(triggered()), imageList, SLOT(slotDescribe()));
   actionDescribe->setShortcut(Qt::SHIFT | Qt::Key_F2);
-  //connect(actionRemove, SIGNAL(triggered()), imageList, SLOT(slotRemove()));
+  connect(actionRemove, SIGNAL(triggered()), imageList, SLOT(slotRemove()));
   actionRemove->setShortcut(Qt::Key_Delete);
 
-  //connect(actionSelectAll, SIGNAL(triggered()), imageList, SLOT(slotSelectAll()));
+  connect(actionSelectAll, SIGNAL(triggered()), imageList, SLOT(slotSelectAll()));
   actionSelectAll->setShortcut(Qt::ControlModifier | Qt::Key_A);
-  //connect(actionDeselectAll, SIGNAL(triggered()), imageList, SLOT(slotDeselectAll()));
+  connect(actionDeselectAll, SIGNAL(triggered()), imageList, SLOT(slotDeselectAll()));
   actionDeselectAll->setShortcut(Qt::ControlModifier | Qt::Key_U);
-  //connect(actionInvertSelection, SIGNAL(triggered()), imageList, SLOT(slotInvertSelection()));
+  connect(actionInvertSelection, SIGNAL(triggered()), imageList, SLOT(slotInvertSelection()));
   actionInvertSelection->setShortcut(Qt::ControlModifier | Qt::Key_Asterisk);
 
   connect(actionConfiguration, SIGNAL(triggered()), this, SLOT(slotConfiguration()));

@@ -77,7 +77,13 @@ void ImageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
   QString name = index.data(ImageModel::ImageNameRole).toString();
   QRect nameRect = textRect(name, option.rect);
 
-  drawDisplay(painter, option, nameRect, name);
+  // We don't need to paint selection state on text
+  QStyleOptionViewItem opt = option;
+  opt.state &= ~QStyle::State_Selected;
+  drawDisplay(painter, opt, nameRect, name);
+
+  if (option.state & QStyle::State_Selected)
+    drawMask(painter, option.rect);
 
   painter->restore();
 }
@@ -122,6 +128,20 @@ void ImageDelegate::drawPixmap(QPainter *painter, const QStyleOptionViewItem &op
   pos.setY(option.rect.top() + (((128 + 20) / 2) - (pixmap.height() / 2)));
 
   painter->drawPixmap(pos, pixmap);
+
+  painter->restore();
+}
+
+void ImageDelegate::drawMask(QPainter *painter, const QRect &rect) const
+{
+  painter->save();
+
+  QPainterPath mask;
+  mask.addRoundRect(rect, 25);
+
+  painter->setBrush(QColor(0, 0, 255, 50));
+  painter->setPen(QColor(0, 0, 255, 50));
+  painter->drawPath(mask);
 
   painter->restore();
 }

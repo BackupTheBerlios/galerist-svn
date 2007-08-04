@@ -48,11 +48,9 @@ class ListView : public QListView
   protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 
   private:
-
-  private slots:
-    void slotSelect(const QModelIndex &selectedIndex);
 };
 
 }
