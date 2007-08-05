@@ -1,11 +1,12 @@
-if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+if(MINGW)
   ADD_DEFINITIONS(-DWANT_UPDATER)
   set(UPDATER true)
-endif(CMAKE_SYSTEM_NAME STREQUAL Windows)
+endif(MINGW)
 
 add_subdirectory(core)
 add_subdirectory(dialogs)
 add_subdirectory(widgets)
+add_subdirectory(translations)
 
 include(${QT_USE_FILE})
 
@@ -34,18 +35,21 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDES})
 
 QT4_ADD_RESOURCES( goya_RC_SRCS ${goya_RCS} )
 
-IF( MINGW )
+IF(MINGW)
   # resource compilation for MinGW
   ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/goyaicon.o
                       COMMAND windres.exe -I${CMAKE_CURRENT_SOURCE_DIR} -i${CMAKE_CURRENT_SOURCE_DIR}/icons.rc 
                            -o ${CMAKE_CURRENT_BINARY_DIR}/goyaicon.o )
     SET(goya_SRCS ${goya_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/goyaicon.o)
-ELSE( MINGW )
+ELSE(MINGW)
     SET(goya_SRCS ${goya_SRCS} icons.rc)
-ENDIF( MINGW )
+ENDIF(MINGW)
 
-add_executable(../bin/goya ${goya_SRCS} ${goya_UIS_H} ${goya_MOC_SRCS} ${goya_RC_SRCS})
+add_executable(goya ${goya_SRCS} ${goya_UIS_H} ${goya_MOC_SRCS} ${goya_RC_SRCS})
 
-TARGET_LINK_LIBRARIES(../bin/goya dialogs core ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(goya dialogs core ${QT_LIBRARIES})
 
-ADD_DEPENDENCIES(../bin/goya core dialogs)
+add_custom_command(TARGET goya POST_BUILD
+                   COMMAND mkdir -p ../bin && mv goya ../bin/)
+
+ADD_DEPENDENCIES(goya core dialogs translations)
