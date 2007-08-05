@@ -17,41 +17,68 @@
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QGridLayout" >
-    <item row="1" column="0" >
-     <widget class="GWidgets::SearchBar" native="1" name="searchBar" />
-    </item>
     <item row="0" column="0" >
-     <widget class="GWidgets::ListView" name="imageList" >
-      <property name="acceptDrops" >
-       <bool>true</bool>
+     <widget class="QStackedWidget" name="centerWidget" >
+      <property name="currentIndex" >
+       <number>0</number>
       </property>
-      <property name="editTriggers" >
-       <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
-      </property>
-      <property name="dragEnabled" >
-       <bool>true</bool>
-      </property>
-      <property name="dragDropOverwriteMode" >
-       <bool>true</bool>
-      </property>
-      <property name="selectionMode" >
-       <enum>QAbstractItemView::ExtendedSelection</enum>
-      </property>
-      <property name="isWrapping" stdset="0" >
-       <bool>true</bool>
-      </property>
-      <property name="resizeMode" >
-       <enum>QListView::Adjust</enum>
-      </property>
-      <property name="spacing" >
-       <number>10</number>
-      </property>
-      <property name="viewMode" >
-       <enum>QListView::IconMode</enum>
-      </property>
-      <property name="uniformItemSizes" >
-       <bool>true</bool>
-      </property>
+      <widget class="QWidget" name="imagesPage" >
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>0</number>
+        </property>
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>0</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>0</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="GWidgets::ListView" name="imageList" >
+          <property name="acceptDrops" >
+           <bool>true</bool>
+          </property>
+          <property name="editTriggers" >
+           <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
+          </property>
+          <property name="dragEnabled" >
+           <bool>true</bool>
+          </property>
+          <property name="dragDropOverwriteMode" >
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode" >
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <property name="isWrapping" stdset="0" >
+           <bool>true</bool>
+          </property>
+          <property name="resizeMode" >
+           <enum>QListView::Adjust</enum>
+          </property>
+          <property name="spacing" >
+           <number>10</number>
+          </property>
+          <property name="viewMode" >
+           <enum>QListView::IconMode</enum>
+          </property>
+          <property name="uniformItemSizes" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="propertiesPage" />
      </widget>
     </item>
    </layout>
@@ -130,6 +157,9 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents" >
     <layout class="QGridLayout" >
+     <property name="bottomMargin" >
+      <number>10</number>
+     </property>
      <item row="0" column="0" >
       <widget class="GWidgets::GalleryTreeView" name="albumView" >
        <property name="editTriggers" >
@@ -404,12 +434,6 @@
    <class>GWidgets::GalleryTreeView</class>
    <extends>QTreeView</extends>
    <header>widgets/gallerytreeview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>GWidgets::SearchBar</class>
-   <extends>QWidget</extends>
-   <header>widgets/searchbar.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>GWidgets::ListView</class>

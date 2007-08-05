@@ -54,8 +54,6 @@ MainWindow::MainWindow()
 
   startTimer(100);
 
-  Data::self()->setValue(Data::SearchBar, QVariant::fromValue<QWidget*>(searchBar));
-
   initActionButtons();
   initToolbar();
   initDocks();
