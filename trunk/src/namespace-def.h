@@ -53,12 +53,6 @@ namespace GWidgets
  */
 namespace GWizard
   {}
-/**
- * A special kind of widgets that are used inside a PhotoView and can't be used in normal Qt dialogs.
- * @short Widgets used in PhotoView.
- */
-namespace GPhotoWidgets
-  {}
 }
 
 

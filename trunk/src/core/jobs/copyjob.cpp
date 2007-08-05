@@ -114,7 +114,7 @@ void CopyJob::multiCopy()
     }
 
     // If the file is 0 in size, it's a fake (need to get a better verification process)
-    if (QFileInfo(*m_source, imageFiles.at(count)).size() == 0 || !imageFiles.at(count).contains(Data::self()->value(Data::SupportedFormats).toRegExp())) {
+    if (QFileInfo(*m_source, imageFiles.at(count)).size() == 0 || !imageFiles.at(count).contains(Data::self()->supportedFormats())) {
       emit signalProgress(count, numberImages, imageFiles.at(count), QImage());
       continue;
     }
@@ -175,7 +175,7 @@ void CopyJob::singleCopy()
     }
 
     // If the file is 0 in size, it's a fake (need to get a better verification process)
-    if (QFileInfo(*m_source, *count).size() == 0 || !(*count).contains(Data::self()->value(Data::SupportedFormats).toRegExp())) {
+    if (QFileInfo(*m_source, *count).size() == 0 || !(*count).contains(Data::self()->supportedFormats())) {
       emit signalProgress(processed, numberImages, *count, QImage());
       processed++;
       continue;

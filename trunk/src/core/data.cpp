@@ -45,14 +45,10 @@ Data::Data(QObject *parent)
     : QObject(parent),
     m_errorHandler(0),
     m_imageModel(0),
-    m_photoContextMenu(0),
-    m_photoEditContextMenu(0),
     m_galleryContextMenu(0),
     m_mainWindow(0),
     m_imageProxy(0),
-                 m_galleryProxy(0),
-    m_imageAddProgress(0)
-
+    m_galleryProxy(0)
 {
   m_self = this;
   m_settings = new QSettings(this);
@@ -64,18 +60,13 @@ Data::Data(QObject *parent)
 
   m_errorHandler = new GCore::ErrorHandler(this);
 
-  QMenu *temp = new QMenu(m_mainWindow);
-  temp->addAction(tr("Nothing available"))->setDisabled(true);
-
-  m_galleryContextMenu = temp;
-  m_photoEditContextMenu = temp;
-  m_photoContextMenu = temp;
-
   // Setting up supported image formats
   m_imageFormats << "*.jpg"; //JPEG
   m_imageFormats << "*.jpeg"; //JPEG
   m_imageFormats << "*.png"; //PNG
   m_imageFormats << "*.gif"; //GIF
+
+  m_supportedFormats = QRegExp("gif|jpg|jpeg|png", Qt::CaseInsensitive);
 
   // We check our built-in translations
   QDir translations(":/translations");
@@ -116,16 +107,8 @@ QObject *Data::setValue(int type, const QVariant &value)
 
       return job;
     }
-    case (PhotoEditContextMenu) : {
-      m_photoEditContextMenu = value.value<QWidget*>();
-      break;
-    }
-    case (PhotoContextMenu) : {
-      m_photoContextMenu = value.value<QWidget*>();
-      break;
-    }
     case (GalleryContextMenu) : {
-      m_galleryContextMenu = value.value<QWidget*>();
+      m_galleryContextMenu = static_cast<QMenu*>(value.value<QWidget*>());
       break;
     }
     case (MainWindow) : {
@@ -138,10 +121,6 @@ QObject *Data::setValue(int type, const QVariant &value)
     }
     case (AppBranch) : {
       m_branch = value.toString();
-      break;
-    }
-    case (SupportedFormats) : {
-      m_supportedFormats = value.toRegExp();
       break;
     }
     case (SearchBar) : {
@@ -180,10 +159,6 @@ QObject *Data::setValue(int type, const QVariant &value)
       m_settings->setValue("DisableVisualEffects", value);
       break;
     }
-    case (ImageAddProgress) : {
-      m_imageAddProgress = value.value<QWidget*>();
-      break;
-    }
   }
 
   return 0;
@@ -204,10 +179,6 @@ QVariant Data::value(int type)
             return QVariant::fromValue<QObject*>(m_dirCompleter);
     case (FileCompleter) :
             return QVariant::fromValue<QObject*>(m_fileCompleter);
-    case (PhotoContextMenu) :
-            return QVariant::fromValue<QWidget*>(m_photoContextMenu);
-    case (PhotoEditContextMenu) :
-            return QVariant::fromValue<QWidget*>(m_photoEditContextMenu);
     case (GalleryContextMenu) :
             return QVariant::fromValue<QWidget*>(m_galleryContextMenu);
     case (MainWindow) :
@@ -218,12 +189,8 @@ QVariant Data::value(int type)
             return m_appVersion;
     case (AppBranch) :
             return m_branch;
-    case (SupportedFormats) :
-            return m_supportedFormats;
     case (SearchBar) :
             return QVariant::fromValue<QWidget*>(m_searchBar);
-    case (ImageAddProgress) :
-            return QVariant::fromValue<QWidget*>(m_imageAddProgress);
     case (DeleteSource) :
             return m_settings->value("DeleteSource", false);
     case (BackgroundType) :
@@ -237,9 +204,9 @@ QVariant Data::value(int type)
     case (Translations) :
             return QStringList(m_availableTranslations.keys());
     case (TranslationName) :
-            return m_settings->value("TranslationName");
+            return m_settings->value("TranslationName", "English");
     case (TranslationPath) :
-            return QDir::toNativeSeparators(m_settings->value("TranslationPath").toString());
+            return QDir::toNativeSeparators(m_settings->value("TranslationPath", ":translations/english.qm").toString());
     case (DisableVisualEffects) :
             return m_settings->value("DisableVisualEffects", false);
   }
@@ -320,6 +287,41 @@ ImageModel *Data::imageModel()
     m_imageModel = new ImageModel(this);
 
   return m_imageModel;
+}
+
+QMenu *Data::listContextMenu() const
+{
+  return m_listContextMenu;
+}
+
+void Data::setListContextMenu(QMenu *menu)
+{
+  m_listContextMenu = menu;
+}
+
+QMenu *Data::dropContextMenu() const
+{
+  return m_dropContextMenu;
+}
+
+void Data::setDropContextMenu(QMenu *dropContextMenu)
+{
+  m_dropContextMenu = dropContextMenu;
+}
+
+QRegExp Data::supportedFormats() const
+{
+  return m_supportedFormats;
+}
+
+QWidget *Data::imageAddProgress() const
+{
+  return m_imageAddProgress;
+}
+
+void Data::setImageAddProgress(QWidget *imageAddProgress)
+{
+  m_imageAddProgress = imageAddProgress;
 }
 
 void Data::processGalleryMove(bool successful)

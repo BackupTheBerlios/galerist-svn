@@ -35,6 +35,7 @@ class ListView : public QListView
     Q_OBJECT
   signals:
     void signalSelected(bool selected);
+    void signalOneSelected(bool yes);
 
   public:
     ListView(QWidget *parent);
@@ -45,10 +46,44 @@ class ListView : public QListView
     void slotRemove();
     void setRootIndex(const QModelIndex &index);
 
+    /**
+     * Inverts the selection.
+     */
+    void invertSelection();
+
   protected:
     void contextMenuEvent(QContextMenuEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
+
+    /**
+     * Method that allows Drag in images.
+     *
+     * @param event The event.
+     */
+    void dragEnterEvent(QDragEnterEvent *event);
+    /**
+     * Method that allows Drag in images.
+     *
+     * @param event The event.
+     */
+    void dragMoveEvent(QDragMoveEvent *event);
+    /**
+     * Method that allows Drag in images.
+     *
+     * @param event The event.
+     */
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    /**
+     * The implemetation of drop in action. It parses the links and passes it to ImageModel and reports to MainWindow.
+     *
+     * @param event Event itself.
+     */
+    void dropEvent(QDropEvent *event);
+
+    /**
+     * Reimplemented method.
+     */
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
   private:
 };

@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
   app.setApplicationName("Goya");
   GCore::Data::self()->setValue(GCore::Data::AppVersion, "0.3.0");
   GCore::Data::self()->setValue(GCore::Data::AppBranch, "unstable");
-  GCore::Data::self()->setValue(GCore::Data::SupportedFormats, QRegExp("gif|jpg|jpeg|png", Qt::CaseInsensitive));
 
   QTranslator translation;
   translation.load(GCore::Data::self()->value(GCore::Data::TranslationName).toString(), GCore::Data::self()->value(GCore::Data::TranslationPath).toString());
@@ -55,7 +54,7 @@ int main(int argc, char *argv[])
   mainWindow->show();
 
   GCore::Data::self()->setValue(GCore::Data::MainWindow, QVariant::fromValue<QWidget*>(mainWindow));
-  GCore::Data::self()->setValue(GCore::Data::ImageAddProgress, QVariant::fromValue<QWidget*>(new GWidgets::ImageAddProgress(mainWindow)));
+  GCore::Data::self()->setImageAddProgress(new GWidgets::ImageAddProgress(mainWindow));
 
   return app.exec();
 }

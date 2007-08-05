@@ -29,6 +29,7 @@
 class QCompleter;
 class QSettings;
 class QSortFilterProxyModel;
+class QMenu;
 
 namespace GCore
 {
@@ -64,16 +65,12 @@ class Data : public QObject
       SettingsPath,
       DirCompleter,
       FileCompleter,
-      PhotoContextMenu,
-      PhotoEditContextMenu,
       GalleryContextMenu,
       MainWindow,
       AppName,
       AppVersion,
       AppBranch,
-      SupportedFormats,
       SearchBar,
-      ImageAddProgress,
       DeleteSource,
       BackgroundType,
       OpenGL,
@@ -146,7 +143,40 @@ class Data : public QObject
      */
     ImageModel *imageModel();
 
+    /**
+     * Gets the context menu used by ListView.
+     */
+    QMenu *listContextMenu() const;
 
+    /**
+     * Sets the context menu used by ListView.
+     */
+    void setListContextMenu(QMenu *menu);
+
+    /**
+     * Gets the drop context menu.
+     */
+    QMenu *dropContextMenu() const;
+
+    /**
+     * Sets the drop context menu.
+     */
+    void setDropContextMenu(QMenu *dropContextMenu);
+
+    /**
+     * Gets supported format.
+     */
+    QRegExp supportedFormats() const;
+
+    /**
+     * Gets the progress widget.
+     */
+    QWidget *imageAddProgress() const;
+
+    /**
+     * Sets the progress widget.
+     */
+    void setImageAddProgress(QWidget *imageAddProgress);
 
   private:
     // Variables.
@@ -157,9 +187,9 @@ class Data : public QObject
     ImageModel *m_imageModel;
     QCompleter *m_dirCompleter;
     QCompleter *m_fileCompleter;
-    QWidget *m_photoContextMenu;
-    QWidget *m_photoEditContextMenu;
-    QWidget *m_galleryContextMenu;
+    QMenu *m_listContextMenu;
+    QMenu *m_galleryContextMenu;
+    QMenu *m_dropContextMenu;
     QMap<QString, QString> m_availableTranslations;
     QString m_appVersion;
     QString m_branch;

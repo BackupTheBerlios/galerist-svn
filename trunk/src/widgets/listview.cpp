@@ -22,21 +22,27 @@
 #include "listview.h"
 
 #include <QtCore/QModelIndex>
+#include <QtCore/QUrl>
 
+#include <QtGui/QApplication>
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QMenu>
 #include <QtGui/QAction>
 #include <QtGui/QMessageBox>
 #include <QtGui/QSortFilterProxyModel>
 
-#include <QtDebug>
-
 #include "core/imagemodel.h"
+#include "core/imageitem.h"
 #include "core/data.h"
 
 #include "widgets/imagedelegate.h"
 
+#include "dialogs/newgallerywizard.h"
+
+#include <QtDebug>
+
 using namespace GCore;
+using namespace GDialogs;
 
 namespace GWidgets {
 
@@ -48,25 +54,18 @@ ListView::ListView(QWidget *parent)
   setItemDelegate(new ImageDelegate(this));
 }
 
+ListView::~ListView()
+{}
+
 void ListView::contextMenuEvent(QContextMenuEvent *event)
 {
-  QMenu menu;
-
-  QAction *properties = menu.addAction(tr("Properties"));
-  QAction *remove = menu.addAction(tr("Remove picture"), this, SLOT(slotRemove()));
-
-  if (selectedIndexes().isEmpty()) {
-    properties->setEnabled(false);
-    remove->setEnabled(false);
-  }
-
-  menu.exec(event->globalPos());
+  Data::self()->listContextMenu()->exec(event->globalPos());
 }
 
 void ListView::slotRemove()
 {
   if (QMessageBox::question(0, tr("Confirm remove"), tr("Are you sure you want to remove %1 picture/s?").arg(selectedIndexes().count()), tr("Remove"), tr("Keep"), QString(), 1, 1) == 0)
-    setRootIndex(static_cast<GCore::ImageModel*> (model())->removeImages(selectedIndexes()));
+    static_cast<GCore::ImageModel*> (model())->removeImages(selectedIndexes());
 }
 
 void ListView::setRootIndex(const QModelIndex &index)
@@ -74,25 +73,106 @@ void ListView::setRootIndex(const QModelIndex &index)
   QListView::setRootIndex(Data::self()->galleryProxy()->mapToSource(index));
 }
 
-void ListView::mouseReleaseEvent(QMouseEvent *event)
+void ListView::invertSelection()
 {
-  if (selectedIndexes().isEmpty())
-    emit signalSelected(false);
-  else
-    emit signalSelected(true);
+  QModelIndexList cachedIndexes = selectedIndexes();
 
-  QListView::mouseReleaseEvent(event);
+  selectAll();
+
+  foreach (QModelIndex index, cachedIndexes)
+    setSelection(visualRect(index), QItemSelectionModel::Deselect);
 }
 
 void ListView::mousePressEvent(QMouseEvent *event)
 {
-  if (!(event->modifiers() & Qt::ControlModifier) && !(event->modifiers() & Qt::ShiftModifier) && !indexAt(event->pos()).isValid())
+  if (!(event->modifiers() & Qt::ControlModifier) && !(event->modifiers() & Qt::ShiftModifier) && !indexAt(event->pos()).isValid() && event->button() != Qt::RightButton)
     clearSelection();
 
   QListView::mousePressEvent(event);
 }
 
-ListView::~ListView()
-{}
+void ListView::dragEnterEvent(QDragEnterEvent *event)
+{
+  QList<QUrl> imageUrls = event->mimeData()->urls();
+  QList<QUrl>::const_iterator end = imageUrls.constEnd();
+
+  bool haveImages = false;
+
+  for (QList<QUrl>::const_iterator count = imageUrls.constBegin(); count != end; count++) {
+    QString path = (*count).toLocalFile();
+    if (path.contains(GCore::Data::self()->supportedFormats())) {
+      haveImages = true;
+      break;
+    }
+  }
+
+  if (haveImages)
+    event->acceptProposedAction();
+}
+
+void ListView::dragMoveEvent(QDragMoveEvent *event)
+{
+  event->acceptProposedAction();
+}
+
+void ListView::dragLeaveEvent(QDragLeaveEvent *event)
+{
+  event->accept();
+}
+
+void ListView::dropEvent(QDropEvent *event)
+{
+  const QMimeData *mimeData = event->mimeData();
+
+  QStringList imagePaths;
+  QList<QUrl> imageUrls = mimeData->urls();
+  QList<QUrl>::const_iterator end = imageUrls.constEnd();
+
+  for (QList<QUrl>::const_iterator count = imageUrls.constBegin(); count != end; count++) {
+    QString path = (*count).toLocalFile();
+    if (!path.isEmpty() && path.contains(GCore::Data::self()->supportedFormats()))
+      imagePaths << path;
+  }
+
+  QString image = imagePaths.first();
+  image.remove(QRegExp("^.+/"));
+  QString path = imagePaths.first();
+  path.remove(image);
+
+  QStringList pictures = imagePaths;
+  pictures.replaceInStrings(path, QString());
+
+  QAction *choice = Data::self()->dropContextMenu()->exec(mapToGlobal(event->pos()));
+
+  if (!choice)
+    return;
+
+  if (choice->data().toInt() == 0) {
+    NewGalleryWizard *wizard = new NewGalleryWizard(path, pictures, this);
+    wizard->show();
+  } else if (choice->data().toInt() == 1) {
+    connect(GCore::Data::self()->imageModel()->addImages(rootIndex(), path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+  }
+
+  event->acceptProposedAction();
+}
+
+void ListView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+  QModelIndexList cachedIndexes = selectedIndexes();
+  if (cachedIndexes.isEmpty()) {
+    emit signalSelected(false);
+    emit signalOneSelected(false);
+  } else {
+    if (cachedIndexes.count() == 1)
+      emit signalOneSelected(true);
+    else
+      emit signalOneSelected(false);
+
+    emit signalSelected(true);
+  }
+
+  QListView::selectionChanged(selected, deselected);
+}
 
 }

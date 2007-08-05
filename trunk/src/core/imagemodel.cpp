@@ -315,7 +315,7 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
     }
   } else {
   // Copy only the fileNames
-  if (!m_currentCopyJob) {
+    if (!JobManager::self()->job("CopyImages")) {
     m_currentCopyParent = parent;
     QObject *job = JobManager::self()->registerJob("CopyImages", new GJobs::CopyJob(sourcePath, fileNames, gallery->getFilePath(), parent));
     connect(job, SIGNAL(signalProcess(const QString&)), this, SLOT(slotProcess(const QString&)));

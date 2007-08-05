@@ -40,6 +40,8 @@
 #include "dialogs/configuration.h"
 #include "dialogs/uniupdate.h"
 
+#include <QtDebug>
+
 using namespace GCore;
 
 MainWindow::MainWindow()
@@ -82,19 +84,15 @@ void MainWindow::initActionButtons()
   // Connect edit menu
   connect(actionAdd, SIGNAL(triggered()), this, SLOT(slotAddImages()));
   actionAdd->setShortcut(Qt::Key_Insert);
-  connect(actionPreview, SIGNAL(triggered()), imageList, SLOT(slotEdit()));
-  connect(actionRename, SIGNAL(triggered()), imageList, SLOT(slotRename()));
-  actionRename->setShortcut(Qt::Key_F2);
-  connect(actionDescribe, SIGNAL(triggered()), imageList, SLOT(slotDescribe()));
-  actionDescribe->setShortcut(Qt::SHIFT | Qt::Key_F2);
+  //connect(actionPreview, SIGNAL(triggered()), imageList, SLOT(slotEdit()));
   connect(actionRemove, SIGNAL(triggered()), imageList, SLOT(slotRemove()));
   actionRemove->setShortcut(Qt::Key_Delete);
 
-  connect(actionSelectAll, SIGNAL(triggered()), imageList, SLOT(slotSelectAll()));
+  connect(actionSelectAll, SIGNAL(triggered()), imageList, SLOT(selectAll()));
   actionSelectAll->setShortcut(Qt::ControlModifier | Qt::Key_A);
-  connect(actionDeselectAll, SIGNAL(triggered()), imageList, SLOT(slotDeselectAll()));
+  connect(actionDeselectAll, SIGNAL(triggered()), imageList, SLOT(clearSelection()));
   actionDeselectAll->setShortcut(Qt::ControlModifier | Qt::Key_U);
-  connect(actionInvertSelection, SIGNAL(triggered()), imageList, SLOT(slotInvertSelection()));
+  connect(actionInvertSelection, SIGNAL(triggered()), imageList, SLOT(invertSelection()));
   actionInvertSelection->setShortcut(Qt::ControlModifier | Qt::Key_Asterisk);
 
   connect(actionConfiguration, SIGNAL(triggered()), this, SLOT(slotConfiguration()));
@@ -128,15 +126,19 @@ void MainWindow::initActionButtons()
   contextMenu = new QMenu(this);
   contextMenu->addAction(actionAdd);
   contextMenu->addAction(actionPreview);
-  contextMenu->addAction(actionRename);
-  contextMenu->addAction(actionDescribe);
   contextMenu->addAction(actionRemove);
   contextMenu->addSeparator();
   contextMenu->addMenu(menuSelection);
-  Data::self()->setValue(Data::PhotoContextMenu, QVariant::fromValue(static_cast<QWidget*>(contextMenu)));
+  Data::self()->setListContextMenu(contextMenu);
 
+  // Create drop context menu
+  QMenu *dropdownMenu = new QMenu(tr("Dropped images"), this);
+  dropdownMenu->addAction(actionDropNew);
+  actionDropNew->setData(0);
+  dropdownMenu->addAction(actionDropInsert);
+  actionDropInsert->setData(1);
 
-//  photoControl->connectView(imageList);
+  Data::self()->setDropContextMenu(dropdownMenu);
 }
 
 void MainWindow::initToolbar()
@@ -161,15 +163,14 @@ void MainWindow::initDocks()
   albumView->setModel(Data::self()->galleryProxy());
   imageList->setModel(Data::self()->imageModel());
 
-  /*connect(imageList, SIGNAL(signalOneSelected(bool)), actionPreview, SLOT(setEnabled(bool)));
-  connect(imageList, SIGNAL(signalOneSelected(bool)), actionRename, SLOT(setEnabled(bool)));
-  connect(imageList, SIGNAL(signalOneSelected(bool)), actionDescribe, SLOT(setEnabled(bool)));
-  connect(imageList, SIGNAL(signalSelected(bool)), actionRemove, SLOT(setEnabled(bool)));*/
+  connect(imageList, SIGNAL(signalOneSelected(bool)), actionPreview, SLOT(setEnabled(bool)));
+  connect(imageList, SIGNAL(signalSelected(bool)), actionRemove, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionRemoveGallery, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionAdd, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionSelectAll, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionDeselectAll, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionInvertSelection, SLOT(setEnabled(bool)));
+  connect(albumView, SIGNAL(signalSelected(bool)), actionDropInsert, SLOT(setEnabled(bool)));
 }
 
 void MainWindow::about()
@@ -236,7 +237,9 @@ void MainWindow::slotAddImages()
   QStringList images = pictures;
   images.replaceInStrings(path, QString());
 
-  connect(Data::self()->imageModel()->addImages(imageList->rootIndex(), path, images), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->value(Data::ImageAddProgress).value<QWidget*>(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+  qDebug() << images << path;
+  
+  connect(Data::self()->imageModel()->addImages(imageList->rootIndex(), path, images), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
 }
 
 void MainWindow::startUpdater()

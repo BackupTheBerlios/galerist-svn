@@ -143,7 +143,7 @@ void ReadJob::readPath(const QDir &path)
     if (getStop())
       return;
 
-    if (!image.contains(GCore::Data::self()->value(Data::SupportedFormats).toRegExp()) || QFileInfo(path, image).size() == 0)
+    if (!image.contains(GCore::Data::self()->supportedFormats()) || QFileInfo(path, image).size() == 0)
       continue;
 
     imageThumbnail = QImage(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio);

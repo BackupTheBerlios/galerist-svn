@@ -22,8 +22,17 @@
     </item>
     <item row="0" column="0" >
      <widget class="GWidgets::ListView" name="imageList" >
+      <property name="acceptDrops" >
+       <bool>true</bool>
+      </property>
       <property name="editTriggers" >
        <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
+      </property>
+      <property name="dragEnabled" >
+       <bool>true</bool>
+      </property>
+      <property name="dragDropOverwriteMode" >
+       <bool>true</bool>
       </property>
       <property name="selectionMode" >
        <enum>QAbstractItemView::ExtendedSelection</enum>
@@ -89,8 +98,6 @@
     </widget>
     <addaction name="actionAdd" />
     <addaction name="actionPreview" />
-    <addaction name="actionRename" />
-    <addaction name="actionDescribe" />
     <addaction name="actionRemove" />
     <addaction name="separator" />
     <addaction name="menuSelection" />
@@ -146,6 +153,9 @@
    </widget>
   </widget>
   <widget class="QToolBar" name="mainBar" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
@@ -261,6 +271,9 @@
    </property>
   </action>
   <action name="actionRemove" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset resource="resources.qrc" >:/images/remove.png</iconset>
    </property>
@@ -286,6 +299,9 @@
    </property>
   </action>
   <action name="actionPreview" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset resource="resources.qrc" >:/images/preview.png</iconset>
    </property>
@@ -294,28 +310,6 @@
    </property>
    <property name="statusTip" >
     <string>Shows the bigger preview of the selected image.</string>
-   </property>
-  </action>
-  <action name="actionRename" >
-   <property name="icon" >
-    <iconset resource="resources.qrc" >:/images/rename.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Rename</string>
-   </property>
-   <property name="statusTip" >
-    <string>Lets you rename the selected image.</string>
-   </property>
-  </action>
-  <action name="actionDescribe" >
-   <property name="icon" >
-    <iconset resource="resources.qrc" >:/images/describe.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Describe</string>
-   </property>
-   <property name="statusTip" >
-    <string>Lets you describe the selected image.</string>
    </property>
   </action>
   <action name="actionSelectAll" >
@@ -377,6 +371,31 @@
    </property>
    <property name="statusTip" >
     <string>Checks for the updates.</string>
+   </property>
+  </action>
+  <action name="actionDropInsert" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/add-existing.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Existing gallery</string>
+   </property>
+   <property name="statusTip" >
+    <string>Insert the dropped in images into the selected gallery.</string>
+   </property>
+  </action>
+  <action name="actionDropNew" >
+   <property name="icon" >
+    <iconset resource="resources.qrc" >:/images/new.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New Gallery</string>
+   </property>
+   <property name="statusTip" >
+    <string>Create a new gallery with the dropped in images.</string>
    </property>
   </action>
  </widget>
