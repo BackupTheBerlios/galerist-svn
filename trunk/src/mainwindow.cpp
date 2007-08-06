@@ -163,6 +163,8 @@ void MainWindow::initDocks()
 
   connect(imageList, SIGNAL(signalOneSelected(bool)), actionPreview, SLOT(setEnabled(bool)));
   connect(imageList, SIGNAL(signalSelected(bool)), actionRemove, SLOT(setEnabled(bool)));
+  connect(imageList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(openProperties(const QModelIndex&)));
+
   connect(albumView, SIGNAL(signalSelected(bool)), actionRemoveGallery, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionAdd, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionSelectAll, SLOT(setEnabled(bool)));
@@ -255,7 +257,7 @@ void MainWindow::slotConfiguration()
 
 MainWindow::~MainWindow()
 {}
-
+/*
 void MainWindow::setEditMode(bool edit)
 {
   galleryDock->setVisible(!edit);
@@ -273,9 +275,31 @@ void MainWindow::setEditMode(bool edit)
   actionRoundBackground->setDisabled(edit);
   menuSelection->setDisabled(edit);
 }
-
+*/
 void MainWindow::timerEvent(QTimerEvent*)
 {
   if (statusBar()->currentMessage().isEmpty())
     statusBar()->showMessage(tr("Ready"));
+}
+
+void MainWindow::openProperties(const QModelIndex &index)
+{
+  centerWidget->setCurrentIndex(1);
+
+  galleryDock->hide();
+  galleryDock->toggleViewAction()->setEnabled(false);
+
+  // Hide main toolbar
+  //mainBar->hide();
+
+  // Disable all actions
+  actionNew->setDisabled(true);
+  actionAdd->setDisabled(true);
+  actionRemove->setDisabled(true);
+  actionRemoveGallery->setDisabled(true);
+  actionRectangularBackground->setDisabled(true);
+  actionRoundBackground->setDisabled(true);
+  menuSelection->setDisabled(true);
+
+  propertiesView->setCurrentIndex(index);
 }

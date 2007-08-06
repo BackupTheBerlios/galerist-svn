@@ -78,7 +78,31 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="propertiesPage" />
+      <widget class="QWidget" name="propertiesPage" >
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>0</number>
+        </property>
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>0</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>0</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="GWidgets::PropertiesView" native="1" name="propertiesView" />
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -439,6 +463,12 @@
    <class>GWidgets::ListView</class>
    <extends>QListView</extends>
    <header location="global" >widgets/listview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GWidgets::PropertiesView</class>
+   <extends>QWidget</extends>
+   <header>widgets/propertiesview.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

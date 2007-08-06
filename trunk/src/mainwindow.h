@@ -52,14 +52,6 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      */
     ~MainWindow();
 
-  public slots:
-    /**
-     * Slot that defines the Goya went into editing mode (or is leaving it).
-     *
-     * @param edit Is it in editing mode?
-     */
-    void setEditMode(bool edit);
-
   protected:
     /**
      * Reimplemented method.
@@ -138,6 +130,11 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      * Checks for updates.
      */
     void startUpdater();
+
+    /**
+     * Open (properties) of a photo.
+     */
+    void openProperties(const QModelIndex &index);
 
 };
 

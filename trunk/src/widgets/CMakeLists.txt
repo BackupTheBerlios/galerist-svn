@@ -1,5 +1,7 @@
 add_subdirectory(wizard)
 
+set(QT_USE_QTSVG TRUE)
+
 include(${QT_USE_FILE})
 
 set(widgets_SRCS
@@ -10,10 +12,12 @@ set(widgets_SRCS
   searchbar.cpp
   listview.cpp
   imagedelegate.cpp
+  propertiesview.cpp
 )
 
 SET(widgets_UIS
   imageaddprogress.ui
+  propertiesview.ui
 )
 
 SET(widgets_MOC_HDRS
@@ -24,6 +28,7 @@ SET(widgets_MOC_HDRS
   searchbar.h
   listview.h
   imagedelegate.h
+  propertiesview.h
 )
 
 QT4_WRAP_CPP(widgets_MOC_SRCS ${widgets_MOC_HDRS})
