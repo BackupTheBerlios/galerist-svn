@@ -162,6 +162,7 @@ class LineEdit : public QLineEdit
      */
     void addValidValue(const QString &value);
 
+    void setInvalidValues(const QStringList &values);
     void addInvalidValues(const QStringList &values);
     void addInvalidValue(const QString &value);
 

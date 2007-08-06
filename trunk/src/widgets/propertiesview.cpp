@@ -36,6 +36,10 @@ PropertiesView::PropertiesView(QWidget *parent)
     : QWidget(parent)
 {
   ui.setupUi(this);
+
+  ui.nameEdit->setType(LineEdit::WithInternalVerify);
+  ui.nameEdit->setValidationMethod(LineEdit::InvalidStatesDefined);
+  ui.nameEdit->setErrorMessage(tr("Please specify a new name."));
 }
 
 PropertiesView::~PropertiesView()
@@ -44,6 +48,7 @@ PropertiesView::~PropertiesView()
 void PropertiesView::setCurrentIndex(const QModelIndex &index)
 {
   m_currentIndex = index;
+
   updateData();
 }
 
@@ -51,6 +56,13 @@ void PropertiesView::updateData()
 {
   if (!m_currentIndex.isValid())
     return;
+
+  ui.nameEdit->setText(m_currentIndex.data(ImageModel::ImageNameRole).toString());
+  ui.descriptionEdit->setText(m_currentIndex.data(ImageModel::ImageDescriptionRole).toString());
+
+  QStringList invalidValues = Data::self()->imageModel()->imagesNames(m_currentIndex.parent());
+  invalidValues.removeAll(ui.nameEdit->text());
+  ui.nameEdit->setInvalidValues(invalidValues);
 
   QPixmap pixmap = QPixmap::fromImage(m_currentIndex.data(ImageModel::ImagePictureRole).value<QImage>()).scaled(512, 512, Qt::KeepAspectRatioByExpanding);
   ui.photo->setFixedSize(pixmap.size());

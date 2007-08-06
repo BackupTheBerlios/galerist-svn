@@ -16,7 +16,7 @@
    <item row="0" column="0" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="detailsTab" >
       <attribute name="title" >
@@ -156,11 +156,8 @@
              <height>512</height>
             </size>
            </property>
-           <property name="frameShape" >
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow" >
-            <enum>QFrame::Raised</enum>
+           <property name="cursor" >
+            <cursorShape>PointingHandCursor</cursorShape>
            </property>
            <property name="text" >
             <string/>

@@ -524,6 +524,21 @@ QStringList ImageModel::getGalleriesList()
   return processGalleriesList();
 }
 
+QStringList ImageModel::imagesNames(const QModelIndex &parent)
+{
+  QStringList output;
+
+  if (!parent.isValid())
+    return output;
+
+  int rows = rowCount(parent);
+
+  for (int count = 0; count < rowCount(parent); count++)
+    output << parent.child(count, 0).data(ImageNameRole).toString();
+
+  return output;
+}
+
 QModelIndex ImageModel::findGallery(const QString &name)
 {
   return processGallerySearch(name);

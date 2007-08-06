@@ -1,7 +1,5 @@
 add_subdirectory(wizard)
 
-set(QT_USE_QTSVG TRUE)
-
 include(${QT_USE_FILE})
 
 set(widgets_SRCS

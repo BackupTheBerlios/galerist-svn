@@ -177,6 +177,11 @@ void LineEdit::addValidValue(const QString &value)
   m_validValues << value;
 }
 
+void LineEdit::setInvalidValues(const QStringList &values)
+{
+  m_invalidValues = values;
+}
+
 void LineEdit::addInvalidValues(const QStringList &values)
 {
   m_invalidValues << values;

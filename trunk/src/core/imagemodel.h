@@ -246,6 +246,11 @@ class ImageModel : public QAbstractItemModel
     QStringList getGalleriesList();
 
     /**
+     * Gets the list of image names.
+     */
+    QStringList imagesNames(const QModelIndex &parent);
+
+    /**
      * Get the model index by name.
      *
      * @param name Name of the gallery.
