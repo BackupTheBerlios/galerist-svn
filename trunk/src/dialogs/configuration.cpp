@@ -50,6 +50,8 @@ Configuration::Configuration(QWidget *parent)
   // Additional initialisations
   imageEditorEdit->setType(GWidgets::LineEdit::FileSelector);
   imageEditorEdit->setValidAttribute(GWidgets::LineEdit::Executable);
+  imageEditorEdit->setEmptyValid(true);
+  imageEditorEdit->setEmptyMessage(tr("Goya will open images with the default program."));
   dirEdit->setType(GWidgets::LineEdit::DirSelector);
   dirEdit->setValidAttribute(GWidgets::LineEdit::Writable);
   dirEdit->setNeedExisting(false);
@@ -87,7 +89,7 @@ Configuration::Configuration(QWidget *parent)
   else
     nonGlRadio->setChecked(true);
 
-  imageEditorEdit->setText(Data::self()->value(Data::EditorPath).toString());
+  imageEditorEdit->setText(Data::self()->imageEditor());
   imageEditorEdit->setNeedTest(true);
 
   dirEdit->setText(Data::self()->value(Data::GalleriesPath).toString());
@@ -144,7 +146,7 @@ void Configuration::accept()
   }
 
   if (imageEditorEdit->isValid())
-    GCore::Data::self()->setValue(Data::EditorPath, imageEditorEdit->text());
+    GCore::Data::self()->setImageEditor(imageEditorEdit->text());
 
   if (translationBox->currentText() != GCore::Data::self()->value(Data::TranslationName).toString()) {
     GCore::Data::self()->setValue(Data::TranslationName, translationBox->currentText());
@@ -167,7 +169,8 @@ void Configuration::accept()
 
 void Configuration::slotTest()
 {
-  QProcess::startDetached("\"" + imageEditorEdit->text() + "\"") ? imageEditorEdit->setValidity(true, tr("File successfully executed."), true) : imageEditorEdit->setValidity(false, tr("File cannot be executed."));
+  if (!imageEditorEdit->text().isEmpty())
+    QProcess::startDetached("\"" + imageEditorEdit->text() + "\"") ? imageEditorEdit->setValidity(true, tr("File successfully executed."), true) : imageEditorEdit->setValidity(false, tr("File cannot be executed."));
 }
 
 void Configuration::slotBrowse()

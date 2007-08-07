@@ -49,6 +49,7 @@ LineEdit::LineEdit(QWidget *parent, Types type)
     m_canceling(false),
     m_testing(false),
     m_needExisting(true),
+                   m_emptyValid(false),
     m_type(type)
 {
   // Wrapper slot, so we emit the data with it. No need subclassing keyPressEvent() method
@@ -212,15 +213,29 @@ void LineEdit::setNeedExisting(bool need)
   m_needExisting = need;
 }
 
+void LineEdit::setEmptyValid(bool yes)
+{
+  m_emptyValid = yes;
+}
+
+void LineEdit::setEmptyMessage(const QString &emptyMessage)
+{
+  m_emptyMessage = emptyMessage;
+}
+
 void LineEdit::checkValidity(const QString &text)
 {
   // We don't use internal verify with WithVerify and Default types
   if (m_type == WithVerify || m_type == Default)
     return;
 
+  if (text.isEmpty()) {
+    setValidity(m_emptyValid, m_emptyMessage, true);
+    return;
+  }
+
   QStringList comperisonList;
   bool validationResult;
-
 
   switch (m_validationMethod) {
     case (ValidStatesDefined) : {

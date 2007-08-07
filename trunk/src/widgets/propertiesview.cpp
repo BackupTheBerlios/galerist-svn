@@ -20,8 +20,13 @@
  ***************************************************************************/
 #include "propertiesview.h"
 
+#include <QtCore/QUrl>
+#include <QtCore/QProcess>
+
 #include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QPixmap>
+#include <QtGui/QDesktopServices>
+#include <QtGui/QMouseEvent>
 
 #include "core/data.h"
 #include "core/imagemodel.h"
@@ -44,6 +49,25 @@ PropertiesView::PropertiesView(QWidget *parent)
 
 PropertiesView::~PropertiesView()
 {}
+
+void PropertiesView::mouseReleaseEvent(QMouseEvent *event)
+{
+  if (childAt(event->pos()) == ui.photo && event->button() != Qt::RightButton) {
+    QString imageEditor = Data::self()->imageEditor();
+    QString imageFilePath = m_currentIndex.data(ImageModel::ImageFilepathRole).toString();
+    if (imageEditor.isEmpty()) {
+      QUrl photoUrl(imageFilePath);
+      QDesktopServices::openUrl(photoUrl);
+    } else {
+      QStringList args;
+      args << imageFilePath;
+      QProcess::startDetached(imageEditor, args);
+    }
+    event->ignore();
+  } else {
+    QWidget::mouseReleaseEvent(event);
+  }
+}
 
 void PropertiesView::setCurrentIndex(const QModelIndex &index)
 {

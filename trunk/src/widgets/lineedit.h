@@ -177,6 +177,16 @@ class LineEdit : public QLineEdit
     void setValidAttribute(Attributes attribute);
     void setNeedExisting(bool need);
 
+    /**
+     * Sets if an empty value is valid.
+     */
+    void setEmptyValid(bool yes);
+
+    /**
+     * Sets message to be shown when LineEdit is empty.
+     */
+    void setEmptyMessage(const QString &emptyMessage);
+
   protected:
     /**
      * Reimplemented method for defining behaviour on paint event.
@@ -205,9 +215,11 @@ class LineEdit : public QLineEdit
     bool m_testing;
     bool m_tested;
     bool m_needExisting;
+    bool m_emptyValid;
     Types m_type;
     QString m_errMessage;
     QString m_validMessage;
+    QString m_emptyMessage;
     QStringList m_validValues;
     QStringList m_invalidValues;
 

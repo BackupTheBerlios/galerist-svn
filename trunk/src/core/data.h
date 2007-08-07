@@ -75,7 +75,6 @@ class Data : public QObject
       BackgroundType,
       OpenGL,
       UpdateStartup,
-      EditorPath,
       Translations,
       TranslationName,
       TranslationPath,
@@ -177,6 +176,16 @@ class Data : public QObject
      * Sets the progress widget.
      */
     void setImageAddProgress(QWidget *imageAddProgress);
+
+    /**
+     * Gets the editor.
+     */
+    QString imageEditor() const;
+
+    /**
+     * Sets the editor.
+     */
+    void setImageEditor(const QString &editor) const;
 
   private:
     // Variables.

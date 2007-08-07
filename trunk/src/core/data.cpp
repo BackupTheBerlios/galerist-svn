@@ -143,10 +143,6 @@ QObject *Data::setValue(int type, const QVariant &value)
       m_settings->setValue("UpdateAtStartup", value);
       break;
     }
-    case (EditorPath) : {
-      m_settings->setValue("EditorPath", value);
-      break;
-    }
     case (TranslationName) : {
       m_settings->setValue("TranslationName", value);
       break;
@@ -199,8 +195,6 @@ QVariant Data::value(int type)
             return m_settings->value("OpenGlRendering", false);
     case (UpdateStartup) :
             return m_settings->value("UpdateAtStartup", true);
-    case (EditorPath) :
-            return QDir::toNativeSeparators(m_settings->value("EditorPath").toString());
     case (Translations) :
             return QStringList(m_availableTranslations.keys());
     case (TranslationName) :
@@ -322,6 +316,16 @@ QWidget *Data::imageAddProgress() const
 void Data::setImageAddProgress(QWidget *imageAddProgress)
 {
   m_imageAddProgress = imageAddProgress;
+}
+
+QString Data::imageEditor() const
+{
+  return QDir::toNativeSeparators(m_settings->value("EditorPath").toString());
+}
+
+void Data::setImageEditor(const QString &editor) const
+{
+  m_settings->setValue("EditorPath", QDir::fromNativeSeparators(editor));
 }
 
 void Data::processGalleryMove(bool successful)
