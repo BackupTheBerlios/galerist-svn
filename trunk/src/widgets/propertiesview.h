@@ -37,6 +37,9 @@ namespace GWidgets
 class PropertiesView : public QWidget
 {
     Q_OBJECT
+  signals:
+    void closed(const QModelIndex &index);
+
   public:
     /**
      * A constructor.
@@ -60,8 +63,21 @@ class PropertiesView : public QWidget
   private:
     Ui::PropertiesView ui;
     QModelIndex m_currentIndex;
+    QString m_oldName;
+    QString m_oldDescription;
+    short m_rotation;
 
     void updateData();
+    void updateNavigation();
+
+  private slots:
+    void next();
+    void previous();
+    void close();
+    void save();
+    void enableSave();
+    void rotateCW();
+    void rotateCCW();
 
 };
 

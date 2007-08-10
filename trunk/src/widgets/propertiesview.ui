@@ -13,6 +13,24 @@
    <string/>
   </property>
   <layout class="QGridLayout" >
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>-1</number>
+   </property>
+   <property name="verticalSpacing" >
+    <number>-1</number>
+   </property>
    <item row="0" column="0" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
@@ -146,13 +164,13 @@
           <widget class="QLabel" name="photo" >
            <property name="minimumSize" >
             <size>
-             <width>512</width>
+             <width>0</width>
              <height>512</height>
             </size>
            </property>
            <property name="maximumSize" >
             <size>
-             <width>512</width>
+             <width>9999999</width>
              <height>512</height>
             </size>
            </property>

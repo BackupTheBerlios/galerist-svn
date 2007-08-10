@@ -23,42 +23,40 @@
 #include <QtCore/QTimer>
 #include <QtCore/QRect>
 #include <QtCore/QSize>
+#include <QtCore/QTemporaryFile>
 
 #include <QtGui/QImage>
+#include <QtGui/QApplication>
+
+#include <Magick++.h>
 
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/metadatamanager.h"
 
-#include "core/jobs/transformationjob.h"
+#include <QtDebug>
 
 namespace GCore
 {
 
 ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
-    : QObject(0),
-    m_parentItem(parent),
+    : m_parentItem(parent),
     m_type(type),
     m_path(path),
     m_metadata(0),
     m_id(-1),
-    m_transformator(0)
+          m_tempImage(0)
 {
   if (m_type == Image)
-    m_id = metadata()->imageId(getFileName());
+    m_id = metadata()->imageId(fileName());
   else
-    m_metadata = new MetaDataManager(getFilePath(), this);
+    m_metadata = new MetaDataManager(filePath(), qApp);
 }
 
 ImageItem::~ImageItem()
 {
   if (!m_childItems.isEmpty() && m_type != Image)
     qDeleteAll(m_childItems.begin(), m_childItems.end());
-
-  if (m_transformator) {
-    m_transformator->stop();
-    m_transformator->wait();
-  }
 }
 
 void ImageItem::appendChild(ImageItem *item)
@@ -118,20 +116,25 @@ ImageItem::Type ImageItem::imageType() const
 void ImageItem::setFilePath(const QString &path)
 {
   m_path = path;
-  emit valuesChanged();
 }
 
-QString ImageItem::getFilePath() const
+QString ImageItem::path() const
+{
+  QFileInfo currentPath(filePath());
+  return currentPath.absolutePath();
+}
+
+QString ImageItem::filePath() const
 {
   if (!m_parentItem) {
     return m_path;
   } else {
-    QDir parentPath(m_parentItem->getFilePath());
+    QDir parentPath(m_parentItem->filePath());
     return parentPath.absoluteFilePath(m_path);
   }
 }
 
-QString ImageItem::getFileName() const
+QString ImageItem::fileName() const
 {
   if (!m_parentItem) {
     // There is no parent item, so path contains the full path
@@ -163,7 +166,7 @@ QString ImageItem::name() const
   if (m_type == Image)
     return metadata()->name(m_id);
   else
-    return getFileName();
+    return fileName();
 }
 
 QString ImageItem::description() const
@@ -182,7 +185,6 @@ bool ImageItem::setName(const QString &name)
   else if (imageType() == Gallery)
     setFilePath(name);
 
-  emit valuesChanged();
   return output;
 }
 
@@ -193,7 +195,6 @@ void ImageItem::setDescription(const QString &description)
 
   metadata()->setDescription(description, m_id);
 
-  emit valuesChanged();
 }
 
 bool ImageItem::remove()
@@ -201,104 +202,78 @@ bool ImageItem::remove()
   return metadata()->removePicture(m_id);
 }
 
-void ImageItem::rotateCW()
+void ImageItem::rotate(short degrees)
 {
-  if (!m_transformator)
-    return;
+  QString file = filePath();
+  Magick::Image image;
+  image.read(file.toStdString());
+  image.rotate(90);
+  image.write(file.toStdString());
 
-  m_transformator->rotateImage(90);
+  Magick::Blob buffer;
+  image.write(&buffer);
+
+  QImage thumbnail;
+  thumbnail.loadFromData((const uchar*) buffer.data(), buffer.length());
+  thumbnail.save(thumbPath(), "JPEG");
 }
 
-void ImageItem::rotateCCW()
+QImage ImageItem::previewCW()
 {
-  if (!m_transformator)
-    return;
-
-  m_transformator->rotateImage(270);
-}
-
-void ImageItem::crop(const QRect &area)
-{
-  if (!m_transformator)
-    return;
-
-  m_transformator->cropImage(area);
-}
-
-void ImageItem::blur(int blurFilters)
-{
-  if (!m_transformator)
-    return;
-
-  m_transformator->blurImage(blurFilters);
-}
-
-void ImageItem::sharpen(int sharpenFilters)
-{
-  if (!m_transformator)
-    return;
-
-  m_transformator->sharpenImage(sharpenFilters);
-}
-
-void ImageItem::resize(const QSize &size)
-{
-  if (!m_transformator)
-    return;
-
-  m_transformator->resizeImage(size);
-}
-
-void ImageItem::cancelTransformations()
-{
-  if (!m_transformator)
-    return;
-
-  m_transformator->loadImage();
-}
-
-QString ImageItem::getThumbName() const
-{
-  return getFileName().append(".jpg");
-}
-
-void ImageItem::loadImage()
-{
-  if (!m_transformator) {
-    m_transformator = new GJobs::TransformationJob(this);
-    m_transformator->loadImage();
-    m_transformator->start();
-
-    connect(m_transformator, SIGNAL(completed(const QImage&)), this, SIGNAL(imageChanged(const QImage&)));
-    connect(m_transformator, SIGNAL(preview(const QImage&)), this, SIGNAL(imageChanged(const QImage&)));
-  }
-}
-
-void ImageItem::saveImage()
-{
-  if (!m_transformator)
-    return;
-
-  m_transformator->saveImage();
-}
-
-void ImageItem::closeImage()
-{
-  if (m_transformator) {
-    disconnect(m_transformator, SIGNAL(completed(const QImage&)), this, SIGNAL(imageChanged(const QImage&)));
-
-    m_transformator->stop();
-    m_transformator = 0;
-  }
-}
-
-void ImageItem::prepareForEdit(bool open)
-{
-  if (open) {
-    loadImage();
+  Magick::Image image;
+  if (m_tempImage) {
+    m_tempImage->open();
+    image.read(m_tempImage->fileName().toStdString());
+    image.magick("jpg");
   } else {
-    closeImage();
+    image.read(filePath().toStdString());
+    m_tempImage = new QTemporaryFile(qApp);
+    m_tempImage->open();
   }
+
+  image.rotate(90);
+  Magick::Blob buffer;
+  image.write(&buffer);
+
+  QImage output;
+  output.loadFromData((const uchar*) buffer.data(), buffer.length());
+  output.save(m_tempImage, "JPEG");
+  m_tempImage->close();
+  return output;
+}
+
+QImage ImageItem::previewCCW()
+{
+  Magick::Image image;
+  if (m_tempImage) {
+    m_tempImage->open();
+    image.read(m_tempImage->fileName().toStdString());
+    image.magick("jpg");
+  } else {
+    image.read(filePath().toStdString());
+    m_tempImage = new QTemporaryFile(qApp);
+    m_tempImage->open();
+  }
+
+  image.rotate(270);
+  Magick::Blob buffer;
+  image.write(&buffer);
+
+  QImage output;
+  output.loadFromData((const uchar*) buffer.data(), buffer.length());
+  output.save(m_tempImage, "JPEG");
+  m_tempImage->close();
+  return output;
+}
+
+QString ImageItem::thumbName() const
+{
+  return fileName().append(".jpg");
+}
+
+QString ImageItem::thumbPath() const
+{
+  return path().append("/.thumbnails/").append(fileName()).append(".jpg");
 }
 
 }

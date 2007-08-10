@@ -4,7 +4,6 @@ set(jobs_SRCS
   abstractjob.cpp
   copyjob.cpp
   readjob.cpp
-  transformationjob.cpp
   movejob.cpp
 )
 
@@ -12,7 +11,6 @@ SET(jobs_MOC_HDRS
   abstractjob.h
   copyjob.h
   readjob.h
-  transformationjob.h
   movejob.h
 )
 

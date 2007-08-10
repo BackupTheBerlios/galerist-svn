@@ -18,7 +18,6 @@ set(core_SRCS
 SET(core_MOC_HDRS
   data.h
   errorhandler.h
-  imageitem.h
   imagemodel.h
   metadatamanager.h
   exifmanager.h

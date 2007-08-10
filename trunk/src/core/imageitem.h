@@ -21,41 +21,25 @@
 #ifndef GCOREIMAGEITEM_H
 #define GCOREIMAGEITEM_H
 
-#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 class QImage;
 class QRect;
 class QSize;
+class QTemporaryFile;
 
 namespace GCore
 {
 
 class MetaDataManager;
 
-namespace GJobs
-{
-class TransformationJob;
-}
-
 /**
  * @short Class that represends a tree of images.
  * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
-class ImageItem : public QObject
+class ImageItem
 {
-    Q_OBJECT
-  signals:
-    /**
-     * Emitted when the image has been changed.
-     *
-     * @param image The changed image.
-     */
-    void imageChanged(const QImage &image);
-    /**
-     * Emitted when a value changes.
-     */
-    void valuesChanged();
-
   public:
     enum Type
     {
@@ -144,26 +128,30 @@ class ImageItem : public QObject
      */
     void setFilePath(const QString &path);
 
+    QString path() const;
+
     /**
      * Get the full file path.
      *
      * @return A full path comprised of this item's path and the parent's path
      */
-    QString getFilePath() const;
+    QString filePath() const;
 
     /**
      * Get only the filename associated with this item.
      *
      * @return Item's filename
      */
-    QString getFileName() const;
+    QString fileName() const;
+
+    QString thumbPath() const;
 
     /**
      * Get the thumbnail name (diference betwen fileName and thumbName is in the extension!).
      *
      * @return Name of the thumbnail image
      */
-    QString getThumbName() const;
+    QString thumbName() const;
 
     /**
      * Returns the MetaData manager.
@@ -205,69 +193,12 @@ class ImageItem : public QObject
     bool remove();
 
     /**
-     * Rotates for 90 degrees into clock-wise direction.
+     * Rotates for degrees into clock-wise direction.
      */
-    void rotateCW();
-    /**
-     * Rotates for 90 degrees into counter clock-wise direction.
-     */
-    void rotateCCW();
+    void rotate(short degrees);
 
-    /**
-     * Crops the image.
-     *
-     * @param area Area of the image to be cropped.
-     */
-    void crop(const QRect &area);
-
-    /**
-     * Blurs the image.
-     *
-     * @param blurFilters Number of bluring filters.
-     */
-    void blur(int blurFilters);
-
-    /**
-     * Sharpens the image.
-     *
-     * @param sharpenFilters Number of sharpen filters.
-     */
-    void sharpen(int shrapenFilters);
-
-    /**
-     * Resizes the image.
-     *
-     * @param size The new size.
-     */
-    void resize(const QSize &size);
-
-    /**
-     * Cancels and reloads the image.
-     */
-    void cancelTransformations();
-
-  public slots:
-    /**
-     * Loads the image into ImageMagick.
-     */
-    void loadImage();
-
-    /**
-     * Saves the image.
-     */
-    void saveImage();
-
-    /**
-     * Closes the image.
-     */
-    void closeImage();
-
-    /**
-     * Prepares the item for potential editing.
-     *
-     * @param open Open or close the image.
-     */
-    void prepareForEdit(bool open);
+    QImage previewCW();
+    QImage previewCCW();
 
   private:
     QList<ImageItem*> m_childItems;
@@ -280,7 +211,7 @@ class ImageItem : public QObject
     MetaDataManager *m_metadata;
     int m_id;
 
-    GJobs::TransformationJob *m_transformator;
+    QTemporaryFile *m_tempImage;
 
 };
 

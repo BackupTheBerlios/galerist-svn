@@ -80,6 +80,8 @@ class ImageModel : public QAbstractItemModel
       ImageThumbnailPathRole = Qt::UserRole + 7,
       /** Returns the actual image. */
       ImagePictureRole       = Qt::UserRole + 8,
+      ImageRotateCW          = Qt::UserRole + 9,
+      ImageRotateCCW         = Qt::UserRole + 10
   };
 
     /**

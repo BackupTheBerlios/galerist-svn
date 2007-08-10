@@ -165,6 +165,8 @@ void MainWindow::initDocks()
   connect(imageList, SIGNAL(signalSelected(bool)), actionRemove, SLOT(setEnabled(bool)));
   connect(imageList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(openProperties(const QModelIndex&)));
 
+  connect(propertiesView, SIGNAL(closed(const QModelIndex&)), this, SLOT(closeProperties(const QModelIndex&)));
+
   connect(albumView, SIGNAL(signalSelected(bool)), actionRemoveGallery, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionAdd, SLOT(setEnabled(bool)));
   connect(albumView, SIGNAL(signalSelected(bool)), actionSelectAll, SLOT(setEnabled(bool)));
@@ -257,25 +259,7 @@ void MainWindow::slotConfiguration()
 
 MainWindow::~MainWindow()
 {}
-/*
-void MainWindow::setEditMode(bool edit)
-{
-  galleryDock->setVisible(!edit);
-  galleryDock->toggleViewAction()->setEnabled(!edit);
 
-  // Hide main toolbar
-  mainBar->setVisible(!edit);
-
-  // Disable all actions
-  actionNew->setDisabled(edit);
-  actionAdd->setDisabled(edit);
-  actionRemove->setDisabled(edit);
-  actionRemoveGallery->setDisabled(edit);
-  actionRectangularBackground->setDisabled(edit);
-  actionRoundBackground->setDisabled(edit);
-  menuSelection->setDisabled(edit);
-}
-*/
 void MainWindow::timerEvent(QTimerEvent*)
 {
   if (statusBar()->currentMessage().isEmpty())
@@ -289,9 +273,6 @@ void MainWindow::openProperties(const QModelIndex &index)
   galleryDock->hide();
   galleryDock->toggleViewAction()->setEnabled(false);
 
-  // Hide main toolbar
-  //mainBar->hide();
-
   // Disable all actions
   actionNew->setDisabled(true);
   actionAdd->setDisabled(true);
@@ -303,3 +284,24 @@ void MainWindow::openProperties(const QModelIndex &index)
 
   propertiesView->setCurrentIndex(index);
 }
+
+void MainWindow::closeProperties(const QModelIndex &index)
+{
+  centerWidget->setCurrentIndex(0);
+
+  galleryDock->show();
+  galleryDock->toggleViewAction()->setEnabled(true);
+
+  // Enable all actions
+  actionNew->setDisabled(false);
+  actionAdd->setDisabled(false);
+  actionRemove->setDisabled(false);
+  actionRemoveGallery->setDisabled(false);
+  actionRectangularBackground->setDisabled(false);
+  actionRoundBackground->setDisabled(false);
+  menuSelection->setDisabled(false);
+
+  imageList->scrollTo(index, QListView::PositionAtCenter);
+  imageList->clearSelection();
+}
+

@@ -180,6 +180,7 @@ void LineEdit::addValidValue(const QString &value)
 
 void LineEdit::setInvalidValues(const QStringList &values)
 {
+  m_invalidValues.clear();
   m_invalidValues = values;
 }
 

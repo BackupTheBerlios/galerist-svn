@@ -69,7 +69,7 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
       if (item->imageType() == ImageItem::Gallery) {
         return item->name();
       } else {
-        ExifManager exifData(item->getFilePath(), Data::self()->imageModel());
+        ExifManager exifData(item->filePath(), Data::self()->imageModel());
 
         QString date;
         if (!exifData.getCreationDate().isValid())
@@ -106,22 +106,28 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
       return QVariant::fromValue(static_cast<QObject*>(item->metadata()));
     }
     case ImageModel::ImageFilenameRole : {
-      return item->getFileName();
+      return item->fileName();
     }
     case ImageModel::ImageFilepathRole : {
-      return item->getFilePath();
+      return item->filePath();
     }
     case ImageModel::ImageDirPathRole : {
-      return item->getFilePath().remove(QDir::fromNativeSeparators(item->getFilePath()).remove(QRegExp("^.+/")));
+      return item->filePath().remove(QDir::fromNativeSeparators(item->filePath()).remove(QRegExp("^.+/")));
     }
     case ImageModel::ImageThumbnailPathRole : {
-      return item->getThumbName();
+      return item->thumbName();
     }
     case Qt::EditRole : {
       return item->data(index.column());
     }
     case (ImageModel::ImagePictureRole) : {
-      return QImage(item->getFilePath());
+      return QImage(item->filePath());
+    }
+    case (ImageModel::ImageRotateCW) : {
+      return item->previewCW();
+    }
+    case (ImageModel::ImageRotateCCW) : {
+      return item->previewCCW();
     }
     default:
       return QVariant();
@@ -130,25 +136,45 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
 
 bool ImageModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-  if (!index.isValid() || index.column() != 0 || (flags(index) & Qt::ItemIsEditable) == 0 || role != Qt::EditRole)
+  if (!index.isValid() || index.column() != 0 || (flags(index) & Qt::ItemIsEditable) == 0)
     return false;
 
   ImageItem *item = static_cast<ImageItem*>(index.internalPointer());
 
-  switch (item->imageType()) {
-    case (ImageItem::Image) : {
+  switch (role) {
+    case (Qt::EditRole) : {
+    if (item->imageType() == ImageItem::Image) {
       item->setName(value.toString());
+      emit dataChanged(index, index);
+      return true;
+    } else {
+      bool status = false;
+      QDir gallery(item->filePath());
+      gallery.cdUp();
+      status = gallery.rename(item->fileName(), value.toString());
+
+      if (status) {
+        item->setName(value.toString());
+        emit dataChanged(index, index);
+      }
+      return status;
+    }
+    }
+    case (ImageDescriptionRole) : {
+      if (item->imageType() != ImageItem::Image)
+        return false;
+
+      item->setDescription(value.toString());
+      emit dataChanged(index, index);
       return true;
     }
-    case (ImageItem::Gallery) : {
-      bool status = false;
-      QDir gallery(item->getFilePath());
-      gallery.cdUp();
-      status = gallery.rename(item->getFileName(), value.toString());
+    case (ImageRotateCW) : {
+      if (item->imageType() != ImageItem::Image)
+        return false;
 
-      if (status)
-        item->setName(value.toString());
-      return status;
+      item->rotate(value.toInt());
+      emit dataChanged(index, index);
+      return true;
     }
     default : {
       return false;
@@ -302,13 +328,13 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
     return 0;
 
   ImageItem *gallery = static_cast<ImageItem*>(parent.internalPointer());
-  QString a = gallery->getFilePath();
+  QString a = gallery->filePath();
 
   // Copy the whole directory
   if (fileNames.isEmpty()) {
     if (!JobManager::self()->job("CopyImages")) {
       m_currentCopyParent = parent;
-      QObject *job = JobManager::self()->registerJob("CopyImages", new GJobs::CopyJob(sourcePath, gallery->getFilePath(), parent, deleteSource, this));
+      QObject *job = JobManager::self()->registerJob("CopyImages", new GJobs::CopyJob(sourcePath, gallery->filePath(), parent, deleteSource, this));
       connect(job, SIGNAL(signalProcess(const QString&)), this, SLOT(slotProcess(const QString&)));
       JobManager::self()->startJob("CopyImages");
       return job;
@@ -317,7 +343,7 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
   // Copy only the fileNames
     if (!JobManager::self()->job("CopyImages")) {
     m_currentCopyParent = parent;
-    QObject *job = JobManager::self()->registerJob("CopyImages", new GJobs::CopyJob(sourcePath, fileNames, gallery->getFilePath(), parent));
+    QObject *job = JobManager::self()->registerJob("CopyImages", new GJobs::CopyJob(sourcePath, fileNames, gallery->filePath(), parent));
     connect(job, SIGNAL(signalProcess(const QString&)), this, SLOT(slotProcess(const QString&)));
     JobManager::self()->startJob("CopyImages");
     return job;
@@ -383,7 +409,7 @@ bool ImageModel::removeGallery(const QModelIndex &index)
   if (item->imageType() != GCore::ImageItem::Gallery)
     return false;
 
-  QDir gallery(item->getFilePath());
+  QDir gallery(item->filePath());
 
   beginRemoveRows(index.parent(), item->row(), item->row());
 
@@ -406,7 +432,7 @@ bool ImageModel::removeGallery(const QModelIndex &index)
     }
   }
 
-  QString fileName = item->getFileName();
+  QString fileName = item->fileName();
 
   ImageItem *rootItem = item->parent();
 
@@ -452,13 +478,13 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
 
     beginRemoveRows(parent, picture->row(), picture->row());
 
-    QDir gallery(picture->getFilePath());
+    QDir gallery(picture->filePath());
     gallery.cdUp();
     gallery.cd(".thumbnails");
 
     // Remove the picture's thumbnail
-    if (!QFile::remove(gallery.absoluteFilePath(picture->getThumbName()))) {
-        qWarning() << "Cannot remove thumbnail: " << gallery.absoluteFilePath(picture->getThumbName()) << endl;
+    if (!QFile::remove(gallery.absoluteFilePath(picture->thumbName()))) {
+        qWarning() << "Cannot remove thumbnail: " << gallery.absoluteFilePath(picture->thumbName()) << endl;
         status = false;
         break;
       }
@@ -466,8 +492,8 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
     gallery.cdUp();
 
     // Remove the picture
-    if (!QFile::remove(picture->getFilePath())) {
-        qWarning() << "Cannot remove image: " << picture->getFilePath() << endl;
+    if (!QFile::remove(picture->filePath())) {
+        qWarning() << "Cannot remove image: " << picture->filePath() << endl;
         status = false;
         break;
       }
@@ -513,7 +539,7 @@ bool ImageModel::checkName(const QString &filename, const QModelIndex &root) con
 
   int numberRows = rootItem->childCount();
   for (int count = 0; count < numberRows; count++)
-    if (rootItem->child(count)->getFileName().toLower() == filename.toLower())
+    if (rootItem->child(count)->fileName().toLower() == filename.toLower())
       return true;
 
   return false;

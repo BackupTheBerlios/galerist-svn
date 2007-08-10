@@ -136,6 +136,11 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
      */
     void openProperties(const QModelIndex &index);
 
+    /**
+     * Close properties view.
+     */
+    void closeProperties(const QModelIndex &index);
+
 };
 
 #endif
