@@ -31,7 +31,7 @@ namespace GCore
 class ImageItem;
 
 /**
- * @short A manager for the gallerys metadata.
+ * @short A manager for the manifest file.
  * @author Gregor Kališnik.
  */
 class MetaDataManager : public QObject
@@ -41,103 +41,44 @@ class MetaDataManager : public QObject
   public:
     /**
      * A constructor.
-     *
-     * @param galleryPath Self explanatory.
-     * @param parent Parent of this manager.
      */
-    MetaDataManager(const QString &galleryPath, QObject *parent = 0);
-
-    /**
-     * Adds image to the metadata.
-     *
-     * @return ID of the new image.
-     * @return -1 Image couldn't be added.
-     *
-     * @param filename Filename of the image.
-     */
-    int addImage(const QString &filename) const;
-
-    /**
-     * Returns the metadata id of the image.
-     *
-     * @param filename Filename of the image.
-     */
-    int imageId(const QString &filename) const;
-
-    /**
-     * Returns the logical name of the image.
-     *
-     * @param id ID of the image.
-     */
-    QString name(int id) const;
-    /**
-     * Sets the image's logical name.
-     *
-     * @param name The new name.
-     * @param id Image's id.
-     *
-     * @return @c true The change was successful.
-     * @return @c false The change was unsuccessful.
-     */
-    bool setName(const QString &name, int id) const;
-    /**
-     * Checks if the name exists.
-     *
-     * @param name Name to check.
-     */
-    bool checkName(const QString &name) const;
-
-    /**
-     * Returns the image's description.
-     *
-     * @param id Image's ID.
-     */
-    QString description(int id) const;
-    /**
-     * Sets image's description.
-     *
-     * @param description The new description.
-     * @param id Image's ID.
-     */
-    void setDescription(const QString &description, int id) const;
-
-    /**
-     * Returns the full metadata info of the image.
-     *
-     * @param id Image's ID.
-     */
-    QMap<QString, QString> metadataInfo(int id) const;
-
-    /**
-     * Removes the image from the metadata.
-     *
-     * @param id Image's ID.
-     *
-     * @return @c true Removal was successful.
-     * @return @c false Removal was unsuccessful.
-     */
-    bool removePicture(int id) const;
-
-    /**
-     * Executes a query and returns the result.
-     *
-     * @param rawQuery The SQL query.
-     */
-    QVariant query(const QString &rawQuery) const;
+    MetaDataManager();
 
     /**
      * Checks if the needed SQL driver is available.
      */
     static bool driverAvailable();
 
-    /**
-     * A destructor.
-     */
-    ~MetaDataManager();
+    static MetaDataManager *self();
+
+    ImageItem *registerGallery(const QString &name, int parentId = -1);
+    ImageItem *registerImage(const QString &name, int galleryId);
+
+    int galleryId(const QString &name, int parentId = -1);
+    int imageId(const QString &name, int parentId);
+
+    QString fileName(int id) const;
+
+    QString galleryName(int id) const;
+    QString imageName(int id) const;
+
+    bool setGalleryName(int id, const QString &name, const QString &path) const;
+    void setImageName(int id, const QString &name) const;
+
+    QString imageDescription(int id) const;
+
+    void setDescription(int id, const QString &description) const;
+
+    bool galleryExists(const QString &fileName, int parentId = -1);
+    bool galleryExists(int galleryId);
+    bool imageExists(const QString &name, int galleryId);
+
+    ImageItem *readManifest();
 
   private:
-    QSqlDatabase m_metadataFile;
-    QString m_galleryName;
+    static MetaDataManager *m_self;
+
+    inline void imageList(ImageItem *gallery) const;
 
 };
 

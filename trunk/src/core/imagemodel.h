@@ -22,14 +22,15 @@
 #define GCOREIMAGEMODEL_H
 
 #include <QtCore/QAbstractItemModel>
+
 #include <QtGui/QIcon>
+
+#include "core/imageitem.h"
 
 class QDir;
 
 namespace GCore
 {
-
-class ImageItem;
 
 namespace GJobs
 {
@@ -68,20 +69,19 @@ class ImageModel : public QAbstractItemModel
       ImageDescriptionRole   = Qt::UserRole + 1,
       /** Image type (Gallery or image). */
       ImageTypeRole          = Qt::UserRole + 2,
-      /** Image's metadata handler. */
-      ImageMetadataRole      = Qt::UserRole + 3,
       /** Image's filename (example.jpg). */
-      ImageFilenameRole      = Qt::UserRole + 4,
+      ImageFilenameRole      = Qt::UserRole + 3,
       /** Image's path with filename (/path/to/image.jpg). */
-      ImageFilepathRole      = Qt::UserRole + 5,
+      ImageFilepathRole      = Qt::UserRole + 4,
       /** Image's directory path (/path/to). */
-      ImageDirPathRole       = Qt::UserRole + 6,
+      ImagePathRole       = Qt::UserRole + 5,
       /** Path to image's thumbnail. */
-      ImageThumbnailPathRole = Qt::UserRole + 7,
+      ImageThumbnailPathRole = Qt::UserRole + 6,
       /** Returns the actual image. */
-      ImagePictureRole       = Qt::UserRole + 8,
-      ImageRotateCW          = Qt::UserRole + 9,
-      ImageRotateCCW         = Qt::UserRole + 10
+      ImagePictureRole       = Qt::UserRole + 7,
+      ImageRotateCW          = Qt::UserRole + 8,
+      ImageRotateCCW         = Qt::UserRole + 9,
+      IdRole                 = Qt::UserRole + 10
   };
 
     /**
@@ -95,6 +95,8 @@ class ImageModel : public QAbstractItemModel
      * A destructor.
      */
     ~ImageModel();
+
+    void showGalleries(bool set);
 
     /**
      * Method for retrieving data.
@@ -128,6 +130,7 @@ class ImageModel : public QAbstractItemModel
      * Gets the index of a item at a specific row and column.
      */
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+
     /**
      * Get the item's parent index.
      *
@@ -199,10 +202,8 @@ class ImageModel : public QAbstractItemModel
      * @param sourcePath Self explanatory.
      * @param parent Parent's index.
      * @param fileNames List of image filenames that will be added to the new gallery.
-     *
-     * @return Reference to the job.
      */
-    QObject *createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent = QModelIndex(), bool deleteSources = false, const QStringList &fileNames = QStringList());
+    //QString createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent = QModelIndex(), bool deleteSources = false, const QStringList &fileNames = QStringList());
 
     /**
      * Removes a gallery.
@@ -266,15 +267,29 @@ class ImageModel : public QAbstractItemModel
      */
     void stopCopy();
 
+  public slots:
+  /**
+   * The process of the add of an image.
+   *
+   * @param fileName Name of the item.
+   */
+    void addItem(ImageItem *item);
+
   protected:
 
   private:
+    mutable GCore::GJobs::ReadJob *m_currentJob;
+    bool m_delete;
+    bool m_showGalleries;
+
+    ImageItem *m_rootItem;
+
     /**
      * Setups the model tree.
      *
      * @param path Path of the data to be parsed.
      */
-    void setupModelData() const;
+    void setupModelData();
     /**
      * Parses a path and adds the items to a root.
      *
@@ -302,20 +317,11 @@ class ImageModel : public QAbstractItemModel
      */
     QModelIndex processGallerySearch(const QString &name, const QModelIndex &parent = QModelIndex());
 
-    mutable GCore::GJobs::ReadJob *m_currentJob;
-    GCore::GJobs::CopyJob *m_currentCopyJob;
-    QModelIndex m_currentCopyParent;
-    bool m_delete;
-
-    ImageItem *m_rootItem;
+    QModelIndex index(int itemId, ImageItem::Type type) const;
+    QModelIndex index(ImageItem *item) const;
+    ImageItem *itemForId(int itemId, ImageItem::Type type) const;
 
   private slots:
-    /**
-     * The process of the add of an image.
-     *
-     * @param fileName Name of the item.
-     */
-    void slotProcess(const QString &fileName);
     /**
      * Changes the data (or just reports it?).
      *

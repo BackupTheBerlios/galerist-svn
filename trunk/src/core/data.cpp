@@ -33,6 +33,7 @@
 #include "core/errorhandler.h"
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
+#include "core/jobmanager.h"
 
 #include "core/jobs/movejob.h"
 
@@ -95,18 +96,6 @@ Data *Data::self()
 QObject *Data::setValue(int type, const QVariant &value)
 {
   switch (type) {
-    case (GalleriesPath) : {
-      GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(galleriesDir(), value.toString(), m_mainWindow);
-      job->start();
-
-      connect(job, SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
-
-      m_backup.insert("GalleriesPath", galleriesDir().absolutePath());
-
-      m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(value.toString()));
-
-      return job;
-    }
     case (GalleryContextMenu) : {
       m_galleryContextMenu = static_cast<QMenu*>(value.value<QWidget*>());
       break;
@@ -165,12 +154,6 @@ QVariant Data::value(int type)
   switch (type) {
     case (ErrorHandler) :
             return qVariantFromValue(m_errorHandler);
-    case (ImageFormats) :
-            return qVariantFromValue(m_imageFormats);
-    case (GalleriesPath) :
-            return QDir::toNativeSeparators(galleriesDir().absolutePath());
-    case (SettingsPath) :
-            return settingsPath();
     case (DirCompleter) :
             return QVariant::fromValue<QObject*>(m_dirCompleter);
     case (FileCompleter) :
@@ -210,15 +193,33 @@ QVariant Data::value(int type)
 
 QDir Data::galleriesDir() const
 {
-  QString galleriesPath = m_settings->value("GalleriesPath", settingsPath() + "/galleries").toString();
-
-  QDir galleriesDir(galleriesPath);
+  QDir galleriesDir(galleriesPath());
   if (!galleriesDir.exists()) {
     // Temporary directory for galleries doesn't exist, creating it
     galleriesDir.mkpath(galleriesDir.absolutePath());
   }
 
-  return galleriesDir.absolutePath();
+  return galleriesDir;
+}
+
+QString Data::galleriesPath() const
+{
+  return m_settings->value("GalleriesPath", settingsPath() + "/galleries").toString();;
+}
+
+void Data::setGalleriesPath(const QString &path)
+{
+  GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(galleriesDir(), path, m_mainWindow);
+
+  JobManager::self()->registerJob("GalleriesMove", job);
+
+  connect(job, SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
+
+  m_backup.insert("GalleriesPath", galleriesDir().absolutePath());
+
+  m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));
+
+  JobManager::self()->startJob("GalleriesMove");
 }
 
 QString Data::settingsPath() const
@@ -249,15 +250,10 @@ Data::~Data()
   saveChanges();
 }
 
-QSortFilterProxyModel *Data::imageProxy()
+ImageModel *Data::imageProxy()
 {
-  if (!m_imageProxy) {
-    m_imageProxy = new QSortFilterProxyModel(this);
-    m_imageProxy->setSourceModel(imageModel());
-
-    m_imageProxy->setFilterRole(ImageModel::ImageTypeRole);
-    m_imageProxy->setFilterWildcard(QString::number(ImageItem::Image));
-  }
+  if (!m_imageProxy)
+    m_imageProxy = new ImageModel(this);
 
   return m_imageProxy;
 }
@@ -306,6 +302,11 @@ void Data::setDropContextMenu(QMenu *dropContextMenu)
 QRegExp Data::supportedFormats() const
 {
   return m_supportedFormats;
+}
+
+QStringList Data::supportedFormatsList() const
+{
+  return m_imageFormats;
 }
 
 QWidget *Data::imageAddProgress() const

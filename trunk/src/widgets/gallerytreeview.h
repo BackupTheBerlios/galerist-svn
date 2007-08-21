@@ -58,6 +58,14 @@ class GalleryTreeView : public QTreeView
      */
     ~GalleryTreeView();
 
+  public slots:
+    /**
+     * Slot that checks if a gallery has been selected and sends a signal.
+     *
+     * @param selected Index, that represents an item in the Model, of selected gallery.
+     */
+    void checkSelection(const QModelIndex &selected);
+    
   protected:
     /**
      * Overloaded method to defining context menu (right mouse click ;)).
@@ -73,12 +81,6 @@ class GalleryTreeView : public QTreeView
      * Slot for deleting the gallery.
      */
     void slotDelete();
-    /**
-     * Slot that checks if a gallery has been selected and sends a signal.
-     *
-     * @param selected Index, that represents an item in the Model, of selected gallery.
-     */
-    void slotCheckSelection(const QModelIndex &selected);
 };
 
 }

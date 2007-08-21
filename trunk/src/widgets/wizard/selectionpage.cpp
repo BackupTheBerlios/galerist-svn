@@ -126,7 +126,7 @@ void SelectionPage::makePreview(const QString &path, const QStringList &images) 
     GJobs::ReadJob *read = new GJobs::ReadJob((QObject*) this, QDir(path), images);
 
     connect(read, SIGNAL(signalProgress(const QString&, const QImage&, const QString&)), this, SLOT(addImage(const QString&, const QImage&, const QString&)));
-    connect(read, SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+    connect(read, SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
 
     read->start();
 

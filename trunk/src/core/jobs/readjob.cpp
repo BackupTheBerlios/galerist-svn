@@ -79,7 +79,7 @@ void ReadJob::job()
       item = m_items.takeFirst();
 
       // We set gallery path.
-      QDir galleryPath(m_model->data(item, GCore::ImageModel::ImageDirPathRole).toString());
+      QDir galleryPath(m_model->data(item, GCore::ImageModel::ImagePathRole).toString());
 
       // We set the name of the file.
       QString fileName(m_model->data(item, GCore::ImageModel::ImageFilenameRole).toString());
@@ -89,9 +89,9 @@ void ReadJob::job()
 
       // Thumbnails path.
       QDir thumbPath(galleryPath);
-      if (!thumbPath.cd(".thumbnails")) {
-        thumbPath.mkdir(".thumbnails");
-        thumbPath.cd(".thumbnails");
+      if (!thumbPath.cd("thumbnails")) {
+        thumbPath.mkdir("thumbnails");
+        thumbPath.cd("thumbnails");
       }
 
       // Create the thumbnail.
@@ -132,7 +132,7 @@ void ReadJob::readPath(const QDir &path)
     }
   }
 
-  QStringList images = path.entryList(Data::self()->value(Data::ImageFormats).toStringList(), QDir::Files);
+  QStringList images = path.entryList(Data::self()->supportedFormatsList(), QDir::Files);
   if (!m_images.isEmpty())
     images = m_images;
 
@@ -149,7 +149,7 @@ void ReadJob::readPath(const QDir &path)
     imageThumbnail = QImage(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio);
 
     emit signalProgress(image, imageThumbnail, path.absolutePath());
-    emit AbstractJob::signalProgress(imagesDone, totalImages, image, imageThumbnail);
+    emit AbstractJob::progress(imagesDone, totalImages, image, imageThumbnail);
     imagesDone++;
   }
 }

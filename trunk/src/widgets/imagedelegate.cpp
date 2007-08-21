@@ -53,6 +53,20 @@ ImageDelegate::ImageDelegate(QObject *parent)
   hoverGradient.setColorAt(1, QColor(202, 232, 245));
   m_hoverGradient = hoverGradient;
   m_hoverBorder = QPen(QColor(159, 211, 249));
+
+  QLinearGradient normalGradientGallery(QPoint(0, 0), QPoint(0, 160));
+  normalGradientGallery.setColorAt(0, QColor(255, 248, 199));
+  normalGradientGallery.setColorAt(0.5, QColor(255, 255, 199));
+  normalGradientGallery.setColorAt(1, QColor(255, 248, 199));
+  m_normalGradientGallery = normalGradientGallery;
+  m_normalBorderGallery = QPen(QColor(240, 221, 191));
+
+  QLinearGradient hoverGradientGallery(QPoint(0, 0), QPoint(0, 160));
+  hoverGradientGallery.setColorAt(0, QColor(253, 245, 162));
+  hoverGradientGallery.setColorAt(0.5, QColor(253, 253, 163));
+  hoverGradientGallery.setColorAt(1, QColor(253, 245, 162));
+  m_hoverGradientGallery = hoverGradientGallery;
+  m_hoverBorderGallery = QPen(QColor(235, 201, 137));
 }
 
 ImageDelegate::~ImageDelegate()
@@ -60,15 +74,11 @@ ImageDelegate::~ImageDelegate()
 
 void ImageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  //We don't want to show galleries in our main window, do we?
-  if (index.data(GCore::ImageModel::ImageTypeRole).toInt() == ImageItem::Gallery)
-    return;
-
   painter->save();
   painter->setClipRect(option.rect, Qt::NoClip);
 
   // Display background
-  drawBackground(painter, option);
+  drawBackground(painter, option, index.data(ImageModel::ImageTypeRole).toInt());
 
   // Display thumbnail
   drawPixmap(painter, option, index.data(ImageModel::ImageThumbnailRole).value<QIcon>().pixmap(QSize(128, 128)));
@@ -99,16 +109,26 @@ void ImageDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionView
   editor->setGeometry(textRect(index.data(ImageModel::ImageNameRole).toString(), option.rect));
 }
 
-void ImageDelegate::drawBackground(QPainter *painter, const QStyleOptionViewItem &option) const
+void ImageDelegate::drawBackground(QPainter *painter, const QStyleOptionViewItem &option, int type) const
 {
   painter->save();
 
+  if (type == ImageItem::Image) {
   if (option.state & QStyle::State_MouseOver) {
     painter->setBrush(m_hoverGradient);
     painter->setPen(m_hoverBorder);
   } else {
     painter->setBrush(m_normalGradient);
     painter->setPen(m_normalBorder);
+  }
+  } else {
+    if (option.state & QStyle::State_MouseOver) {
+      painter->setBrush(m_hoverGradientGallery);
+      painter->setPen(m_hoverBorderGallery);
+    } else {
+      painter->setBrush(m_normalGradientGallery);
+      painter->setPen(m_normalBorderGallery);
+    }
   }
 
   QPainterPath rect;

@@ -48,7 +48,7 @@ void MoveJob::job()
 
   if (!m_destination.mkpath(m_destination.absolutePath()) && !m_destination.exists()) {
     qDebug("Error creating directory.");
-    emit signalFailed(tr("Cannot create destination directory %1.").arg(m_destination.absolutePath()), GCore::ErrorHandler::Critical);
+    emit failed(tr("Cannot create destination directory %1.").arg(m_destination.absolutePath()), GCore::ErrorHandler::Critical);
     return;
   }
   long totalGalleryImages = -1;
@@ -76,7 +76,7 @@ void MoveJob::job()
     itemName.remove('/');
 
     QFileInfo itemInfo(item);
-    if (item.contains(".thumbnails") || item.contains(".metadata"))
+    if (item.contains("thumbnails") || item.contains(".metadata"))
       continue;
 
     destinationPath.cd(m_destination.absolutePath());
@@ -90,21 +90,21 @@ void MoveJob::job()
       totalGalleryImages = calculateGallerieImages(parents);
     }
 
-    if (itemInfo.isDir() && !item.contains(".thumbnails")) {
+    if (itemInfo.isDir() && !item.contains("thumbnails")) {
       destinationPath.mkdir(itemName);
       destinationPath.cd(itemName);
       path.cd(itemName);
       if (!QFile::copy(path.absoluteFilePath(".metadata"), destinationPath.absoluteFilePath(".metadata"))) {
-        emit signalFailed(tr("Cannot move gallery %1.").arg(item), GCore::ErrorHandler::Critical);
+        emit failed(tr("Cannot move gallery %1.").arg(item), GCore::ErrorHandler::Critical);
         isSuccessful = false;
         break;
       }
       continue;
     }
 
-    destinationPath.mkdir(".thumbnails");
-    destinationPath.cd(".thumbnails");
-    path.cd(".thumbnails");
+    destinationPath.mkdir("thumbnails");
+    destinationPath.cd("thumbnails");
+    path.cd("thumbnails");
 
     QString thumbnailName = itemName;
     thumbnailName.append(".jpg");
@@ -112,10 +112,10 @@ void MoveJob::job()
 
     // Notifying
     QImage thumbnail(thumbnailPath);
-    emit signalProgress(imagesDone, totalImages, itemName, thumbnail);
+    emit progress(imagesDone, totalImages, itemName, thumbnail);
 
     if (!QFile::copy(thumbnailPath, destinationPath.absoluteFilePath(thumbnailName))) {
-      emit signalFailed(tr("Cannot move thumbnail %1.").arg(thumbnailPath), GCore::ErrorHandler::Critical);
+      emit failed(tr("Cannot move thumbnail %1.").arg(thumbnailPath), GCore::ErrorHandler::Critical);
       isSuccessful = false;
       break;
     }
@@ -124,7 +124,7 @@ void MoveJob::job()
     destinationPath.cdUp();
 
     if (!QFile::copy(item, destinationPath.absoluteFilePath(itemName))) {
-      emit signalFailed(tr("Cannot move image %1.").arg(item), GCore::ErrorHandler::Critical);
+      emit failed(tr("Cannot move image %1.").arg(item), GCore::ErrorHandler::Critical);
       isSuccessful = false;
       break;
     }
@@ -136,7 +136,7 @@ void MoveJob::job()
 
   if (isSuccessful) {
     if (deleteDirectory(m_source))
-      emit signalFailed(tr("Old Gallery directory couldn't be deleted."), GCore::ErrorHandler::Warning);
+      emit failed(tr("Old Gallery directory couldn't be deleted."), GCore::ErrorHandler::Warning);
   } else {
     deleteDirectory(m_destination);
   }
@@ -166,7 +166,7 @@ long MoveJob::calculateImages() const
   QDirIterator imagesIterator(m_source.absolutePath(), QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories);
   while (imagesIterator.hasNext()) {
     QFileInfo info(imagesIterator.filePath());
-    if (info.isFile() && !imagesIterator.filePath().contains(".thumbnails") && imagesIterator.fileName() != ".metadata")
+    if (info.isFile() && !imagesIterator.filePath().contains("thumbnails") && imagesIterator.fileName() != ".metadata")
       counter++;
     imagesIterator.next();
   }
@@ -191,16 +191,16 @@ bool MoveJob::deleteDirectory(const QDir &path) const
       if (!gallery.remove(image))
         reportWarning = true;
 
-    gallery.cd(".thumbnails");
+    gallery.cd("thumbnails");
 
     // Deleting thumbnails
     foreach(QString thumbnail, gallery.entryList(QDir::Files | QDir::Hidden))
       if (!gallery.remove(thumbnail))
         reportWarning = true;
 
-    // We delete the .thumbnails directory
+    // We delete the thumbnails directory
     gallery.cdUp();
-    if (!gallery.rmdir(".thumbnails"))
+    if (!gallery.rmdir("thumbnails"))
       reportWarning = true;
   }
 

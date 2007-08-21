@@ -26,15 +26,16 @@
 #include <QtCore/QMap>
 #include <QtCore/QDir>
 
+#include <QtGui/QSortFilterProxyModel>
+
+#include "core/imagemodel.h"
+
 class QCompleter;
 class QSettings;
-class QSortFilterProxyModel;
 class QMenu;
 
 namespace GCore
 {
-class ImageModel;
-
 /**
  * @short Contains all the data for Goya.
  * @author Gregor Kališnik <gregor@unimatrix-one.org>
@@ -60,9 +61,6 @@ class Data : public QObject
      */
     enum Type {
       ErrorHandler,
-      ImageFormats,
-      GalleriesPath,
-      SettingsPath,
       DirCompleter,
       FileCompleter,
       GalleryContextMenu,
@@ -99,11 +97,19 @@ class Data : public QObject
     QVariant value(int type);
 
     /**
-     * Returns path where galleries resides.
-     *
-     * @return Path of galleries as a QDir.
+     * Returns the dir where galleries resides.
      */
     QDir galleriesDir() const;
+
+    /**
+     * Returns path where galleries resides.
+     */
+    QString galleriesPath() const;
+
+    /**
+     * Sets the gallery path.
+     */
+    void setGalleriesPath(const QString &path);
 
     /**
      * Returns the path to the settings.
@@ -130,7 +136,7 @@ class Data : public QObject
     /**
      * Gets proxy model for ListView.
      */
-    QSortFilterProxyModel *imageProxy();
+    ImageModel *imageProxy();
 
     /**
      * Gets proxy model for GalleryView.
@@ -166,6 +172,8 @@ class Data : public QObject
      * Gets supported format.
      */
     QRegExp supportedFormats() const;
+
+    QStringList supportedFormatsList() const;
 
     /**
      * Gets the progress widget.
@@ -204,7 +212,7 @@ class Data : public QObject
     QString m_branch;
     QWidget *m_mainWindow;
     QSortFilterProxyModel *m_galleryProxy;
-    QSortFilterProxyModel *m_imageProxy;
+    ImageModel *m_imageProxy;
     QRegExp m_supportedFormats;
 
     QWidget *m_searchBar;

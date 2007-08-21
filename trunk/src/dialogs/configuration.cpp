@@ -92,7 +92,7 @@ Configuration::Configuration(QWidget *parent)
   imageEditorEdit->setText(Data::self()->imageEditor());
   imageEditorEdit->setNeedTest(true);
 
-  dirEdit->setText(Data::self()->value(Data::GalleriesPath).toString());
+  dirEdit->setText(Data::self()->galleriesPath());
 
 #ifdef WANT_UPDATER
   updateBox->setChecked(GCore::Data::self()->value(Data::UpdateStartup).toBool());
@@ -121,9 +121,10 @@ Configuration::~Configuration()
 void Configuration::accept()
 {
   bool wait = false;
-  if (GCore::Data::self()->value(Data::GalleriesPath).toString() != dirEdit->text() && dirEdit->isValid())
+  if (GCore::Data::self()->galleriesPath() != dirEdit->text() && dirEdit->isValid())
     if (QMessageBox::question(this, tr("Confirm move"), tr("Are you sure you want to move all the galleries?"), tr("&Move"), tr("&No"), "", 1, 1) == 0) {
-      QObject *job = GCore::JobManager::self()->registerJob("MoveGallery", Data::self()->setValue(Data::GalleriesPath, dirEdit->text()));
+      Data::self()->setGalleriesPath(dirEdit->text());
+      QObject *job = JobManager::self()->job("GalleriesMove");
       job->setParent(this);
       moveGroup->show();
       buttonBox->setDisabled(true);

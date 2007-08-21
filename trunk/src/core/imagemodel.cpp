@@ -22,27 +22,24 @@
 
 #include <QtGui/QSortFilterProxyModel>
 
-#include "core/imageitem.h"
 #include "core/metadatamanager.h"
 #include "core/exifmanager.h"
 #include "core/data.h"
 #include "core/jobmanager.h"
 
 #include "core/jobs/readjob.h"
-#include "core/jobs/copyjob.h"
 
 #include <QtDebug>
+
+using namespace GCore::GJobs;
 
 namespace GCore
 {
 
 ImageModel::ImageModel(QObject *parent)
     : QAbstractItemModel(parent),
-    //m_currentCopyJob(0),
-    m_currentCopyParent(QModelIndex()),
     m_delete(false)
 {
-  m_rootItem = new ImageItem(Data::self()->value(Data::GalleriesPath).toString(), 0, ImageItem::Root);
   setupModelData();
 }
 
@@ -66,7 +63,7 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
       return item->name();
     }
     case Qt::ToolTipRole : {
-      if (item->imageType() == ImageItem::Gallery) {
+      if (item->type() == ImageItem::Gallery) {
         return item->name();
       } else {
         ExifManager exifData(item->filePath(), Data::self()->imageModel());
@@ -94,40 +91,40 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
         return fileIcon(index);
     }
     case ImageModel::ImageDescriptionRole : {
-      if (item->imageType() != ImageItem::Image)
+      if (item->type() != ImageItem::Image)
         return QVariant();
 
       return item->description();
     }
     case ImageModel::ImageTypeRole : {
-      return item->imageType();
-    }
-    case ImageModel::ImageMetadataRole : {
-      return QVariant::fromValue(static_cast<QObject*>(item->metadata()));
+      return item->type();
     }
     case ImageModel::ImageFilenameRole : {
       return item->fileName();
     }
     case ImageModel::ImageFilepathRole : {
-      return item->filePath();
+      return item->absoluteFilePath();
     }
-    case ImageModel::ImageDirPathRole : {
-      return item->filePath().remove(QDir::fromNativeSeparators(item->filePath()).remove(QRegExp("^.+/")));
+    case ImageModel::ImagePathRole : {
+      return item->absolutePath();
     }
     case ImageModel::ImageThumbnailPathRole : {
-      return item->thumbName();
+      return item->absoluteThumbPath();
     }
     case Qt::EditRole : {
-      return item->data(index.column());
+      return item->name();
     }
     case (ImageModel::ImagePictureRole) : {
       return QImage(item->filePath());
     }
     case (ImageModel::ImageRotateCW) : {
-      return item->previewCW();
+      return item->previewRotate(90);
     }
     case (ImageModel::ImageRotateCCW) : {
-      return item->previewCCW();
+      return item->previewRotate(270);
+    }
+    case (ImageModel::IdRole) : {
+      return item->id();
     }
     default:
       return QVariant();
@@ -143,25 +140,13 @@ bool ImageModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
   switch (role) {
     case (Qt::EditRole) : {
-    if (item->imageType() == ImageItem::Image) {
-      item->setName(value.toString());
-      emit dataChanged(index, index);
-      return true;
-    } else {
-      bool status = false;
-      QDir gallery(item->filePath());
-      gallery.cdUp();
-      status = gallery.rename(item->fileName(), value.toString());
-
-      if (status) {
-        item->setName(value.toString());
+      bool output = item->setName(value.toString());
+      if (output)
         emit dataChanged(index, index);
-      }
-      return status;
-    }
+      return output;
     }
     case (ImageDescriptionRole) : {
-      if (item->imageType() != ImageItem::Image)
+      if (item->type() != ImageItem::Image)
         return false;
 
       item->setDescription(value.toString());
@@ -169,7 +154,7 @@ bool ImageModel::setData(const QModelIndex &index, const QVariant &value, int ro
       return true;
     }
     case (ImageRotateCW) : {
-      if (item->imageType() != ImageItem::Image)
+      if (item->type() != ImageItem::Image)
         return false;
 
       item->rotate(value.toInt());
@@ -192,9 +177,6 @@ Qt::ItemFlags ImageModel::flags(const QModelIndex &index) const
 
 QVariant ImageModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-    return m_rootItem->data(section);
-
   return QVariant();
 }
 
@@ -208,6 +190,7 @@ QModelIndex ImageModel::index(int row, int column, const QModelIndex &parent) co
     parentItem = static_cast<ImageItem*>(parent.internalPointer());
 
   ImageItem *childItem = parentItem->child(row);
+  
   if (childItem)
     return createIndex(row, column, childItem);
   else
@@ -242,10 +225,7 @@ int ImageModel::rowCount(const QModelIndex &parent) const
 
 int ImageModel::columnCount(const QModelIndex &parent) const
 {
-  if (parent.isValid())
-    return static_cast<ImageItem*>(parent.internalPointer())->columnCount();
-  else
-    return m_rootItem->columnCount();
+  return 1;
 }
 
 void ImageModel::setName(const QString &name, const QModelIndex &index)
@@ -275,7 +255,7 @@ bool ImageModel::exists(const QString &name, const QModelIndex &index)
 
   ImageItem *item = static_cast<ImageItem*>(index.internalPointer());
 
-  return item->metadata()->checkName(name);
+  return MetaDataManager::self()->imageExists(name, item->parent()->id());
 }
 
 QIcon ImageModel::fileIcon(const QModelIndex &item) const
@@ -289,11 +269,9 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
     icon.addFile(":/images/folder-open.png", QSize(), QIcon::Normal, QIcon::On);
   } else {
 
-    QDir thumbPath(item.data(ImageModel::ImageFilepathRole).toString());
-    thumbPath.cdUp();
+    QDir thumbPath(item.data(ImageModel::ImagePathRole).toString());
 
-    if (!thumbPath.cd(".thumbnails") || !QFile::exists(thumbPath.absoluteFilePath(item.data(ImageModel::ImageThumbnailPathRole).toString()))) {
-
+    if (!thumbPath.cd("thumbnails") || !QFile::exists(item.data(ImageModel::ImageThumbnailPathRole).toString())) {
       GJobs::ReadJob *job = new GJobs::ReadJob(this);
       job->queuePhoto(item);
       JobManager::self()->registerJob("ThumbnailJob-" + item.data(ImageFilenameRole).toString(), job);
@@ -304,7 +282,7 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
 
       icon.addFile(":/images/image-big.png");
     } else {
-      icon.addFile(thumbPath.absoluteFilePath(item.data(ImageModel::ImageThumbnailPathRole).toString()));
+      icon.addFile(item.data(ImageModel::ImageThumbnailPathRole).toString());
     }
   }
 
@@ -314,7 +292,6 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
 void ImageModel::reconstruct()
 {
   ImageItem *temp = m_rootItem;
-  m_rootItem = new ImageItem(Data::self()->value(Data::GalleriesPath).toString(), 0, ImageItem::Root);
   setupModelData();
 
   delete temp;
@@ -323,7 +300,7 @@ void ImageModel::reconstruct()
 }
 
 QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourcePath, const QStringList &fileNames, bool deleteSource)
-{
+{/*
   if (!parent.isValid())
     return 0;
 
@@ -350,52 +327,26 @@ QObject *ImageModel::addImages(const QModelIndex &parent, const QString &sourceP
   }
   }
 
-  return 0;
+  return 0;*/
 }
 
-QObject *ImageModel::createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent, bool deleteSources, const QStringList &fileNames)
+/*QString ImageModel::createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent, bool deleteSources, const QStringList &fileNames)
 {
-  QString path;
+  ImageItem *parentItem;
   if (parent.isValid())
-    path = parent.data(ImageModel::ImageFilepathRole).toString();
+    parentItem = static_cast<ImageItem*>(parent.internalPointer());
   else
-    path = Data::self()->value(Data::GalleriesPath).toString();
+    parentItem = m_rootItem;
 
-  // We create the destination directory
-  QDir destPath(path);
-  if (!destPath.mkpath(name)) {
-    ErrorHandler::reportMessage(tr("Cannot create gallery directory."), ErrorHandler::Critical);
-    return 0;
-  }
-  destPath.cd(name);
+  QString hash = JobManager::self()->createGalleryJob(name, parentItem, sourcePath, fileNames, deleteSources);
+  connect(JobManager::self()->job(hash), SIGNAL(finished(ImageItem*)), this, SLOT(addItem(ImageItem*)));
+  JobManager::self()->startJob(hash);
 
-  QModelIndex parentIndex;
-
-  if (!parent.isValid()) {
-    // Notify the viewers we are making a new gallery
-    beginInsertRows(QModelIndex(), m_rootItem->childCount(), m_rootItem->childCount() + 1);
-
-    m_rootItem->appendChild(new GCore::ImageItem(name, m_rootItem, ImageItem::Gallery));
-
-    parentIndex = index(m_rootItem->childCount() - 1, 0);
-  } else {
-    ImageItem *parentItem = static_cast<ImageItem*>(parent.internalPointer());
-
-    beginInsertRows(parent, parentItem->childCount(), parentItem->childCount() + 1);
-
-    parentItem->appendChild(new GCore::ImageItem(name, parentItem, GCore::ImageItem::Gallery));
-
-    parentIndex = parent.child(parentItem->childCount() - 1, 0);
-  }
-
-  endInsertRows();
-  //static_cast<QSortFilterProxyModel *>(Data::self()->value(Data::ModelProxy).value<QObject*>())->setSourceModel(this);
-
-  return addImages(parentIndex, sourcePath, fileNames, deleteSources);
-}
+  return hash;
+}*/
 
 bool ImageModel::removeGallery(const QModelIndex &index)
-{
+{/*
   if (!index.isValid())
     return false;
 
@@ -418,7 +369,7 @@ bool ImageModel::removeGallery(const QModelIndex &index)
 
   // Delete what is left in the gallery
   QDir thumbnails(gallery);
-  if (thumbnails.cd(".thumbnails")) {
+  if (thumbnails.cd("thumbnails")) {
     QDirIterator thumbnailsImages(thumbnails.absolutePath(), QDir::Files | QDir::Hidden | QDir::System);
     while (thumbnailsImages.hasNext())
       thumbnails.remove(thumbnailsImages.next());
@@ -426,7 +377,7 @@ bool ImageModel::removeGallery(const QModelIndex &index)
     thumbnails.cdUp();
 
     // Delete the folders.
-    if (!gallery.rmdir(".thumbnails")) {
+    if (!gallery.rmdir("thumbnails")) {
       ErrorHandler::reportMessage(tr("Cannot delete gallery. Thumbnails directory cannot be deleted."), ErrorHandler::Critical);
       return false;
     }
@@ -453,11 +404,11 @@ bool ImageModel::removeGallery(const QModelIndex &index)
 
   endRemoveRows();
 
-  return status;
+  return status;*/
 }
 
 QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
-{
+{/*
   if (indexList.isEmpty())
     return QModelIndex();
 
@@ -480,7 +431,7 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
 
     QDir gallery(picture->filePath());
     gallery.cdUp();
-    gallery.cd(".thumbnails");
+    gallery.cd("thumbnails");
 
     // Remove the picture's thumbnail
     if (!QFile::remove(gallery.absoluteFilePath(picture->thumbName()))) {
@@ -509,7 +460,7 @@ QModelIndex ImageModel::removeImages(const QModelIndexList &indexList)
     endRemoveRows();
   }
 
-  return index(parentNum, 0);
+  return index(parentNum, 0);*/
 }
 
 QModelIndexList ImageModel::childs(const QModelIndex &parent)
@@ -575,34 +526,9 @@ void ImageModel::stopCopy()
   JobManager::self()->stopJob("CopyImages");
 }
 
-void ImageModel::setupModelData() const
+void ImageModel::setupModelData()
 {
-  processPath(QDir(Data::self()->value(Data::GalleriesPath).toString()));
-}
-
-void ImageModel::processPath(const QDir &path, ImageItem *root) const
-{
-  if (!root)
-    root = m_rootItem;
-
-  QStringList items = path.entryList(QDir::Dirs);
-  items.removeAll(".");
-  items.removeAll("..");
-  items.removeAll(".thumbnails");
-
-  foreach(QString item, items) {
-    QDir temp = path;
-    temp.cd(item);
-    ImageItem *gallery = new ImageItem(item, root, ImageItem::Gallery);
-    root->appendChild(gallery);
-    processPath(temp, gallery);
-  }
-
-  QStringList images = path.entryList(QDir::Files);
-  images.removeAll(".metadata");
-
-  foreach(QString image, images)
-  root->appendChild(new ImageItem(image, root, ImageItem::Image));
+  m_rootItem = MetaDataManager::self()->readManifest();
 }
 
 QStringList ImageModel::processGalleriesList(ImageItem *root)
@@ -614,7 +540,7 @@ QStringList ImageModel::processGalleriesList(ImageItem *root)
   int childCount = root->childCount();
   for (int count = 0; count < childCount; count++) {
     // Check if the item is a gallery
-    if (root->child(count)->imageType() == ImageItem::Gallery) {
+    if (root->child(count)->type() == ImageItem::Gallery) {
       output << root->child(count)->name();
 
       // Check if this gallery has childs
@@ -645,28 +571,55 @@ QModelIndex ImageModel::processGallerySearch(const QString &name, const QModelIn
   return QModelIndex();
 }
 
-void ImageModel::slotProcess(const QString &fileName)
+QModelIndex ImageModel::index(int itemId, ImageItem::Type type) const
 {
-  if (!m_currentCopyParent.isValid())
-    return;
+  return index(itemForId(itemId, type));
+}
 
-  ImageItem *gallery = static_cast<ImageItem*>(m_currentCopyParent.internalPointer());
+QModelIndex ImageModel::index(ImageItem *item) const
+{
+  if (item && item != m_rootItem)
+    return createIndex(item->row(), 0, item);
 
-  if (!fileName.isEmpty() && fileName != "~ERROR~") {
-    beginInsertRows(m_currentCopyParent, gallery->childCount(), gallery->childCount() + 1);
+  return QModelIndex();
+}
 
-    ImageItem *image = new ImageItem(fileName, gallery, ImageItem::Image);
-    image->metadata()->addImage(fileName);
+ImageItem *ImageModel::itemForId(int itemId, ImageItem::Type type) const
+{
+  QQueue<ImageItem*> queue;
 
-    gallery->appendChild(image);
+  if (itemId == -1)
+    return m_rootItem;
 
+  queue.enqueue(m_rootItem);
+
+  while (!queue.isEmpty()) {
+    ImageItem *item = queue.dequeue();
+    int childCount = item->childCount();
+
+    for (int count = 0; count < childCount; count++) {
+      ImageItem *child = item->child(count);
+      if (child->id() == itemId && child->type() == type)
+        return child;
+
+      if (child->childCount() > 0)
+        queue.enqueue(child);
+    }
+  }
+
+  return 0;
+}
+
+void ImageModel::addItem(ImageItem *item)
+{
+  if (item->type() == ImageItem::Gallery) {
+    ImageItem *parent = itemForId(item->parentId(), ImageItem::Gallery);
+
+    beginInsertRows(index(parent), 0, 0);
+    parent->appendChild(item);
     endInsertRows();
 
-    // Is there any better option?
-//    static_cast<QSortFilterProxyModel*>(Data::self()->value(Data::ModelProxy).value<QObject*>())->setSourceModel(this);
-
-  } else if (fileName != "~ERROR~") {
-    removeGallery(m_currentCopyParent);
+  } else if (item->type() == ImageItem::Image) {
   }
 }
 

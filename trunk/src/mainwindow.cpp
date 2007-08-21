@@ -239,8 +239,6 @@ void MainWindow::slotAddImages()
   QStringList images = pictures;
   images.replaceInStrings(path, QString());
 
-  qDebug() << images << path;
-  
   connect(Data::self()->imageModel()->addImages(imageList->rootIndex(), path, images), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
 }
 
@@ -268,6 +266,12 @@ void MainWindow::timerEvent(QTimerEvent*)
 
 void MainWindow::openProperties(const QModelIndex &index)
 {
+  if (index.data(ImageModel::ImageTypeRole).toInt() == ImageItem::Gallery) {
+    albumView->checkSelection(Data::self()->galleryProxy()->mapFromSource(Data::self()->imageModel()->index(index.row(), index.column(), index.parent())));
+    imageList->setRootIndex(index);
+    return;
+  }
+  
   centerWidget->setCurrentIndex(1);
 
   galleryDock->hide();

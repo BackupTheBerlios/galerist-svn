@@ -70,7 +70,10 @@ void ListView::slotRemove()
 
 void ListView::setRootIndex(const QModelIndex &index)
 {
-  QListView::setRootIndex(Data::self()->galleryProxy()->mapToSource(index));
+  if (index.model() == Data::self()->galleryProxy())
+    QListView::setRootIndex(Data::self()->galleryProxy()->mapToSource(index));
+  else
+    QListView::setRootIndex(index);
 }
 
 void ListView::invertSelection()

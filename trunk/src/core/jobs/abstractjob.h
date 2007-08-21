@@ -30,6 +30,7 @@ class QImage;
 
 namespace GCore
 {
+class ImageItem;
 namespace GJobs
 {
 
@@ -49,19 +50,20 @@ class AbstractJob : public QThread
      * @param current Current's unit name.
      * @param image Current's unit image.
      */
-    void signalProgress(int finished, int total, const QString &current, const QImage &image);
+    void progress(int finished, int total, const QString &current, const QImage &image);
     /**
      * Signal for reporting an error.
      *
      * @param errorMessage Error string to show the user.
      */
-    void signalFailed(const QString &errorMessage, int);
+    void failed(const QString &errorMessage, int);
     /**
      * Reports that the job has been finished.
      *
      * @param successful Tells if the job has been successful.
      */
     void finished(bool successful);
+    void finished(ImageItem *item);
 
   public:
     /**

@@ -39,19 +39,12 @@
 namespace GCore
 {
 
-ImageItem::ImageItem(const QString &path, ImageItem *parent, Type type)
-    : m_parentItem(parent),
+ImageItem::ImageItem(int id, Type type)
+    : m_parentItem(0),
     m_type(type),
-    m_path(path),
-    m_metadata(0),
-    m_id(-1),
-          m_tempImage(0)
-{
-  if (m_type == Image)
-    m_id = metadata()->imageId(fileName());
-  else
-    m_metadata = new MetaDataManager(filePath(), qApp);
-}
+    m_id(id),
+    m_tempImage(0)
+{}
 
 ImageItem::~ImageItem()
 {
@@ -59,9 +52,28 @@ ImageItem::~ImageItem()
     qDeleteAll(m_childItems.begin(), m_childItems.end());
 }
 
+int ImageItem::id() const
+{
+  return m_id;
+}
+
+void ImageItem::setParent(ImageItem *parent)
+{
+  m_parentItem = parent;
+}
+
+void ImageItem::setParentId(int id)
+{
+  m_parentId = id;
+}
+
 void ImageItem::appendChild(ImageItem *item)
 {
-  m_childItems.append(item);
+  item->setParent(this);
+  if (item->type() == Image)
+    m_childItems.append(item);
+  else
+    m_childItems.prepend(item);
 }
 
 void ImageItem::removeChild(ImageItem *child)
@@ -88,104 +100,118 @@ int ImageItem::row() const
   return 0;
 }
 
-int ImageItem::columnCount() const
-{
-  // We have a fixed number of data
-  return 1;
-}
-
-QVariant ImageItem::data(int column) const
-{
-  // We (I) don't like columns :)
-  if (!column)
-    return name();
-  else
-    return description();
-}
-
 ImageItem *ImageItem::parent() const
 {
   return m_parentItem;
 }
 
-ImageItem::Type ImageItem::imageType() const
+int ImageItem::parentId() const
+{
+  return m_parentId;
+}
+
+ImageItem::Type ImageItem::type() const
 {
   return m_type;
 }
 
-void ImageItem::setFilePath(const QString &path)
+QDir ImageItem::dir() const
 {
-  m_path = path;
+  QDir dir = Data::self()->galleriesDir();
+  dir.cd(path());
+  return dir;
 }
 
 QString ImageItem::path() const
 {
-  QFileInfo currentPath(filePath());
-  return currentPath.absolutePath();
+  QStringList names;
+
+  ImageItem *parent = m_parentItem;
+  while (parent && parent->type() != Root) {
+    names.prepend(parent->name());
+    parent = parent->parent();
+  }
+
+  return names.join("/");
+}
+
+QString ImageItem::absolutePath() const
+{
+  return dir().absolutePath();
 }
 
 QString ImageItem::filePath() const
 {
-  if (!m_parentItem) {
-    return m_path;
-  } else {
-    QDir parentPath(m_parentItem->filePath());
-    return parentPath.absoluteFilePath(m_path);
-  }
+  return path() + fileName();
+}
+
+QString ImageItem::absoluteFilePath() const
+{
+  return dir().absoluteFilePath(fileName());
 }
 
 QString ImageItem::fileName() const
 {
-  if (!m_parentItem) {
-    // There is no parent item, so path contains the full path
-    QFileInfo currentPath(m_path);
-
-    return currentPath.fileName();
-  } else {
-    return m_path;
+  if (m_type != Image) {
+    qWarning("GCore::ImageItem::fileName: Gallery does not have a file name!");
+    return QString();
   }
+
+  return MetaDataManager::self()->fileName(m_id);
 }
 
-MetaDataManager *ImageItem::metadata() const
+QDir ImageItem::thumbDir() const
 {
-  MetaDataManager *output = 0;
-  if (!m_metadata && m_type == Gallery)
-    qFatal("Error! MetadataManager not initialised! But should be. BUG!");
+  QDir thumbnails = dir();
+  thumbnails.cd("thumbnails");
+  return thumbnails;
+}
 
-  if (m_type == Gallery)
-    output = m_metadata;
+QString ImageItem::thumbPath() const
+{
+  return thumbDir().relativeFilePath(thumbName());
+}
 
-  if (!m_metadata && m_type == Image)
-    output = parent()->metadata();
+QString ImageItem::absoluteThumbPath() const
+{
+  return thumbDir().absoluteFilePath(thumbName());
+}
 
-  return output;
+QString ImageItem::thumbName() const
+{
+  return fileName().append(".jpg");
 }
 
 QString ImageItem::name() const
 {
   if (m_type == Image)
-    return metadata()->name(m_id);
-  else
-    return fileName();
+    return MetaDataManager::self()->imageName(m_id);
+
+  if (m_type == Gallery)
+    return MetaDataManager::self()->galleryName(m_id);
+
+  return "Root";
 }
 
 QString ImageItem::description() const
 {
   if (m_type == Image)
-    return metadata()->description(m_id);
+    return MetaDataManager::self()->imageDescription(m_id);
   else
     return QString();
 }
 
 bool ImageItem::setName(const QString &name)
 {
-  bool output = true;
-  if (imageType() == Image)
-    output = metadata()->setName(name, m_id);
-  else if (imageType() == Gallery)
-    setFilePath(name);
+  if (m_type == Image) {
+    MetaDataManager::self()->setImageName(m_id, name);
+    return true;
+  }
 
-  return output;
+  if (m_type == Gallery)
+    return MetaDataManager::self()->setGalleryName(m_id, name, absolutePath());
+
+  return false;
 }
 
 void ImageItem::setDescription(const QString &description)
@@ -193,18 +219,12 @@ void ImageItem::setDescription(const QString &description)
   if (m_type != Image)
     return;
 
-  metadata()->setDescription(description, m_id);
-
-}
-
-bool ImageItem::remove()
-{
-  return metadata()->removePicture(m_id);
+  MetaDataManager::self()->setDescription(m_id, description);
 }
 
 void ImageItem::rotate(short degrees)
 {
-  QString file = filePath();
+  QString file = absoluteFilePath();
   Magick::Image image;
   image.read(file.toStdString());
   image.rotate(90);
@@ -215,10 +235,10 @@ void ImageItem::rotate(short degrees)
 
   QImage thumbnail;
   thumbnail.loadFromData((const uchar*) buffer.data(), buffer.length());
-  thumbnail.save(thumbPath(), "JPEG");
+  thumbnail.save(absoluteThumbPath(), "JPEG");
 }
 
-QImage ImageItem::previewCW()
+QImage ImageItem::previewRotate(short degrees)
 {
   Magick::Image image;
   if (m_tempImage) {
@@ -226,12 +246,12 @@ QImage ImageItem::previewCW()
     image.read(m_tempImage->fileName().toStdString());
     image.magick("jpg");
   } else {
-    image.read(filePath().toStdString());
+    image.read(absoluteFilePath().toStdString());
     m_tempImage = new QTemporaryFile(qApp);
     m_tempImage->open();
   }
 
-  image.rotate(90);
+  image.rotate(degrees);
   Magick::Blob buffer;
   image.write(&buffer);
 
@@ -240,40 +260,6 @@ QImage ImageItem::previewCW()
   output.save(m_tempImage, "JPEG");
   m_tempImage->close();
   return output;
-}
-
-QImage ImageItem::previewCCW()
-{
-  Magick::Image image;
-  if (m_tempImage) {
-    m_tempImage->open();
-    image.read(m_tempImage->fileName().toStdString());
-    image.magick("jpg");
-  } else {
-    image.read(filePath().toStdString());
-    m_tempImage = new QTemporaryFile(qApp);
-    m_tempImage->open();
-  }
-
-  image.rotate(270);
-  Magick::Blob buffer;
-  image.write(&buffer);
-
-  QImage output;
-  output.loadFromData((const uchar*) buffer.data(), buffer.length());
-  output.save(m_tempImage, "JPEG");
-  m_tempImage->close();
-  return output;
-}
-
-QString ImageItem::thumbName() const
-{
-  return fileName().append(".jpg");
-}
-
-QString ImageItem::thumbPath() const
-{
-  return path().append("/.thumbnails/").append(fileName()).append(".jpg");
 }
 
 }

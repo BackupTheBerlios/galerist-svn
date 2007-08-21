@@ -42,7 +42,7 @@ namespace GWidgets
 GalleryTreeView::GalleryTreeView(QWidget *parent)
     : QTreeView(parent)
 {
-  connect(this, SIGNAL(pressed(const QModelIndex&)), this, SLOT(slotCheckSelection(const QModelIndex&)));
+  connect(this, SIGNAL(pressed(const QModelIndex&)), this, SLOT(checkSelection(const QModelIndex&)));
 }
 
 void GalleryTreeView::contextMenuEvent(QContextMenuEvent *event)
@@ -60,7 +60,7 @@ void GalleryTreeView::slotDelete()
     static_cast<ImageModel*>(static_cast<QSortFilterProxyModel*>(model())->sourceModel())->removeGallery(selectedGallery);
 }
 
-void GalleryTreeView::slotCheckSelection(const QModelIndex &selected)
+void GalleryTreeView::checkSelection(const QModelIndex &selected)
 {
   clearFocus();
   collapseAll();

@@ -21,9 +21,11 @@
 
 #include "metadatamanager.h"
 
-#include <QtSql>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
+#include <QtCore/QQueue>
+
+#include <QtGui/QApplication>
+
+#include <QtSql/QSqlDatabase>
 
 #include "core/data.h"
 #include "core/imageitem.h"
@@ -32,137 +34,17 @@
 namespace GCore
 {
 
-MetaDataManager::MetaDataManager(const QString &galleryPath, QObject *parent)
-    : QObject(parent)
+MetaDataManager *MetaDataManager::m_self = 0;
+
+MetaDataManager::MetaDataManager()
+    : QObject(qApp)
 {
-  // We initialise the database.
-  QDir dir(galleryPath);
-  m_galleryName = galleryPath;
-  m_galleryName.remove(QDir::homePath() + "/");
+  QSqlDatabase manifest = QSqlDatabase::addDatabase("QSQLITE");
+  manifest.setDatabaseName(Data::self()->galleriesDir().absoluteFilePath("manifest.db"));
+  manifest.open();
 
-  m_metadataFile = QSqlDatabase::addDatabase("QSQLITE", m_galleryName);
-  m_metadataFile.setDatabaseName(dir.absoluteFilePath(".metadata"));
-
-  // If it doesn't exists yet. We create the internal structure.
-  if (!QFile::exists(dir.absoluteFilePath(".metadata"))) {
-    m_metadataFile.open();
-    m_metadataFile.transaction();
-    m_metadataFile.exec("CREATE TABLE image (image_id INTEGER PRIMARY KEY AUTOINCREMENT, filename CHAR(30) UNIQUE, image_name CHAR(30) UNIQUE, description TEXT);");
-    m_metadataFile.exec("CREATE TABLE tag (tag_id INTEGER PRIMARY KEY AUTOINCREMENT, tag_name CHAR(20) UNIQUE NOT NULL);");
-    m_metadataFile.exec("CREATE TABLE phototag (tag_id INTEGER NOT NULL, image_id INTEGER NOT NULL, PRIMARY KEY(tag_id, image_id));");
-    m_metadataFile.commit();
-  } else
-    m_metadataFile.open();
-}
-
-int MetaDataManager::addImage(const QString &filename) const
-{
-  QVariant id = m_metadataFile.exec("INSERT INTO image (filename) VALUES ('" + filename + "');").lastInsertId();
-
-  if (id.isValid())
-    return id.toInt();
-  else
-    return -1;
-}
-
-int MetaDataManager::imageId(const QString &filename) const
-{
-  int id;
-
-  if (filename.isEmpty())
-    return -1;
-
-  QVariant result = query("SELECT image_id FROM image WHERE filename = '" + filename + "';");
-  if (result.isValid()) {
-    id = result.toInt();
-  } else {
-    id = addImage(filename);
-  }
-
-  return id;
-}
-
-QString MetaDataManager::name(int id) const
-{
-  return metadataInfo(id)["name"];
-}
-
-bool MetaDataManager::setName(const QString &name, int id) const
-{
-  bool status = true;
-
-  if (!query("UPDATE image SET image_name = '" + name + "' WHERE image_id = '" + QString::number(id) + "';").toBool())
-    status = false;
-
-  return status;
-}
-
-bool MetaDataManager::checkName(const QString &name) const
-{
-  return query("SELECT image_id FROM image WHERE LOWER(image_name) = LOWER('" + name + "') OR LOWER(filename) = LOWER('" + name + "');").isValid();
-}
-
-QString MetaDataManager::description(int id) const
-{
-  return metadataInfo(id)["description"];
-}
-
-void MetaDataManager::setDescription(const QString &description, int id) const
-{
-  query("UPDATE image SET description = '" + description + "' WHERE image_id = '" + QString::number(id) + "';");
-}
-
-QMap<QString, QString> MetaDataManager::metadataInfo(int id) const
-{
-  QMap<QString, QString> metadata;
-
-  QSqlQuery query("SELECT image_name, description, filename FROM image WHERE image_id = '" + QString::number(id) + "';", m_metadataFile);
-
-  if (!query.next()) {
-    query.clear();
-    metadata["name"] = tr("Unavailable");
-    metadata["description"] = tr("No description");
-    return metadata;
-  }
-
-  metadata["name"] = query.value(0).toString();
-  if (metadata["name"].isEmpty())
-    metadata["name"] = query.value(2).toString();
-
-  metadata["description"] = query.value(1).toString();
-  if (metadata["description"].isEmpty())
-    metadata["description"] = tr("No description");
-
-  query.clear();
-
-  return metadata;
-}
-
-bool MetaDataManager::removePicture(int id) const
-{
-  bool status = true;
-
-  QVariant result = query("DELETE FROM image WHERE image_id = '" + QString::number(id) + "';");
-  if (result.isValid() && !result.toBool())
-    status = false;
-
-  return status;
-}
-
-QVariant MetaDataManager::query(const QString &rawQuery) const
-{
-  QVariant output;
-
-  QSqlQuery query(m_metadataFile);
-  if (!query.exec(rawQuery)) {
-    qCritical() << query.lastError().text() << endl;
-    output = false;
-  } else {
-    if (query.next())
-      output = query.value(0);
-  }
-
-  return output;
+  manifest.exec("CREATE TABLE IF NOT EXISTS gallery (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), parent_id INTEGER);");
+  manifest.exec("CREATE TABLE IF NOT EXISTS image (id INTEGER PRIMARY KEY AUTOINCREMENT, gallery_id INTEGER, name VARCHAR(150), file_name VARCHAR(150), description TEXT);");
 }
 
 bool MetaDataManager::driverAvailable()
@@ -170,9 +52,243 @@ bool MetaDataManager::driverAvailable()
   return QSqlDatabase::isDriverAvailable("QSQLITE");
 }
 
-MetaDataManager::~MetaDataManager()
+MetaDataManager *MetaDataManager::self()
 {
-  m_metadataFile.close();
+  if (!m_self)
+    m_self = new MetaDataManager;
+
+  return m_self;
+}
+
+ImageItem *MetaDataManager::registerGallery(const QString &name, int parentId)
+{
+  if (galleryExists(name, parentId))
+    qFatal("GCore::MetaDataManager::registerGallery: Tried to register a gallery with an existing name!");
+
+  QSqlQuery query;
+  query.prepare("INSERT INTO gallery (name, parent_id) VALUES (:name, :parentId)");
+  query.bindValue(":name", name);
+  query.bindValue(":parentId", parentId);
+  query.exec();
+
+  ImageItem *item = new ImageItem(query.lastInsertId().toInt(), ImageItem::Gallery);
+  item->setParentId(parentId);
+  return item;
+}
+
+ImageItem *MetaDataManager::registerImage(const QString &fileName, int galleryId)
+{
+  if (!galleryExists(galleryId))
+    qFatal("GCore::MetaDataManager::registerImage: Tried to register an image with invalid galleryId. Terminating!");
+
+  if (imageExists(fileName, galleryId)){
+    qFatal("GCore::MetaDataManager::registerImage: Tried to register an image with an existing name!");
+    return 0;
+  }
+
+  QSqlQuery query;
+  query.prepare("INSERT INTO image (gallery_id, name, file_name) VALUES (:galleryId, :name, :fileName)");
+  query.bindValue(":galleryId", galleryId);
+  query.bindValue(":name", fileName);
+  query.bindValue(":fileName", fileName);
+  query.exec();
+
+  ImageItem *item = new ImageItem(query.lastInsertId().toInt(), ImageItem::Image);
+  item->setParentId(galleryId);
+  return item;
+}
+
+int MetaDataManager::galleryId(const QString &name, int parentId)
+{
+  QSqlQuery query;
+  query.prepare("SELECT id FROM gallery WHERE name = ? AND parent_id = ? LIMIT 1;");
+  query.addBindValue(name);
+  query.addBindValue(parentId);
+  query.exec();
+
+  if (query.next())
+    return query.value(0).toInt();
+
+  return -1;
+}
+
+int MetaDataManager::imageId(const QString &name, int galleryId)
+{
+  QSqlQuery query;
+  query.prepare("SELECT id FROM image WHERE name = ? AND gallery_id = ?;");
+  query.addBindValue(name);
+  query.addBindValue(galleryId);
+  query.exec();
+
+  if (query.next())
+    return query.value(0).toInt();
+
+  return -1;
+}
+
+QString MetaDataManager::fileName(int id) const
+{
+  QSqlQuery query;
+  query.prepare("SELECT file_name FROM image WHERE id = ?;");
+  query.addBindValue(id);
+  query.exec();
+
+  if (query.next())
+    return query.value(0).toString();
+
+  return QString();
+}
+
+QString MetaDataManager::galleryName(int id) const
+{
+  QSqlQuery query;
+  query.prepare("SELECT name FROM gallery WHERE id = ?;");
+  query.addBindValue(id);
+  query.exec();
+
+  if (query.next())
+    return query.value(0).toString();
+
+  return QString();
+}
+
+QString MetaDataManager::imageName(int id) const
+{
+  QSqlQuery query;
+  query.prepare("SELECT name FROM image WHERE id = ?;");
+  query.addBindValue(id);
+  query.exec();
+
+  if (query.next())
+    return query.value(0).toString();
+
+  return QString();
+}
+
+bool MetaDataManager::setGalleryName(int id, const QString &name, const QString &path) const
+{
+  QDir gallery(path);
+  if (!gallery.rename(galleryName(id), name))
+    return false;
+
+  QSqlQuery query;
+  query.prepare("UPDATE gallery SET name = ? WHERE id = ?;");
+  query.addBindValue(name);
+  query.addBindValue(id);
+  query.exec();
+
+  return true;
+}
+
+void MetaDataManager::setImageName(int id, const QString &name) const
+{
+  QSqlQuery query;
+  query.prepare("UPDATE image SET name = ? WHERE id = ?;");
+  query.addBindValue(name);
+  query.addBindValue(id);
+  query.exec();
+}
+
+QString MetaDataManager::imageDescription(int id) const
+{
+  QSqlQuery query;
+  query.prepare("SELECT description FROM image WHERE id = ?;");
+  query.addBindValue(id);
+  query.exec();
+
+  if (query.next())
+    return query.value(0).toString();
+
+  return QString();
+}
+
+void MetaDataManager::setDescription(int id, const QString &description) const
+{
+  QSqlQuery query;
+  query.prepare("UPDATE image SET description = ? WHERE id = ?;");
+  query.addBindValue(description);
+  query.addBindValue(id);
+  query.exec();
+}
+
+bool MetaDataManager::galleryExists(const QString &fileName, int parentId)
+{
+  return galleryId(fileName, parentId) != -1;
+}
+
+bool MetaDataManager::galleryExists(int galleryId)
+{
+  QSqlQuery query;
+  query.prepare("SELECT id FROM gallery WHERE id = ?;");
+  query.addBindValue(galleryId);
+  query.exec();
+
+  return query.next();
+}
+
+bool MetaDataManager::imageExists(const QString &name, int galleryId)
+{
+  QSqlQuery query;
+  query.prepare("SELECT id FROM image WHERE name = ? AND galleryId = ?;");
+  query.addBindValue(name);
+  query.addBindValue(galleryId);
+  query.exec();
+
+  return query.next();
+}
+
+ImageItem *MetaDataManager::readManifest()
+{
+  ImageItem *root = new ImageItem(-1, ImageItem::Root);
+
+  QQueue<ImageItem*> queue;
+  QList<ImageItem*> galleryList;
+  galleryList << root;
+
+  QSqlQuery galleries("SELECT id, parent_id FROM gallery;");
+
+  while (galleries.next()) {
+    int id = galleries.value(0).toInt();
+    int parentId = galleries.value(1).toInt();
+
+    ImageItem *gallery = new ImageItem(id, ImageItem::Gallery);
+
+    foreach (ImageItem *item, galleryList) {
+      if (item->id() == parentId) {
+        item->appendChild(gallery);
+        break;
+      }
+    }
+
+    galleryList << gallery;
+
+    if (!gallery->parent())
+      queue.enqueue(gallery);
+
+    imageList(gallery);
+  }
+
+  while (!queue.isEmpty()) {
+    ImageItem *gallery = queue.dequeue();
+    foreach (ImageItem *item, galleryList) {
+      if (item->id() == gallery->id()) {
+        item->appendChild(gallery);
+        break;
+      }
+    }
+  }
+
+  return root;
+}
+
+void MetaDataManager::imageList(ImageItem *gallery) const
+{
+  QSqlQuery query("SELECT id FROM image WHERE gallery_id = " + QString::number(gallery->id()) + ";");
+
+  while (query.next()) {
+    ImageItem *image = new ImageItem(query.value(0).toInt(), ImageItem::Image);
+    gallery->appendChild(image);
+  }
 }
 
 }

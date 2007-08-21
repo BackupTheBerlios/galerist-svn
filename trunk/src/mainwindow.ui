@@ -201,15 +201,15 @@
        <property name="autoExpandDelay" >
         <number>1</number>
        </property>
+       <property name="animated" >
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
    </widget>
   </widget>
   <widget class="QToolBar" name="mainBar" >
-   <property name="enabled" >
-    <bool>false</bool>
-   </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
@@ -482,12 +482,12 @@
    <slot>setRootIndex(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>167</x>
-     <y>268</y>
+     <x>158</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>459</x>
-     <y>265</y>
+     <x>421</x>
+     <y>261</y>
     </hint>
    </hints>
   </connection>

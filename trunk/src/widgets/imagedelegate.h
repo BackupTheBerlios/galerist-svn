@@ -49,7 +49,12 @@ class ImageDelegate : public QItemDelegate
     QPen m_normalBorder;
     QPen m_hoverBorder;
 
-    void drawBackground(QPainter *painter, const QStyleOptionViewItem &option) const;
+    QLinearGradient m_normalGradientGallery;
+    QLinearGradient m_hoverGradientGallery;
+    QPen m_normalBorderGallery;
+    QPen m_hoverBorderGallery;
+
+    void drawBackground(QPainter *painter, const QStyleOptionViewItem &option, int type) const;
     void drawPixmap(QPainter *painter, const QStyleOptionViewItem &option, const QPixmap &pixmap) const;
     void drawMask(QPainter *painter, const QRect &rect) const;
 

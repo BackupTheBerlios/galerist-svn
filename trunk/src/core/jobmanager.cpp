@@ -20,9 +20,14 @@
  ***************************************************************************/
 #include "jobmanager.h"
 
+#include <QtCore/QDateTime>
+#include <QtCore/QCryptographicHash>
+
 #include <QtGui/QApplication>
 
-#include "core/jobs/abstractjob.h"
+#include "core/data.h"
+
+#include "core/jobs/createjob.h"
 
 using namespace GCore::GJobs;
 
@@ -38,7 +43,6 @@ JobManager::JobManager()
 
 JobManager::~JobManager()
 {
-  qDebug("quaba!");
   stop();
 
   foreach (AbstractJob *job, m_jobHash) {
@@ -50,18 +54,29 @@ JobManager::~JobManager()
   wait();
 }
 
-QObject *JobManager::registerJob(const QString &jobName, AbstractJob *job)
+void JobManager::registerJob(const QString &jobName, AbstractJob *job)
 {
   m_mutex.lock();
   m_jobHash.insert(jobName, job);
   m_mutex.unlock();
-
-  return job;
 }
 
-QObject *JobManager::registerJob(const QString &jobName, QObject *job)
+void JobManager::registerJob(const QString &jobName, QObject *job)
 {
-  return registerJob(jobName, static_cast<AbstractJob*> (job));
+  registerJob(jobName, static_cast<AbstractJob*> (job));
+}
+
+QString JobManager::createGalleryJob(const QString &name, const QModelIndex &parent, const QString &source, const QStringList &images, bool deleteSource)
+{
+  qsrand(time(0));
+  QString hash = QCryptographicHash::hash(QString(QString::number(qrand()) + QString::number(time(0))).toAscii(), QCryptographicHash::Md5);
+
+  CreateJob *job = new CreateJob(name, parent, source, images, deleteSource, this);
+  registerJob(hash, job);
+
+  connect(job, SIGNAL(finished(ImageItem*)), Data::self()->imageModel(), SLOT(addItem(ImageItem*)));
+
+  return hash;
 }
 
 void JobManager::startJob(const QString &jobName)

@@ -26,13 +26,12 @@
 #include <QtCore/QMutex>
 #include <QtCore/QStringList>
 
+#include "core/jobs/abstractjob.h"
+
+class QModelIndex;
+
 namespace GCore
 {
-
-namespace GJobs
-{
-class AbstractJob;
-}
 
 /**
  * @short Manages the jobs and acts as a job storage class.
@@ -60,8 +59,10 @@ class JobManager : public QThread
      *
      * @return Pointer to the job.
      */
-    QObject *registerJob(const QString &jobName, GJobs::AbstractJob *job);
-    QObject *registerJob(const QString &jobName, QObject *job);
+    void registerJob(const QString &jobName, GJobs::AbstractJob *job);
+    void registerJob(const QString &jobName, QObject *job);
+
+    QString createGalleryJob(const QString &name, const QModelIndex &parentItem, const QString &source, const QStringList &images, bool deleteSource);
 
     /**
      * Starts the job.

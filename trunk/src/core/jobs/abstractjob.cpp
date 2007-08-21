@@ -41,7 +41,7 @@ AbstractJob::AbstractJob(QObject *parent)
     m_paused(false)
 {
   // Connect with the error handler.
-  connect(this, SIGNAL(signalFailed(const QString&, int)), Data::self()->value(Data::ErrorHandler).value<QObject*>(), SLOT(slotReporter(const QString&, int)));
+  connect(this, SIGNAL(failed(const QString&, int)), Data::self()->value(Data::ErrorHandler).value<QObject*>(), SLOT(slotReporter(const QString&, int)));
   connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(terminate()));
 }
 
@@ -73,7 +73,7 @@ void AbstractJob::run()
 {
   job();
   if (m_stop)
-    emit signalProgress(0, -1, QString(), QImage());
+    emit progress(0, -1, QString(), QImage());
 }
 
 bool AbstractJob::getStop()

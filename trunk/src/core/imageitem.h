@@ -23,6 +23,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QVariant>
+#include <QtCore/QDir>
 
 class QImage;
 class QRect;
@@ -48,19 +49,17 @@ class ImageItem
       Image
   };
 
-    /**
-     * Class constructor.
-     *
-     * @param path The location of this image item relative to it's parent
-     * @param parent Optional pointer to the parent item
-     * @param type Optional image item type
-     */
-    ImageItem(const QString &path, ImageItem *parent = 0, Type type = Image);
+    ImageItem(int id, Type type);
 
     /**
      * Class destructor.
      */
     ~ImageItem();
+
+    int id() const;
+
+    void setParent(ImageItem *parent);
+    void setParentId(int id);
 
     /**
      * Appends a child.
@@ -90,20 +89,6 @@ class ImageItem
      */
     int childCount() const;
     /**
-     * Number of columns (the different data).
-     *
-     * @return Number of columns.
-     */
-    int columnCount() const;
-    /**
-     * Gets the data at the column.
-     *
-     * @param column Column of which the data we need.
-     *
-     * @return The data.
-     */
-    QVariant data(int column) const;
-    /**
      * The row number of this item at parent's child list.
      *
      * @return Row.
@@ -116,26 +101,26 @@ class ImageItem
      */
     ImageItem *parent() const;
 
+    int parentId() const;
+
     /**
      * Additional methods, for gathering additional information.
      */
-    Type imageType() const;
+    Type type() const;
 
-    /**
-     * Change the file path.
-     *
-     * @param path New file path
-     */
-    void setFilePath(const QString &path);
+    QDir dir() const;
 
     QString path() const;
+    QString absolutePath() const;
 
     /**
      * Get the full file path.
      *
-     * @return A full path comprised of this item's path and the parent's path
+     * @return A relative path comprised of this item's path and the parent's path
      */
     QString filePath() const;
+
+    QString absoluteFilePath() const;
 
     /**
      * Get only the filename associated with this item.
@@ -144,7 +129,11 @@ class ImageItem
      */
     QString fileName() const;
 
+    QDir thumbDir() const;
+
     QString thumbPath() const;
+
+    QString absoluteThumbPath() const;
 
     /**
      * Get the thumbnail name (diference betwen fileName and thumbName is in the extension!).
@@ -152,13 +141,6 @@ class ImageItem
      * @return Name of the thumbnail image
      */
     QString thumbName() const;
-
-    /**
-     * Returns the MetaData manager.
-     *
-     * @return Reference to the MetaData manager.
-     */
-    MetaDataManager *metadata() const;
 
     /**
      * Returns item's name.
@@ -185,30 +167,19 @@ class ImageItem
     void setDescription(const QString &description);
 
     /**
-     * Removes the item from the metadata.
-     *
-     * @return @c true Removal was successful.
-     * @return @c false Removal was unsuccesful.
-     */
-    bool remove();
-
-    /**
      * Rotates for degrees into clock-wise direction.
      */
     void rotate(short degrees);
 
-    QImage previewCW();
-    QImage previewCCW();
+    QImage previewRotate(short degrees);
 
   private:
     QList<ImageItem*> m_childItems;
 
     // Additional information
     ImageItem *m_parentItem;
+    int m_parentId;
     Type m_type;
-    QString m_path;
-    QString m_fileName;
-    MetaDataManager *m_metadata;
     int m_id;
 
     QTemporaryFile *m_tempImage;

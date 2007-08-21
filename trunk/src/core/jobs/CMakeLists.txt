@@ -2,14 +2,14 @@ include(${QT_USE_FILE})
 
 set(jobs_SRCS
   abstractjob.cpp
-  copyjob.cpp
+  createjob.cpp
   readjob.cpp
   movejob.cpp
 )
 
 SET(jobs_MOC_HDRS
   abstractjob.h
-  copyjob.h
+  createjob.h
   readjob.h
   movejob.h
 )
