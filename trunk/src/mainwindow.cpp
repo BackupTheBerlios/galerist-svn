@@ -267,7 +267,7 @@ void MainWindow::timerEvent(QTimerEvent*)
 void MainWindow::openProperties(const QModelIndex &index)
 {
   if (index.data(ImageModel::ImageTypeRole).toInt() == ImageItem::Gallery) {
-    albumView->checkSelection(Data::self()->galleryProxy()->mapFromSource(Data::self()->imageModel()->index(index.row(), index.column(), index.parent())));
+    albumView->checkSelection(Data::self()->galleryProxy()->mapFromSource(index));
     imageList->setRootIndex(index);
     return;
   }
