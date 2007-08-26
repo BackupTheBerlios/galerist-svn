@@ -57,12 +57,7 @@ void CopyPage::initializePage()
     parentGallery = Data::self()->imageModel()->findGallery(field("ParentGallery").toString());
 
   // We copy the images to the right place
-//  QString hash = Data::self()->imageModel()->createGallery(field("GalleryName").toString(), field("GalleryPath").toString(), parentGallery, field("DeleteSourceImages").toBool());
-  QString hash = JobManager::self()->createGalleryJob(field("GalleryName").toString(), parentGallery, field("GalleryPath").toString(), QStringList(), field("DeleteSourceImages").toBool());
-  //connect(JobManager::self()->job(hash), SIGNAL(finished(ImageItem*)), this, SLOT(addItem(ImageItem*)));
-
-  // Connect the gallery handler.
-  //qRegisterMetaType<QImage>("QImage");
+  QString hash = JobManager::self()->createGalleryJob(field("GalleryName").toString(), parentGallery, field("GalleryPath").toString(), m_prefedinedImages, field("DeleteSourceImages").toBool());
 
   connect(JobManager::self()->job(hash), SIGNAL(progress(int, int, const QString&, const QImage&)), this, SLOT(slotProgress(int, int, const QString&, const QImage&)));
 

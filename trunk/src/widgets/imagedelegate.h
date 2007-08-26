@@ -37,8 +37,6 @@ class ImageDelegate : public QItemDelegate
   public:
     ImageDelegate(QObject *parent = 0);
 
-    ~ImageDelegate();
-
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;

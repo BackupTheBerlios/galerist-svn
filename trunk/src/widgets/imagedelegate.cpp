@@ -40,6 +40,8 @@ namespace GWidgets
 ImageDelegate::ImageDelegate(QObject *parent)
     : QItemDelegate(parent)
 {
+  setClipping(false);
+
   QLinearGradient normalGradient(QPoint(0, 0), QPoint(0, 160));
   normalGradient.setColorAt(0, QColor(228, 241, 247));
   normalGradient.setColorAt(0.5, QColor(240, 249, 254));
@@ -69,13 +71,12 @@ ImageDelegate::ImageDelegate(QObject *parent)
   m_hoverBorderGallery = QPen(QColor(235, 201, 137));
 }
 
-ImageDelegate::~ImageDelegate()
-{}
-
 void ImageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+  if (!index.isValid())
+    return;
+  
   painter->save();
-  painter->setClipRect(option.rect, Qt::NoClip);
 
   // Display background
   drawBackground(painter, option, index.data(ImageModel::ImageTypeRole).toInt());

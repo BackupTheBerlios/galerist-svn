@@ -31,8 +31,10 @@
 #include <QtGui/QPainter>
 
 #include "core/imagemodel.h"
-#include "core/imageitem.h"
 #include "core/data.h"
+#include "core/jobmanager.h"
+
+#include "widgets/imageaddprogress.h"
 
 using namespace GCore;
 
@@ -54,10 +56,13 @@ void GalleryTreeView::slotDelete()
 {
   QModelIndex selectedGallery = Data::self()->galleryProxy()->mapToSource(selectedIndexes().first());
 
-  emit clicked(QModelIndex());
+  //emit clicked(QModelIndex());
 
-  if (QMessageBox::question(0, tr("Confirm deletion"), tr("Are you sure you want to delete %1?").arg(selectedGallery.data().toString()), tr("Delete"), tr("Keep"), QString(), 1, 1) == 0)
-    static_cast<ImageModel*>(static_cast<QSortFilterProxyModel*>(model())->sourceModel())->removeGallery(selectedGallery);
+  if (QMessageBox::question(0, tr("Confirm deletion"), tr("Are you sure you want to delete %1?").arg(selectedGallery.data(ImageModel::ImageNameRole).toString()), tr("Delete"), tr("Keep"), QString(), 1, 1) == 0) {
+    QString job = JobManager::self()->deleteGallery(selectedGallery);
+    connect(JobManager::self()->job(job), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString &, const QImage &)));
+    JobManager::self()->startJob(job);
+  }
 }
 
 void GalleryTreeView::checkSelection(const QModelIndex &selected)

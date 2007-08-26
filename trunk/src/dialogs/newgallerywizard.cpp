@@ -28,6 +28,8 @@
 
 #include <QtGui/QMessageBox>
 
+using namespace GWidgets::GWizard;
+
 namespace GDialogs
 {
 
@@ -42,9 +44,11 @@ NewGalleryWizard::NewGalleryWizard(const QString &path, const QStringList &image
 {
   setupUi();
 
-  GWidgets::GWizard::SelectionPage *selectionPage = static_cast<GWidgets::GWizard::SelectionPage*>(page(m_selectionPage));
+  SelectionPage *selectionPage = static_cast<SelectionPage*>(page(m_selectionPage));
+  CopyPage *copyPage = static_cast<CopyPage*>(page(m_copyPage));
 
   selectionPage->setPredefinedImages(path, images);
+  copyPage->setPredefinedImages(path, images);
 }
 
 NewGalleryWizard::~NewGalleryWizard()
@@ -53,16 +57,16 @@ NewGalleryWizard::~NewGalleryWizard()
 void NewGalleryWizard::reject()
 {
   if (currentId() == m_copyPage)
-    static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->pauseCopy();
+    static_cast<CopyPage*>(currentPage())->pauseCopy();
 
   if (QMessageBox::question(0, tr("Confirm cancel"), tr("Are you sure you want to cancel this wizard?"), tr("Cancel"), tr("Continue"), QString(), 1, 1) == 0) {
     if (currentId() == m_copyPage) {
-      static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->stopCopy();
+      static_cast<CopyPage*>(currentPage())->stopCopy();
     }
     QWizard::reject();
   } else {
     if (currentId() == m_copyPage)
-      static_cast<GWidgets::GWizard::CopyPage*>(currentPage())->resumeCopy();
+      static_cast<CopyPage*>(currentPage())->resumeCopy();
   }
 }
 
@@ -74,11 +78,11 @@ void NewGalleryWizard::setupUi()
 
   setOption(QWizard::DisabledBackButtonOnLastPage);
 
-  addPage(new GWidgets::GWizard::WelcomePage);
-  m_selectionPage = addPage(new GWidgets::GWizard::SelectionPage);
-  addPage(new GWidgets::GWizard::SummaryPage);
-  m_copyPage = addPage(new GWidgets::GWizard::CopyPage);
-  addPage(new GWidgets::GWizard::FinishPage);
+  addPage(new WelcomePage);
+  m_selectionPage = addPage(new SelectionPage);
+  addPage(new SummaryPage);
+  m_copyPage = addPage(new CopyPage);
+  addPage(new FinishPage);
 
   setPixmap(QWizard::LogoPixmap, QPixmap(":/images/galerist.png").scaled(55, 55, Qt::KeepAspectRatio));
   setPixmap(QWizard::BannerPixmap, QPixmap(":/images/newgallerywizard-banner.png"));

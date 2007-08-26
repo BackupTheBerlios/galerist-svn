@@ -186,72 +186,12 @@ class ImageModel : public QAbstractItemModel
     void reconstruct();
 
     /**
-     * Adds images to the model
-     *
-     * @param parent Parent's index.
-     * @param sourcePath Self explanatory.
-     * @param fileNames List of images to copy and add.
-     *
-     * @return Reference to the job.
-     */
-    QObject *addImages(const QModelIndex &parent, const QString &sourcePath, const QStringList &fileNames = QStringList(), bool deleteSource = false);
-    /**
-     * Creates a gallery and adds it into the model.
-     *
-     * @param name Name of the gallery.
-     * @param sourcePath Self explanatory.
-     * @param parent Parent's index.
-     * @param fileNames List of image filenames that will be added to the new gallery.
-     */
-    //QString createGallery(const QString &name, const QString &sourcePath, const QModelIndex &parent = QModelIndex(), bool deleteSources = false, const QStringList &fileNames = QStringList());
-
-    /**
-     * Removes a gallery.
-     *
-     * @param index Gallery's index.
-     *
-     * @return @c true Removal was successful.
-     * @return @c false Removal was unsuccessful.
-     */
-    bool removeGallery(const QModelIndex &index);
-    /**
-     * Removes the images.
-     *
-     * @param indexList List of items to remove.
-     *
-     * @return Parent's index.
-     */
-    QModelIndex removeImages(const QModelIndexList &indexList);
-
-    /**
      * Method for getting list of childs.
      * @param parent Parent of childs.
      *
      * @return List of childs.
      */
     QModelIndexList childs(const QModelIndex &parent = QModelIndex());
-
-    /**
-     * A method to find if a file with the given filename allready exists.
-     * @param filename The searched filename.
-     * @param root The root in where you want to search for the filename. Defaults to the main root.
-     *
-     * @return @c true Filename is found, and it exists.
-     * @return @c false Filename isn't found.
-     */
-    bool checkName(const QString &filename, const QModelIndex &root = QModelIndex()) const;
-
-    /**
-     * Gets the list of all galleries in the model.
-     *
-     * @return List of galleries.
-     */
-    QStringList getGalleriesList();
-
-    /**
-     * Gets the list of image names.
-     */
-    QStringList imagesNames(const QModelIndex &parent);
 
     /**
      * Get the model index by name.
@@ -265,7 +205,7 @@ class ImageModel : public QAbstractItemModel
     /**
      * Stops the copy process.
      */
-    void stopCopy();
+    //void stopCopy();
 
   public slots:
   /**
@@ -274,6 +214,8 @@ class ImageModel : public QAbstractItemModel
    * @param fileName Name of the item.
    */
     void addItem(ImageItem *item);
+
+    void removeItem(const QModelIndex &index);
 
   protected:
 
@@ -290,32 +232,6 @@ class ImageModel : public QAbstractItemModel
      * @param path Path of the data to be parsed.
      */
     void setupModelData();
-    /**
-     * Parses a path and adds the items to a root.
-     *
-     * @param path Path of the potential items.
-     * @param root Root to which to add items. If null they will be added to the main root.
-     */
-    void processPath(const QDir &path, ImageItem *root = 0) const;
-
-    /**
-     * A recursive method for actualy getting the gallery list.
-     *
-     * @param root Root item.
-     *
-     * @return The gallery list.
-     */
-    QStringList processGalleriesList(ImageItem *root = 0);
-
-    /**
-     * A recursive method for searching a gallery by name.
-     *
-     * @param name Name of the gallery.
-     * @param parent Parent index.
-     *
-     * @return Index of the found gallery.
-     */
-    QModelIndex processGallerySearch(const QString &name, const QModelIndex &parent = QModelIndex());
 
     QModelIndex index(int itemId, ImageItem::Type type) const;
     QModelIndex index(ImageItem *item) const;

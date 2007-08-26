@@ -48,8 +48,8 @@ ImageItem::ImageItem(int id, Type type)
 
 ImageItem::~ImageItem()
 {
-  if (!m_childItems.isEmpty() && m_type != Image)
-    qDeleteAll(m_childItems.begin(), m_childItems.end());
+  if (!m_childItems.isEmpty())
+    qDeleteAll(m_childItems);
 }
 
 int ImageItem::id() const
@@ -224,10 +224,13 @@ void ImageItem::setDescription(const QString &description)
 
 void ImageItem::rotate(short degrees)
 {
+  if (!degrees)
+    return;
+
   QString file = absoluteFilePath();
   Magick::Image image;
   image.read(file.toStdString());
-  image.rotate(90);
+  image.rotate(degrees);
   image.write(file.toStdString());
 
   Magick::Blob buffer;

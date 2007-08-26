@@ -201,9 +201,6 @@
        <property name="autoExpandDelay" >
         <number>1</number>
        </property>
-       <property name="animated" >
-        <bool>true</bool>
-       </property>
       </widget>
      </item>
     </layout>

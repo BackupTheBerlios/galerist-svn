@@ -5,6 +5,8 @@ set(jobs_SRCS
   createjob.cpp
   readjob.cpp
   movejob.cpp
+  copyjob.cpp
+  deletejob.cpp
 )
 
 SET(jobs_MOC_HDRS
@@ -12,6 +14,8 @@ SET(jobs_MOC_HDRS
   createjob.h
   readjob.h
   movejob.h
+  copyjob.h
+  deletejob.h
 )
 
 QT4_WRAP_CPP(jobs_MOC_SRCS ${jobs_MOC_HDRS})

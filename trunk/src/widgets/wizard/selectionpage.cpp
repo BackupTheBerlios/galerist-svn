@@ -25,6 +25,7 @@
 
 #include "core/data.h"
 #include "core/imagemodel.h"
+#include "core/metadatamanager.h"
 
 #include "core/jobs/readjob.h"
 
@@ -78,11 +79,11 @@ void SelectionPage::initializePage()
     setField("GalleryName", "");
 
     // Add all available galleries
-    parentBox->addItems(Data::self()->imageModel()->getGalleriesList());
+    parentBox->addItems(MetaDataManager::self()->galleryList());
 
     nameEdit->setType(GWidgets::LineEdit::WithInternalVerify);
     nameEdit->setValidationMethod(GWidgets::LineEdit::InvalidStatesDefined);
-    nameEdit->addInvalidValues(Data::self()->imageModel()->getGalleriesList());
+    nameEdit->addInvalidValues(MetaDataManager::self()->galleryList());
     nameEdit->setErrorMessage(tr("Gallery allready exists. Please select a different name."));
 
     imagesEdit->setType(GWidgets::LineEdit::DirSelector);

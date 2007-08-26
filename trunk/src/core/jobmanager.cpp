@@ -28,6 +28,8 @@
 #include "core/data.h"
 
 #include "core/jobs/createjob.h"
+#include "core/jobs/copyjob.h"
+#include "core/jobs/deletejob.h"
 
 using namespace GCore::GJobs;
 
@@ -68,13 +70,48 @@ void JobManager::registerJob(const QString &jobName, QObject *job)
 
 QString JobManager::createGalleryJob(const QString &name, const QModelIndex &parent, const QString &source, const QStringList &images, bool deleteSource)
 {
-  qsrand(time(0));
-  QString hash = QCryptographicHash::hash(QString(QString::number(qrand()) + QString::number(time(0))).toAscii(), QCryptographicHash::Md5);
+  QString hash = createHash();
 
   CreateJob *job = new CreateJob(name, parent, source, images, deleteSource, this);
   registerJob(hash, job);
 
   connect(job, SIGNAL(finished(ImageItem*)), Data::self()->imageModel(), SLOT(addItem(ImageItem*)));
+
+  return hash;
+}
+
+QString JobManager::addImages(const QModelIndex &galleryIndex, const QStringList &images, bool deleteSource)
+{
+  QString hash = createHash();
+
+  CopyJob *job = new CopyJob(galleryIndex, images, deleteSource, this);
+  registerJob(hash, job);
+
+  connect(job, SIGNAL(process(ImageItem*)), Data::self()->imageModel(), SLOT(addItem(ImageItem*)));
+
+  return hash;
+}
+
+QString JobManager::deleteGallery(const QModelIndex &galleryIndex)
+{
+  QString hash = createHash();
+
+  DeleteJob *job = new DeleteJob(galleryIndex, this);
+  registerJob(hash, job);
+
+  connect(job, SIGNAL(remove(const QModelIndex&)), Data::self()->imageModel(), SLOT(removeItem(const QModelIndex&)));
+
+  return hash;
+}
+
+QString JobManager::deleteImages(const QModelIndexList &images)
+{
+  QString hash = createHash();
+
+  DeleteJob *job = new DeleteJob(images, this);
+  registerJob(hash, job);
+
+  connect(job, SIGNAL(remove(const QModelIndex&)), Data::self()->imageModel(), SLOT(removeItem(const QModelIndex&)));
 
   return hash;
 }
@@ -150,6 +187,12 @@ void JobManager::run()
       m_jobHash.remove(jobName);
     deletedJobs.clear();
   }
+}
+
+QString JobManager::createHash() const
+{
+  qsrand(time(0));
+  return QCryptographicHash::hash(QString(QString::number(qrand()) + QString::number(time(0))).toAscii(), QCryptographicHash::Md5);
 }
 
 }

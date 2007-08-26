@@ -18,55 +18,48 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "imageaddprogress.h"
+#ifndef GCORE_GJOBSDELETEJOB_H
+#define GCORE_GJOBSDELETEJOB_H
 
-#include <QtCore/QTimer>
+#include "core/jobs/abstractjob.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
+#include <QtCore/QModelIndex>
+#include <QtCore/QList>
 
-namespace GWidgets
+namespace GCore
 {
 
-ImageAddProgress::ImageAddProgress(QWidget *parent)
-    : QWidget(parent, Qt::ToolTip)
+namespace GJobs
 {
-  setupUi(this);
 
-  setWindowModality(Qt::NonModal);
-
-  QPoint position;
-  QRect desktop = QApplication::desktop()->screenGeometry();
-  position.setY(desktop.bottom() - 200);
-  position.setX(desktop.right() - 300);
-  move(position);
-
-  hide();
-}
-
-ImageAddProgress::~ImageAddProgress()
-{}
-
-void ImageAddProgress::setProgress(int finished, int total, const QString &currentName, const QImage &currentPixmap)
+/**
+ * @short Job for deleting galleries and images.
+ * @author Gregor Kališnik <gregor@unimatrix-one.org>
+ */
+class DeleteJob : public GCore::GJobs::AbstractJob
 {
-  show();
+    Q_OBJECT
+  signals:
+    void remove(const QModelIndex &item);
 
-  if (total == -1) {
-    nameLabel->setText(tr("Reading of pictures has been canceled."));
-    QTimer::singleShot(1000, this, SLOT(hide()));
-    return;
-  }
+  public:
+    DeleteJob(const QModelIndex &galleryIndex, QObject *parent = 0);
+    DeleteJob(const QModelIndexList &images, QObject *parent);
 
-  progressBar->setMaximum(total);
-  progressBar->setValue(finished);
-  nameLabel->setText(currentName);
-  if (!currentPixmap.isNull())
-    imageLabel->setPixmap(QPixmap::fromImage(currentPixmap).scaled(64, 64, Qt::KeepAspectRatio));
+  protected:
+    void job();
 
-  if (finished == total) {
-    nameLabel->setText(tr("Reading of pictures is successful."));
-    QTimer::singleShot(1000, this, SLOT(hide()));
-  }
+  private:
+    QModelIndex m_gallery;
+    QModelIndexList m_images;
+
+    void deleteGallery();
+    void deleteImages();
+
+};
+
 }
 
 }
+
+#endif

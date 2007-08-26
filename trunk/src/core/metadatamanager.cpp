@@ -22,10 +22,12 @@
 #include "metadatamanager.h"
 
 #include <QtCore/QQueue>
+#include <QtCore/QMutexLocker>
 
 #include <QtGui/QApplication>
 
 #include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
 
 #include "core/data.h"
 #include "core/imageitem.h"
@@ -43,8 +45,8 @@ MetaDataManager::MetaDataManager()
   manifest.setDatabaseName(Data::self()->galleriesDir().absoluteFilePath("manifest.db"));
   manifest.open();
 
-  manifest.exec("CREATE TABLE IF NOT EXISTS gallery (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100), parent_id INTEGER);");
-  manifest.exec("CREATE TABLE IF NOT EXISTS image (id INTEGER PRIMARY KEY AUTOINCREMENT, gallery_id INTEGER, name VARCHAR(150), file_name VARCHAR(150), description TEXT);");
+  manifest.exec("CREATE TABLE IF NOT EXISTS gallery (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100) UNIQUE, parent_id INTEGER);");
+  manifest.exec("CREATE TABLE IF NOT EXISTS image (id INTEGER PRIMARY KEY AUTOINCREMENT, gallery_id INTEGER, name VARCHAR(150) UNIQUE, file_name VARCHAR(150), description TEXT);");
 }
 
 bool MetaDataManager::driverAvailable()
@@ -64,6 +66,8 @@ ImageItem *MetaDataManager::registerGallery(const QString &name, int parentId)
 {
   if (galleryExists(name, parentId))
     qFatal("GCore::MetaDataManager::registerGallery: Tried to register a gallery with an existing name!");
+
+  QMutexLocker locker(&m_locker);
 
   QSqlQuery query;
   query.prepare("INSERT INTO gallery (name, parent_id) VALUES (:name, :parentId)");
@@ -86,6 +90,8 @@ ImageItem *MetaDataManager::registerImage(const QString &fileName, int galleryId
     return 0;
   }
 
+  QMutexLocker locker(&m_locker);
+
   QSqlQuery query;
   query.prepare("INSERT INTO image (gallery_id, name, file_name) VALUES (:galleryId, :name, :fileName)");
   query.bindValue(":galleryId", galleryId);
@@ -98,8 +104,54 @@ ImageItem *MetaDataManager::registerImage(const QString &fileName, int galleryId
   return item;
 }
 
+void MetaDataManager::unregisterGallery(int id, int parentId)
+{
+  QMutexLocker locker(&m_locker);
+
+  QList<int> galleriesList;
+  galleriesList << id;
+
+  QQueue<int> queue;
+  queue.enqueue(id);
+
+  while (!queue.isEmpty()) {
+  QSqlQuery galleries;
+  galleries.prepare("SELECT id FROM gallery WHERE parent_id = ?");
+  galleries.addBindValue(queue.dequeue());
+  galleries.exec();
+
+  while (galleries.next()) {
+    queue.enqueue(galleries.value(0).toInt());
+    galleriesList << galleries.value(0).toInt();
+  }
+  }
+
+  foreach (int galleryId, galleriesList) {
+    QSqlQuery query;
+  query.prepare("DELETE FROM gallery WHERE id = ?");
+  query.addBindValue(galleryId);
+  query.exec();
+
+  query.prepare("DELETE FROM image WHERE gallery_id = ?");
+  query.addBindValue(galleryId);
+  query.exec();
+  }
+}
+
+void MetaDataManager::unregisterImage(int id, int galleryId)
+{
+  QMutexLocker locker(&m_locker);
+
+  QSqlQuery query;
+  query.prepare("DELETE FROM image WHERE id = ? AND gallery_id = ?");
+  query.addBindValue(id);
+  query.addBindValue(galleryId);
+  query.exec();
+}
+
 int MetaDataManager::galleryId(const QString &name, int parentId)
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("SELECT id FROM gallery WHERE name = ? AND parent_id = ? LIMIT 1;");
   query.addBindValue(name);
@@ -114,6 +166,7 @@ int MetaDataManager::galleryId(const QString &name, int parentId)
 
 int MetaDataManager::imageId(const QString &name, int galleryId)
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("SELECT id FROM image WHERE name = ? AND gallery_id = ?;");
   query.addBindValue(name);
@@ -128,6 +181,7 @@ int MetaDataManager::imageId(const QString &name, int galleryId)
 
 QString MetaDataManager::fileName(int id) const
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("SELECT file_name FROM image WHERE id = ?;");
   query.addBindValue(id);
@@ -141,6 +195,7 @@ QString MetaDataManager::fileName(int id) const
 
 QString MetaDataManager::galleryName(int id) const
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("SELECT name FROM gallery WHERE id = ?;");
   query.addBindValue(id);
@@ -154,6 +209,7 @@ QString MetaDataManager::galleryName(int id) const
 
 QString MetaDataManager::imageName(int id) const
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("SELECT name FROM image WHERE id = ?;");
   query.addBindValue(id);
@@ -165,11 +221,44 @@ QString MetaDataManager::imageName(int id) const
   return QString();
 }
 
+QStringList MetaDataManager::imageList(int galleryId) const
+{
+  QMutexLocker locker(&m_locker);
+  QSqlQuery query;
+  query.prepare("SELECT name FROM image WHERE gallery_id = ?");
+  query.addBindValue(galleryId);
+  query.exec();
+
+  QStringList output;
+
+  while (query.next())
+    output << query.value(0).toString();
+
+  return output;
+}
+
+QStringList MetaDataManager::galleryList() const
+{
+  QMutexLocker locker(&m_locker);
+  QSqlQuery query;
+  query.prepare("SELECT name FROM gallery");
+  query.exec();
+
+  QStringList output;
+
+  while (query.next())
+    output << query.value(0).toString();
+
+  return output;
+}
+
 bool MetaDataManager::setGalleryName(int id, const QString &name, const QString &path) const
 {
   QDir gallery(path);
   if (!gallery.rename(galleryName(id), name))
     return false;
+
+  QMutexLocker locker(&m_locker);
 
   QSqlQuery query;
   query.prepare("UPDATE gallery SET name = ? WHERE id = ?;");
@@ -182,6 +271,7 @@ bool MetaDataManager::setGalleryName(int id, const QString &name, const QString 
 
 void MetaDataManager::setImageName(int id, const QString &name) const
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("UPDATE image SET name = ? WHERE id = ?;");
   query.addBindValue(name);
@@ -191,6 +281,7 @@ void MetaDataManager::setImageName(int id, const QString &name) const
 
 QString MetaDataManager::imageDescription(int id) const
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("SELECT description FROM image WHERE id = ?;");
   query.addBindValue(id);
@@ -204,6 +295,7 @@ QString MetaDataManager::imageDescription(int id) const
 
 void MetaDataManager::setDescription(int id, const QString &description) const
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("UPDATE image SET description = ? WHERE id = ?;");
   query.addBindValue(description);
@@ -218,6 +310,7 @@ bool MetaDataManager::galleryExists(const QString &fileName, int parentId)
 
 bool MetaDataManager::galleryExists(int galleryId)
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
   query.prepare("SELECT id FROM gallery WHERE id = ?;");
   query.addBindValue(galleryId);
@@ -228,8 +321,9 @@ bool MetaDataManager::galleryExists(int galleryId)
 
 bool MetaDataManager::imageExists(const QString &name, int galleryId)
 {
+  QMutexLocker locker(&m_locker);
   QSqlQuery query;
-  query.prepare("SELECT id FROM image WHERE name = ? AND galleryId = ?;");
+  query.prepare("SELECT id FROM image WHERE name = ? AND gallery_id = ?;");
   query.addBindValue(name);
   query.addBindValue(galleryId);
   query.exec();
@@ -239,6 +333,7 @@ bool MetaDataManager::imageExists(const QString &name, int galleryId)
 
 ImageItem *MetaDataManager::readManifest()
 {
+  QMutexLocker locker(&m_locker);
   ImageItem *root = new ImageItem(-1, ImageItem::Root);
 
   QQueue<ImageItem*> queue;

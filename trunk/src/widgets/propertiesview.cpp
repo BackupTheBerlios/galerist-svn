@@ -31,6 +31,7 @@
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
+#include "core/metadatamanager.h"
 
 using namespace GCore;
 
@@ -99,7 +100,7 @@ void PropertiesView::updateData()
   m_oldDescription = description;
   m_rotation = 0;
 
-  QStringList invalidValues = Data::self()->imageModel()->imagesNames(m_currentIndex.parent());
+  QStringList invalidValues = MetaDataManager::self()->imageList(m_currentIndex.parent().data(ImageModel::IdRole).toInt());
   invalidValues.removeAll(name);
   ui.nameEdit->setInvalidValues(invalidValues);
 
@@ -108,7 +109,9 @@ void PropertiesView::updateData()
 
   QPixmap pixmap = QPixmap::fromImage(m_currentIndex.data(ImageModel::ImagePictureRole).value<QImage>());
 
-  pixmap = pixmap.scaled(512, 512, pixmap.height() > pixmap.width() ? Qt::KeepAspectRatio : Qt::KeepAspectRatioByExpanding);
+  if (pixmap.height() > 512 || pixmap.width() > 512)
+    pixmap = pixmap.scaled(512, 512, pixmap.height() > pixmap.width() ? Qt::KeepAspectRatio : Qt::KeepAspectRatioByExpanding);
+
   ui.photo->setPixmap(pixmap);
 }
 

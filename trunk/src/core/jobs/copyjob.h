@@ -18,115 +18,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GJOBSCOPYJOB_H
-#define GJOBSCOPYJOB_H
+#ifndef GCORE_GJOBSCOPYJOB_H
+#define GCORE_GJOBSCOPYJOB_H
+
+#include "core/jobs/abstractjob.h"
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QStringList>
 
-#include "core/jobs/abstractjob.h"
-
-class QDir;
-
 namespace GCore
 {
-class ImageItem;
 
+  class ImageItem;
+  
 namespace GJobs
 {
 
 /**
- * @short Class for copiing images.
+ * @short Job for copiing new images.
  * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
 class CopyJob : public GCore::GJobs::AbstractJob
 {
     Q_OBJECT
   signals:
-    /**
-     * Signal for reporting process.
-     *
-     * @param name Name of the processed image.
-     */
-    void signalProcess(const QString &name);
+    void process(ImageItem *image);
 
   public:
-    /**
-     * Defines what kind of copy to use.
-     */
-    enum CopyMode
-    {
-      /** Copy only one image. */
-      SingleMode,
-      /** Copy whole bunch of images. */
-      MultiMode
-  };
-
-    /**
-     * A constructor for copiing the whole folder.
-     *
-     * @param source Source path.
-     * @param destination Destination path.
-     * @param gallery Index of the gallery to which the images will be added.
-     * @param parent Parent of this job.
-     */
-    CopyJob(const QString &source, const QString &destination, const QModelIndex &gallery, bool deleteSource = false, QObject *parent = 0);
-    /**
-     * A constructor for copiing a list of images.
-     *
-     * @param source Source path.
-     * @param fileNames List of files to copy.
-     * @param destination Destination path.
-     * @param gallery Index of the gallery to which the images will be added.
-     * @param parent Parent of this job.
-     */
-    CopyJob(const QString &source, const QStringList &fileNames, const QString &destination, const QModelIndex &gallery, QObject *parent = 0);
-
-    /**
-     * Returns the index of the destination gallery.
-     *
-     * @return Gallery index.
-     */
-    QModelIndex getGalleryIndex();
-
-    /**
-     * A destructor.
-     */
-    ~CopyJob();
+    CopyJob(const QModelIndex &galleryIndex, const QStringList &images, bool deleteSources = false, QObject *parent = 0);
 
   protected:
-    /**
-     * Reimplemented method to define the work process.
-     */
     void job();
-
+    
   private:
-    //Copy methods.
-    /**
-     * The copy process for copiing the whole folder.
-     */
-    void multiCopy();
-    /**
-     * The copy process for a list of files.
-     */
-    void singleCopy();
-
-    /**
-     * Deletes the copied images.
-     */
-    void deleteSourceImages(const QStringList &images);
-
-    //Variables.
-    QDir *m_source;
-    QDir *m_destination;
-    QStringList m_fileNames;
-    QModelIndex m_gallery;
-    CopyMode m_mode;
-    bool m_deleteSource;
+    QModelIndex m_galery;
+    QStringList m_images;
+    bool m_deleteSources;
 
 };
 
 }
+
 }
 
 #endif

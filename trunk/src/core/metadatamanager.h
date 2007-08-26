@@ -22,8 +22,9 @@
 #define GCOREMETADATAMANAGER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 
-#include <QtSql>
+//#include <QtSql>
 
 namespace GCore
 {
@@ -54,6 +55,9 @@ class MetaDataManager : public QObject
     ImageItem *registerGallery(const QString &name, int parentId = -1);
     ImageItem *registerImage(const QString &name, int galleryId);
 
+    void unregisterGallery(int id, int parentId);
+    void unregisterImage(int id, int galleryId);
+
     int galleryId(const QString &name, int parentId = -1);
     int imageId(const QString &name, int parentId);
 
@@ -61,6 +65,9 @@ class MetaDataManager : public QObject
 
     QString galleryName(int id) const;
     QString imageName(int id) const;
+
+    QStringList imageList(int galleryId) const;
+    QStringList galleryList() const;
 
     bool setGalleryName(int id, const QString &name, const QString &path) const;
     void setImageName(int id, const QString &name) const;
@@ -79,6 +86,8 @@ class MetaDataManager : public QObject
     static MetaDataManager *m_self;
 
     inline void imageList(ImageItem *gallery) const;
+
+    mutable QMutex m_locker;
 
 };
 

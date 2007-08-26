@@ -27,6 +27,7 @@
 #include <QtGui/QApplication>
 #include <QtCore/QTranslator>
 #include <QtCore/QTextCodec>
+#include <QtCore/QModelIndex>
 
 #include "mainwindow.h"
 
@@ -36,6 +37,8 @@
 
 int main(int argc, char *argv[])
 {
+  qRegisterMetaType<QModelIndex>("QModelIndex");
+
   QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 

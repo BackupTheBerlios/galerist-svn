@@ -21,174 +21,66 @@
 #include "copyjob.h"
 
 #include <QtCore/QDir>
-#include <QtCore/QStringList>
-#include <QtGui/QImage>
-#include <QtCore/QModelIndex>
-#include <QtCore/QFileInfo>
 
-#include "core/data.h"
-#include "core/errorhandler.h"
 #include "core/imagemodel.h"
+#include "core/metadatamanager.h"
+#include "core/data.h"
 
 namespace GCore
 {
+
 namespace GJobs
 {
 
-CopyJob::CopyJob(const QString &source, const QString &destination, const QModelIndex &gallery, bool deleteSource, QObject *parent)
+CopyJob::CopyJob(const QModelIndex &galleryIndex, const QStringList &images, bool deleteSources, QObject *parent)
     : GCore::GJobs::AbstractJob(parent),
-    m_source(new QDir(source)),
-    m_destination(new QDir(destination)),
-    m_gallery(gallery),
-    m_mode(MultiMode),
-    m_deleteSource(deleteSource)
+    m_galery(galleryIndex),
+    m_images(images),
+             m_deleteSources(deleteSources)
 {}
-
-CopyJob::CopyJob(const QString &source, const QStringList &fileNames, const QString &destination, const QModelIndex &gallery, QObject *parent)
-    : GCore::GJobs::AbstractJob(parent),
-    m_source(new QDir(source)),
-    m_destination(new QDir(destination)),
-    m_fileNames(fileNames),
-    m_gallery(gallery),
-    m_mode(SingleMode),
-    m_deleteSource(false)
-{}
-
-QModelIndex CopyJob::getGalleryIndex()
-{
-  return m_gallery;
-}
 
 void CopyJob::job()
 {
-  switch (m_mode) {
-    case(SingleMode): {
-      singleCopy();
-      return;
-    }
-    case(MultiMode): {
-      multiCopy();
-      return;
-    }
-    default: {
-      emit signalFailed(tr("Copy mode undefined."), ErrorHandler::Critical);
-      return;
-    }
-  }
-}
-
-void CopyJob::multiCopy()
-{
-  bool failure = false;
-  // Get the list of images we need to copy.
-  QStringList imageFiles;
-  imageFiles = m_source->entryList(Data::self()->value(Data::ImageFormats).toStringList());
-
-  // Count how many images we need to copy.
-  int numberImages = imageFiles.count() - 1;
-
-  // If there is no files to copy.. Why bothering going into the for loop at all?
-  if (imageFiles.isEmpty()) {
-    emit signalProgress(1, 1, "None", QImage());
+  if (!m_galery.isValid()) {
+    qWarning("GCore::GJobs::CopyJob::job: Wrong gallery index used!");
     return;
   }
 
-  // Create a directory for thumbnails.
-  QDir thumbnailPath(*m_destination);
-  if (!thumbnailPath.cd(".thumbnails")) {
-    thumbnailPath.mkdir(".thumbnails");
-    thumbnailPath.cd(".thumbnails");
-  }
+  QDir destinationDir = m_galery.data(ImageModel::ImagePathRole).toString();
+  destinationDir.cd(m_galery.data(ImageModel::ImageNameRole).toString());
 
-  // Copy files.
-  for (int count = 0; count <= numberImages; count++) {
-    while (getStop() || m_paused) {
-      if (getStop()) {
-        // deleteCopied();
-        emit signalProcess(QString());
-        emit signalProgress(count, numberImages, QString(), QImage());
-        failure = true;
-        break;
-      }
-      usleep(10);
-    }
+  QDir thumbnailDir = destinationDir;
+  thumbnailDir.cd("thumbnails");
 
-    // If the file is 0 in size, it's a fake (need to get a better verification process)
-    if (QFileInfo(*m_source, imageFiles.at(count)).size() == 0 || !imageFiles.at(count).contains(Data::self()->supportedFormats())) {
-      emit signalProgress(count, numberImages, imageFiles.at(count), QImage());
-      continue;
-    }
+  QDir sourceDir = m_images.at(0);
+  sourceDir.cdUp();
 
-    // Create the thumbnail
-    QImage image = QImage(m_source->absoluteFilePath(imageFiles.at(count))).scaled(128, 128, Qt::KeepAspectRatio);
+  int galleryId = m_galery.data(ImageModel::IdRole).toInt();
 
-    // Send the progress Signal
-    emit signalProgress(count, numberImages, imageFiles.at(count), image);
+  int processed = 0;
+  int total = m_images.count();
 
-    // Add the picture to the metadata database and get the new filename
-    QString fileName = imageFiles.at(count);
+  QList<ImageItem*> processedImages;
 
-    // Save the thumbnail
-    QString thumbName = fileName;
-    image.save(thumbnailPath.absoluteFilePath(thumbName.append(".jpg")), "JPG");
+  foreach (QString imagePath, m_images) {
+    QString imageName = imagePath;
+    imageName.remove(sourceDir.absolutePath()).remove("/");
 
-    // Copy the image.
-    if (!QFile::copy(m_source->absoluteFilePath(imageFiles.at(count)), m_destination->absoluteFilePath(fileName))) {
-      emit signalProcess(QString());
-      emit signalProgress(count, numberImages, QString("failed"), QImage());
-      stop();
-      failure = true;
-      //break;
-    }
-
-    // We finished with this picture. Notifying the model class
-    emit signalProcess(fileName);
-  }
-
-  if (failure || !m_deleteSource)
-    return;
-
-  QStringList images;
-  foreach(QString image, imageFiles)
-  images << m_source->absoluteFilePath(image);
-
-  deleteSourceImages(images);
-}
-
-void CopyJob::singleCopy()
-{
-  bool failure = false;
-  QStringList::const_iterator end = m_fileNames.constEnd();
-  int numberImages = m_fileNames.count();
-  int processed = 1;
-
-  QDir thumbnailPath(*m_destination);
-  if (!thumbnailPath.cd(".thumbnails")) {
-    thumbnailPath.mkdir(".thumbnails");
-    thumbnailPath.cd(".thumbnails");
-  }
-
-  for (QStringList::const_iterator count = m_fileNames.constBegin(); count != end; count++) {
-    if (getStop()) {
-      emit signalProgress(processed, numberImages, QString(), QImage());
-      break;
-    }
-
-    // If the file is 0 in size, it's a fake (need to get a better verification process)
-    if (QFileInfo(*m_source, *count).size() == 0 || !(*count).contains(Data::self()->supportedFormats())) {
-      emit signalProgress(processed, numberImages, *count, QImage());
+    // If the file is 0 in size, it's a fake (need to get a better verification process), or it is not a supported image
+    if (QFileInfo(sourceDir, imageName).size() == 0 || !(imageName).contains(Data::self()->supportedFormats())) {
       processed++;
       continue;
     }
 
-    // Create the thumbnail
-    QImage image = QImage(m_source->absoluteFilePath(*count)).scaled(128, 128, Qt::KeepAspectRatio);
+    QImage image = QImage(imagePath).scaled(128, 128, Qt::KeepAspectRatio);
 
-    // Checks if the filename allready exists. And get a new filename
-    QString fileName = *count;
+    emit progress(processed, total, imageName, image);
+
+    // Checks if the filename already exists and get a new filename
+    QString fileName = imageName;
     int appendNumber = 0;
-    while (static_cast<const GCore::ImageModel*>(m_gallery.model())->checkName(fileName, m_gallery)) {
-      fileName = *count;
+    while (QFile::exists(destinationDir.absoluteFilePath(fileName))) {
+      fileName = imageName;
       if (fileName.indexOf('.', -4) != -1)
         fileName.insert(fileName.indexOf('.', -4), QString::number(appendNumber));
       else
@@ -196,39 +88,21 @@ void CopyJob::singleCopy()
       appendNumber++;
     }
 
-    // Send the progress Signal
-    emit signalProgress(processed, numberImages, *count, image);
+    QString thumbName = fileName + ".jpg";
 
-    // Save the thumbnail
-    QString thumbName = fileName;
-    image.save(thumbnailPath.absoluteFilePath(thumbName.append(".jpg")), "JPG");
-
-    // Copy the image.
-    if (!QFile::copy(m_source->absoluteFilePath(*count), m_destination->absoluteFilePath(fileName))) {
-      emit signalFailed(tr("Copy failed for %1 .").arg(m_source->absoluteFilePath(*count)), ErrorHandler::Critical);
-      fileName = "~ERROR~";
-      failure = true;
-      emit signalProcess(fileName);
-      break;
+    if (!QFile::copy(imagePath, destinationDir.absoluteFilePath(fileName)))
+      emit failed(tr("Copy failed for %1 to %2.").arg(imagePath).arg(destinationDir.absoluteFilePath(fileName)), ErrorHandler::Warning);
+    else {
+      image.save(thumbnailDir.absoluteFilePath(thumbName), "JPG");
+      emit process(MetaDataManager::self()->registerImage(fileName, galleryId));
     }
 
-    // We finished with this picture. Notifying the model class
-    emit signalProcess(fileName);
     processed++;
   }
-}
 
-CopyJob::~CopyJob()
-{
-  delete m_destination;
-  delete m_source;
-}
-
-void CopyJob::deleteSourceImages(const QStringList &images)
-{
-  foreach(QString image, images)
-  QFile::remove(image);
+  emit progress(total, total, QString(), QImage());
 }
 
 }
+
 }

@@ -22,6 +22,7 @@
 
 #include <QtCore/QPoint>
 #include <QtCore/QDir>
+#include <QtCore/QTimer>
 
 #include <QtGui/QHeaderView>
 #include <QtGui/QAction>
@@ -35,6 +36,7 @@
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/metadatamanager.h"
+#include "core/jobmanager.h"
 
 #include "dialogs/newgallerywizard.h"
 #include "dialogs/configuration.h"
@@ -239,7 +241,9 @@ void MainWindow::slotAddImages()
   QStringList images = pictures;
   images.replaceInStrings(path, QString());
 
-  connect(Data::self()->imageModel()->addImages(imageList->rootIndex(), path, images), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+  QString job = JobManager::self()->addImages(imageList->rootIndex(), pictures);
+  connect(JobManager::self()->job(job), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+  JobManager::self()->startJob(job);
 }
 
 void MainWindow::startUpdater()
@@ -271,7 +275,7 @@ void MainWindow::openProperties(const QModelIndex &index)
     imageList->setRootIndex(index);
     return;
   }
-  
+
   centerWidget->setCurrentIndex(1);
 
   galleryDock->hide();

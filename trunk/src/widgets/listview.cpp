@@ -34,6 +34,7 @@
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
 #include "core/data.h"
+#include "core/jobmanager.h"
 
 #include "widgets/imagedelegate.h"
 
@@ -64,8 +65,10 @@ void ListView::contextMenuEvent(QContextMenuEvent *event)
 
 void ListView::slotRemove()
 {
-  if (QMessageBox::question(0, tr("Confirm remove"), tr("Are you sure you want to remove %1 picture/s?").arg(selectedIndexes().count()), tr("Remove"), tr("Keep"), QString(), 1, 1) == 0)
-    static_cast<GCore::ImageModel*> (model())->removeImages(selectedIndexes());
+  if (QMessageBox::question(0, tr("Confirm remove"), tr("Are you sure you want to remove %1 picture/s?").arg(selectedIndexes().count()), tr("Remove"), tr("Keep"), QString(), 1, 1) == 0) {
+    QString job = JobManager::self()->deleteImages(selectedIndexes());
+    JobManager::self()->startJob(job);
+  }
 }
 
 void ListView::setRootIndex(const QModelIndex &index)
@@ -154,7 +157,9 @@ void ListView::dropEvent(QDropEvent *event)
     NewGalleryWizard *wizard = new NewGalleryWizard(path, pictures, this);
     wizard->show();
   } else if (choice->data().toInt() == 1) {
-    connect(GCore::Data::self()->imageModel()->addImages(rootIndex(), path, pictures), SIGNAL(signalProgress(int, int, const QString&, const QImage&)), GCore::Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+    QString job = JobManager::self()->addImages(rootIndex(), imagePaths);
+    connect(JobManager::self()->job(job), SIGNAL(progress(int, int, const QString&, const QImage&)), GCore::Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+    JobManager::self()->startJob(job);
   }
 
   event->acceptProposedAction();
