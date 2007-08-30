@@ -218,8 +218,6 @@ void Data::setGalleriesPath(const QString &path)
   m_backup.insert("GalleriesPath", galleriesDir().absolutePath());
 
   m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));
-
-  JobManager::self()->startJob("GalleriesMove");
 }
 
 QString Data::settingsPath() const

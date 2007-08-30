@@ -33,6 +33,9 @@
 #include "core/imageitem.h"
 #include "core/errorhandler.h"
 
+#include <QtDebug>
+#include <QtSql/QSqlError>
+
 namespace GCore
 {
 
@@ -97,7 +100,8 @@ ImageItem *MetaDataManager::registerImage(const QString &fileName, int galleryId
   query.bindValue(":galleryId", galleryId);
   query.bindValue(":name", fileName);
   query.bindValue(":fileName", fileName);
-  query.exec();
+  qDebug() << query.exec() << query.lastError().text();
+  
 
   ImageItem *item = new ImageItem(query.lastInsertId().toInt(), ImageItem::Image);
   item->setParentId(galleryId);
@@ -168,7 +172,8 @@ int MetaDataManager::imageId(const QString &name, int galleryId)
 {
   QMutexLocker locker(&m_locker);
   QSqlQuery query;
-  query.prepare("SELECT id FROM image WHERE name = ? AND gallery_id = ?;");
+  query.prepare("SELECT id FROM image WHERE (name = ? OR file_name = ?) AND gallery_id = ?;");
+  query.addBindValue(name);
   query.addBindValue(name);
   query.addBindValue(galleryId);
   query.exec();

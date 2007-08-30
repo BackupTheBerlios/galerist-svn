@@ -110,15 +110,14 @@ class AbstractJob : public QThread
      */
     bool getStop();
 
+    /**
+     * Pauses if needed.
+     */
+    bool freeze();
+
     bool m_stop;
     bool m_paused;
     QMutex m_locker;
-
-  private slots:
-    /**
-     * Deletes the thread (used for initiating the delete sequence).
-     */
-    void slotDeleteLater();
 
 };
 

@@ -42,7 +42,6 @@ AbstractJob::AbstractJob(QObject *parent)
 {
   // Connect with the error handler.
   connect(this, SIGNAL(failed(const QString&, int)), Data::self()->value(Data::ErrorHandler).value<QObject*>(), SLOT(slotReporter(const QString&, int)));
-  connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(terminate()));
 }
 
 void AbstractJob::stop()
@@ -81,10 +80,12 @@ bool AbstractJob::getStop()
   return m_stop;
 }
 
-void AbstractJob::slotDeleteLater()
+bool AbstractJob::freeze()
 {
-  usleep(100);
-  QThread::deleteLater();
+  while (m_paused && !m_stop)
+    usleep(5);
+
+  return m_stop;
 }
 
 }

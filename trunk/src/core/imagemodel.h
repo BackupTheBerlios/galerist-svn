@@ -45,14 +45,6 @@ class CopyJob;
 class ImageModel : public QAbstractItemModel
 {
     Q_OBJECT
-  signals:
-    /**
-     * Signal that is emited when reading (creating) thumbnails.
-     *
-     * @param fileName The name of the current thumbnail.
-     */
-    void signalThumb(const QString &fileName);
-
   public:
     /**
      * Roles that tells data() method what information to return.
@@ -77,11 +69,13 @@ class ImageModel : public QAbstractItemModel
       ImagePathRole       = Qt::UserRole + 5,
       /** Path to image's thumbnail. */
       ImageThumbnailPathRole = Qt::UserRole + 6,
+      /** Thumbnails path. */
+      ThumbnailsPathRole     = Qt::UserRole + 7,
       /** Returns the actual image. */
-      ImagePictureRole       = Qt::UserRole + 7,
-      ImageRotateCW          = Qt::UserRole + 8,
-      ImageRotateCCW         = Qt::UserRole + 9,
-      IdRole                 = Qt::UserRole + 10
+      ImagePictureRole       = Qt::UserRole + 8,
+      ImageRotateCW          = Qt::UserRole + 9,
+      ImageRotateCCW         = Qt::UserRole + 10,
+      IdRole                 = Qt::UserRole + 11
   };
 
     /**
@@ -202,11 +196,6 @@ class ImageModel : public QAbstractItemModel
      */
     QModelIndex findGallery(const QString &name);
 
-    /**
-     * Stops the copy process.
-     */
-    //void stopCopy();
-
   public slots:
   /**
    * The process of the add of an image.
@@ -220,9 +209,9 @@ class ImageModel : public QAbstractItemModel
   protected:
 
   private:
-    mutable GCore::GJobs::ReadJob *m_currentJob;
     bool m_delete;
     bool m_showGalleries;
+    mutable QMap<QString,QString> m_progressRead;
 
     ImageItem *m_rootItem;
 
@@ -243,7 +232,7 @@ class ImageModel : public QAbstractItemModel
      *
      * @param item Item's index.
      */
-    void slotChange(const QModelIndex &item);
+    void processThumbnail(const QString &fileName, const QImage&, int parentId);
 
 };
 

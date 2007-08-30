@@ -42,63 +42,22 @@ class ReadJob : public GCore::GJobs::AbstractJob
     Q_OBJECT
   signals:
     /**
-     * Emitted when a thumbnail is finished.
+     * Progress signal.
      */
-    void signalThumb(const QString &fileName);
-    /**
-     * Same signal as above but using a QModelIndex.
-     *
-     * @see GCore#GJobs#ReadJob#signalThumb
-     */
-    void signalProcessed(const QModelIndex &item);
-    /**
-     * Same as above signal but has the filename of the thumbnail and the thumbnail itself.
-     *
-     * @see GCore#GJobs#ReadJob#signalThumb
-     */
-    void signalProgress(const QString &filename, const QImage &image, const QString &directory = 0);
+    void progress(const QString &filename, const QImage &image, int parentId);
 
   public:
     /**
-     * Constructor for reading and adding to the model.
+     * A multi purpose constructor ;).
      *
-     * @param model Model to which new images will be added.
+     * @param source The source directory of images.
+     * @param images List of images (filenames) taht needs to be read. If empty, whole directory is going to be read.
+     * @param output Destination path to save thumbnails. If empty, no thumbnails will be saved.
+     * @param parent Parent object.
      */
-    ReadJob(const QAbstractItemModel *model);
+    ReadJob(const QDir &source, const QStringList &images, const QDir &output, int parentId, QObject *parent);
 
-    /**
-     * Constructor for reading only.
-     *
-     * @param parent Parent of this job.
-     * @param path Path to the gallery.
-     * @param recursive Read recursevly.
-     */
-    ReadJob(QObject *parent, const QDir &path, bool recursive = false);
-
-    /**
-     * Constructor for reading preselected list of images only.
-     *
-     * @param parent Parent of this job.
-     * @param path Path to the gallery.
-     * @param images List of images.
-     * @param recursive Read recursevly.
-     */
-    ReadJob(QObject *parent, const QDir &path, const QStringList &images, bool recursive = false);
-
-    /**
-     * Returns the currently processed item.
-     */
-    QModelIndex getItem();
-
-    /**
-     * Adds a photo to the queue.
-     */
-    void queuePhoto(const QModelIndex &item);
-
-    /**
-     * A destructor.
-     */
-    ~ReadJob();
+    QStringList imagesList() const;
 
   protected:
     /**
@@ -108,22 +67,10 @@ class ReadJob : public GCore::GJobs::AbstractJob
     void job();
 
   private:
-    /**
-     * Reads the directory and make image thumbnails.
-     *
-     * @param path Path to the directory with images.
-     */
-    void readPath(const QDir &path);
-
-    // Variables
-    const QAbstractItemModel *m_model;
-    QString m_filePath;
-    QList<QModelIndex> m_items;
-
-    QDir m_path;
-    bool m_recursive;
-
+    QDir m_source;
     QStringList m_images;
+    QDir m_destination;
+    int m_parentId;
 
 };
 

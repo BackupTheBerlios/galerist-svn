@@ -243,7 +243,6 @@ void MainWindow::slotAddImages()
 
   QString job = JobManager::self()->addImages(imageList->rootIndex(), pictures);
   connect(JobManager::self()->job(job), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
-  JobManager::self()->startJob(job);
 }
 
 void MainWindow::startUpdater()

@@ -79,15 +79,15 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
   public slots:
 
   private:
+    bool m_initialised;
+    mutable QString m_hash;
+
     /**
      * Shows what images will be added.
      *
      * @param path Path in where the potential images are stored.
      */
     void makePreview(const QString &path, const QStringList &images = QStringList()) const;
-
-    bool m_initialised;
-    mutable QObject *m_readJob;
 
   private slots:
     /**
@@ -98,7 +98,7 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
     /**
      * Adds images to the preview list.
      */
-    void addImage(const QString&, const QImage &image, const QString&);
+    void addImage(const QString&, const QImage &image, int);
 
     void clearPreview(bool isValid);
 

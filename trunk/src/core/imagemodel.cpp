@@ -29,8 +29,6 @@
 #include "core/data.h"
 #include "core/jobmanager.h"
 
-#include "core/jobs/readjob.h"
-
 #include <QtDebug>
 
 using namespace GCore::GJobs;
@@ -112,6 +110,9 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
     }
     case ImageModel::ImageThumbnailPathRole : {
       return item->absoluteThumbPath();
+    }
+    case ThumbnailsPathRole : {
+      return item->thumbDir().absolutePath();
     }
     case Qt::EditRole : {
       return item->name();
@@ -280,14 +281,12 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
     QDir thumbPath(item.data(ImageModel::ImagePathRole).toString());
 
     if (!thumbPath.cd("thumbnails") || !QFile::exists(item.data(ImageModel::ImageThumbnailPathRole).toString())) {
-     /* GJobs::ReadJob *job = new GJobs::ReadJob(this);
-      job->queuePhoto(item);
-      JobManager::self()->registerJob("ThumbnailJob-" + item.data(ImageFilenameRole).toString(), job);
-      connect(job, SIGNAL(signalThumb(const QString&)), this, SIGNAL(signalThumb(const QString&)));
-      qRegisterMetaType<QModelIndex>("QModelIndex");
-      connect(job, SIGNAL(signalProcessed(const QModelIndex&)), this, SLOT(slotChange(const QModelIndex&)));
-      JobManager::self()->startJob("ThumbnailJob-" + item.data(ImageFilenameRole).toString());
-*/
+      if (!JobManager::self()->job(m_progressRead.value(item.data(ImageFilenameRole).toString()))) {
+      QString hash = JobManager::self()->readImages(item.data(ImagePathRole).toString(), item.data(ImageFilenameRole).toStringList(), item.data(ThumbnailsPathRole).toString());
+      connect(JobManager::self()->job(hash), SIGNAL(progress(const QString&, const QImage&, int)), this, SLOT(processThumbnail(const QString&, const QImage&, int)));
+      m_progressRead.insert(item.data(ImageFilenameRole).toString(), hash);
+      }
+
       icon.addFile(":/images/image-big.png");
     } else {
       icon.addFile(item.data(ImageModel::ImageThumbnailPathRole).toString());
@@ -361,11 +360,6 @@ QModelIndex ImageModel::findGallery(const QString &name)
   return QModelIndex();
 }
 
-/*void ImageModel::stopCopy()
-{
-  JobManager::self()->stopJob("CopyImages");
-}*/
-
 void ImageModel::setupModelData()
 {
   m_rootItem = MetaDataManager::self()->readManifest();
@@ -424,9 +418,11 @@ void ImageModel::addItem(ImageItem *item)
   }
 }
 
-void ImageModel::slotChange(const QModelIndex &item)
+void ImageModel::processThumbnail(const QString &fileName, const QImage&, int parentId)
 {
-  QModelIndex currentItem = item;
+  int imageId = MetaDataManager::self()->imageId(fileName, parentId);
+  QModelIndex currentItem = index(itemForId(imageId, ImageItem::Image));
+  m_progressRead.remove(fileName);
   emit dataChanged(currentItem, currentItem);
 }
 

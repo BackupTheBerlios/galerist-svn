@@ -26,6 +26,8 @@
 #include "core/metadatamanager.h"
 #include "core/data.h"
 
+#include <QtDebug>
+
 namespace GCore
 {
 
@@ -57,7 +59,7 @@ void CopyJob::job()
 
   int galleryId = m_galery.data(ImageModel::IdRole).toInt();
 
-  int processed = 0;
+  int processed = 1;
   int total = m_images.count();
 
   QList<ImageItem*> processedImages;
@@ -65,6 +67,7 @@ void CopyJob::job()
   foreach (QString imagePath, m_images) {
     QString imageName = imagePath;
     imageName.remove(sourceDir.absolutePath()).remove("/");
+    qDebug() << imageName;
 
     // If the file is 0 in size, it's a fake (need to get a better verification process), or it is not a supported image
     if (QFileInfo(sourceDir, imageName).size() == 0 || !(imageName).contains(Data::self()->supportedFormats())) {
@@ -73,8 +76,6 @@ void CopyJob::job()
     }
 
     QImage image = QImage(imagePath).scaled(128, 128, Qt::KeepAspectRatio);
-
-    emit progress(processed, total, imageName, image);
 
     // Checks if the filename already exists and get a new filename
     QString fileName = imageName;
@@ -96,11 +97,10 @@ void CopyJob::job()
       image.save(thumbnailDir.absoluteFilePath(thumbName), "JPG");
       emit process(MetaDataManager::self()->registerImage(fileName, galleryId));
     }
+    emit progress(processed, total, imageName, image);
 
     processed++;
   }
-
-  emit progress(total, total, QString(), QImage());
 }
 
 }

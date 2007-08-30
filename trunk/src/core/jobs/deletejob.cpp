@@ -126,7 +126,7 @@ void DeleteJob::deleteImages()
 
     emit progress(deleted, total, name, thumbnail);
 
-    if (!QFile::remove(thumbName) && !QFile::remove(fileName)) {
+    if (!QFile::remove(thumbName) || !QFile::remove(fileName)) {
           emit failed(tr("Couldn't deleted the image %1.").arg(name), ErrorHandler::Warning);
         }
     else {

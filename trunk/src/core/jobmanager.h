@@ -25,6 +25,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QStringList>
+#include <QtCore/QDir>
 #include <QtCore/QModelIndex>
 
 #include "core/jobs/abstractjob.h"
@@ -68,10 +69,7 @@ class JobManager : public QThread
     QString deleteGallery(const QModelIndex &galleryIndex);
     QString deleteImages(const QModelIndexList &images);
 
-    /**
-     * Starts the job.
-     */
-    void startJob(const QString &jobName);
+    QString readImages(const QDir &source, const QStringList &images, const QDir &destination = QDir(), int parentId = 0);
 
     /**
      * Stops the job.
@@ -117,9 +115,9 @@ class JobManager : public QThread
 
   private:
     QHash<QString, GJobs::AbstractJob*> m_jobHash;
-    QMutex m_mutex;
     bool m_stop;
     static JobManager *m_self;
+    mutable unsigned long m_idCounter;
 
     inline QString createHash() const;
 };

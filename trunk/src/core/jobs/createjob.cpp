@@ -64,7 +64,7 @@ void CreateJob::job()
   ImageItem *gallery = MetaDataManager::self()->registerGallery(m_name, m_parent.isValid() ? m_parent.data(ImageModel::IdRole).toInt() : -1);
 
   foreach (QString imageName, images) {
-    if (getStop()) {
+    if (freeze()) {
       emit progress(processed, numberImages, QString(), QImage());
       failure = true;
       break;
@@ -114,6 +114,8 @@ void CreateJob::job()
 
     destinationDir.cdUp();
     destinationDir.rmdir(m_name);
+
+    MetaDataManager::self()->unregisterGallery(gallery->id(), gallery->parentId());
 
     return;
   }

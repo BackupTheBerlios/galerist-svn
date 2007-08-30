@@ -91,6 +91,7 @@ class CopyPage : public QWizardPage, private Ui::CopyPage
     bool m_finished;
     QString m_predefinedPath;
     QStringList m_prefedinedImages;
+    QString m_jobHash;
 
   private slots:
     /**

@@ -37,125 +37,40 @@ namespace GCore
 namespace GJobs
 {
 
-ReadJob::ReadJob(const QAbstractItemModel *model)
-    : GCore::GJobs::AbstractJob(const_cast<QAbstractItemModel*>(model)),
-    m_model(model)
-{}
-
-ReadJob::ReadJob(QObject *parent, const QDir &path, bool recursive)
+ReadJob::ReadJob(const QDir &source, const QStringList &images, const QDir &output, int parentId, QObject *parent)
     : GCore::GJobs::AbstractJob(parent),
-    m_model(0),
-    m_path(path),
-    m_recursive(recursive)
+    m_source(source),
+    m_images(images),
+    m_destination(output),
+    m_parentId(parentId)
 {}
 
-ReadJob::ReadJob(QObject *parent, const QDir &path, const QStringList &images, bool recursive)
-    : GCore::GJobs::AbstractJob(parent),
-    m_model(0),
-    m_path(path),
-    m_recursive(recursive),
-    m_images(images)
-{}
-
-QModelIndex ReadJob::getItem()
-{
-  return QModelIndex();
-}
-
-void ReadJob::queuePhoto(const QModelIndex &item)
-{
-  m_items << item;
-}
+    QStringList ReadJob::imagesList() const
+    {
+      return m_images;
+    }
 
 void ReadJob::job()
 {
-  if (m_model) {
-    QModelIndex item;
-    while (!m_items.isEmpty()) {
-      if (getStop())
-        break;
+  QStringList images = m_images.isEmpty() ? m_source.entryList(Data::self()->supportedFormatsList()) : m_images;
+  int total = images.count();
+  int read = 1;
 
-      // Let's use our first item
-      item = m_items.takeFirst();
+  foreach(QString imageName, images) {
+    if (freeze())
+      break;
 
-      // We set gallery path.
-      QDir galleryPath(m_model->data(item, GCore::ImageModel::ImagePathRole).toString());
+    QImage image(m_source.absoluteFilePath(imageName));
+    image = image.scaled(128, 128, Qt::KeepAspectRatio);
 
-      // We set the name of the file.
-      QString fileName(m_model->data(item, GCore::ImageModel::ImageFilenameRole).toString());
+    if (m_destination != QDir())
+      image.save(m_destination.absoluteFilePath(imageName + ".jpg"), "JPG");
 
-      // We make sure, the others know what we are doing!
-      emit signalThumb(fileName);
-
-      // Thumbnails path.
-      QDir thumbPath(galleryPath);
-      if (!thumbPath.cd("thumbnails")) {
-        thumbPath.mkdir("thumbnails");
-        thumbPath.cd("thumbnails");
-      }
-
-      // Create the thumbnail.
-      QImage thumbnail = QImage(QDir::toNativeSeparators(galleryPath.absoluteFilePath(fileName))).scaled(128, 128, Qt::KeepAspectRatio);
-      thumbnail.save(QDir::toNativeSeparators(thumbPath.absoluteFilePath(fileName.append(".jpg"))), "JPG");
-
-      // We report about our achievement.
-      emit signalThumb(QString());
-      emit signalProcessed(item);
-
-      if (getStop())
-        break;
-    }
-  } else {
-    readPath(m_path);
-    emit signalProgress("", QImage());
+    emit progress(imageName, image, m_parentId);
+    emit AbstractJob::progress(read, total, imageName, image);
+    read++;
   }
 }
-
-void ReadJob::readPath(const QDir &path)
-{
-  if (!path.exists() || getStop())
-    return;
-
-  QImage imageThumbnail;
-
-  if (m_recursive) {
-    QStringList items = path.entryList(QDir::Dirs);
-    items.removeAll(".");
-    items.removeAll("..");
-
-    foreach(QString item, items) {
-      QDir temp = path;
-      temp.cd(item);
-      readPath(temp);
-      if (getStop())
-        return;
-    }
-  }
-
-  QStringList images = path.entryList(Data::self()->supportedFormatsList(), QDir::Files);
-  if (!m_images.isEmpty())
-    images = m_images;
-
-  int totalImages = images.count();
-  int imagesDone = 1;
-
-  foreach(QString image, images) {
-    if (getStop())
-      return;
-
-    if (!image.contains(GCore::Data::self()->supportedFormats()) || QFileInfo(path, image).size() == 0)
-      continue;
-
-    imageThumbnail = QImage(path.absoluteFilePath(image)).scaled(128, 128, Qt::KeepAspectRatio);
-
-    emit signalProgress(image, imageThumbnail, path.absolutePath());
-    emit AbstractJob::progress(imagesDone, totalImages, image, imageThumbnail);
-    imagesDone++;
-  }
-}
-
-ReadJob::~ReadJob()
-{}
 
 }
 

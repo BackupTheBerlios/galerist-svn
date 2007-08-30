@@ -65,10 +65,8 @@ void ListView::contextMenuEvent(QContextMenuEvent *event)
 
 void ListView::slotRemove()
 {
-  if (QMessageBox::question(0, tr("Confirm remove"), tr("Are you sure you want to remove %1 picture/s?").arg(selectedIndexes().count()), tr("Remove"), tr("Keep"), QString(), 1, 1) == 0) {
+  if (QMessageBox::question(0, tr("Confirm remove"), tr("Are you sure you want to remove %1 picture/s?").arg(selectedIndexes().count()), tr("Remove"), tr("Keep"), QString(), 1, 1) == 0)
     QString job = JobManager::self()->deleteImages(selectedIndexes());
-    JobManager::self()->startJob(job);
-  }
 }
 
 void ListView::setRootIndex(const QModelIndex &index)
@@ -159,7 +157,6 @@ void ListView::dropEvent(QDropEvent *event)
   } else if (choice->data().toInt() == 1) {
     QString job = JobManager::self()->addImages(rootIndex(), imagePaths);
     connect(JobManager::self()->job(job), SIGNAL(progress(int, int, const QString&, const QImage&)), GCore::Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
-    JobManager::self()->startJob(job);
   }
 
   event->acceptProposedAction();

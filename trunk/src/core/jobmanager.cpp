@@ -30,6 +30,10 @@
 #include "core/jobs/createjob.h"
 #include "core/jobs/copyjob.h"
 #include "core/jobs/deletejob.h"
+#include "core/jobs/readjob.h"
+
+
+#include <QtDebug>
 
 using namespace GCore::GJobs;
 
@@ -40,7 +44,8 @@ JobManager *JobManager::m_self = 0;
 
 JobManager::JobManager()
     : QThread(qApp),
-      m_stop(false)
+      m_stop(false),
+             m_idCounter(0)
 {}
 
 JobManager::~JobManager()
@@ -58,9 +63,7 @@ JobManager::~JobManager()
 
 void JobManager::registerJob(const QString &jobName, AbstractJob *job)
 {
-  m_mutex.lock();
   m_jobHash.insert(jobName, job);
-  m_mutex.unlock();
 }
 
 void JobManager::registerJob(const QString &jobName, QObject *job)
@@ -116,9 +119,16 @@ QString JobManager::deleteImages(const QModelIndexList &images)
   return hash;
 }
 
-void JobManager::startJob(const QString &jobName)
+QString JobManager::readImages(const QDir &source, const QStringList &images, const QDir &destination, int parentId)
 {
-  m_jobHash.value(jobName)->start();
+  QString hash = createHash();
+
+  qDebug() << images;
+  
+  ReadJob *job = new ReadJob(source, images, destination, parentId, this);
+  registerJob(hash, job);
+
+  return hash;
 }
 
 void JobManager::stopJob(const QString &jobName)
@@ -128,9 +138,7 @@ void JobManager::stopJob(const QString &jobName)
 
 void JobManager::stop()
 {
-  m_mutex.lock();
   m_stop = true;
-  m_mutex.unlock();
 }
 
 bool JobManager::isRunning(const QString &jobName)
@@ -170,21 +178,25 @@ JobManager *JobManager::self()
 void JobManager::run()
 {
   while (!m_stop) {
-    if (m_jobHash.isEmpty())
+    if (m_jobHash.isEmpty()) {
       usleep(50);
+      m_idCounter = 0;
+    }
 
     QStringList deletedJobs;
     QHashIterator<QString, AbstractJob*> count(m_jobHash);
     while (count.hasNext()) {
       count.next();
-      if (count.value()->wait(50)) {
-        delete count.value();
-        deletedJobs << count.key();
-      }
+      AbstractJob *job = count.value();
+      job->start();
+      job->wait();
+      deletedJobs << count.key();
     }
 
-    foreach (QString jobName, deletedJobs)
+    foreach (QString jobName, deletedJobs) {
+      delete m_jobHash.value(jobName);
       m_jobHash.remove(jobName);
+    }
     deletedJobs.clear();
   }
 }
