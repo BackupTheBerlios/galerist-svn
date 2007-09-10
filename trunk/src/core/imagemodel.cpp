@@ -227,7 +227,6 @@ QModelIndexList ImageModel::indexList(const QList<int> &ids, ImageItem::Type typ
 QModelIndexList ImageModel::indexList(ImageItem::Type type, const QModelIndex &parent) const
 {
   QList<int> ids = type == ImageItem::Image ? MetaDataManager::self()->imageList(parent.data(IdRole).toInt()) : MetaDataManager::self()->galleryList(parent.data(IdRole).toInt());
-  qDebug() << ids;
   return indexList(ids, type);
 }
 
@@ -309,10 +308,10 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
     QDir thumbPath(item.data(ImageModel::ImagePathRole).toString());
 
     if (!thumbPath.exists("thumbnails") || !QFile::exists(item.data(ImageModel::ImageThumbnailPathRole).toString())) {
-      if (!JobManager::self()->job(m_progressRead.value(item.data(ImageFilenameRole).toString()))) {
-        QString hash = JobManager::self()->readImages(item.data(ImagePathRole).toString(), item.data(ImageFilenameRole).toStringList(), item.data(ImagePathRole).toString());
-      connect(JobManager::self()->job(hash), SIGNAL(progress(const QString&, const QImage&, int)), this, SLOT(processThumbnail(const QString&, const QImage&, int)));
-      m_progressRead.insert(item.data(ImageFilenameRole).toString(), hash);
+      if (!m_progressRead.value(item.data(ImageFilenameRole).toString()).isValid()) {
+        Job job = JobManager::self()->readImages(item.data(ImagePathRole).toString(), item.data(ImageFilenameRole).toStringList(), item.data(ImagePathRole).toString());
+      connect(job.jobPtr(), SIGNAL(progress(const QString&, const QImage&, int)), this, SLOT(processThumbnail(const QString&, const QImage&, int)));
+      m_progressRead.insert(item.data(ImageFilenameRole).toString(), job);
       }
 
       icon.addFile(":/images/image-big.png");

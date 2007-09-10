@@ -46,14 +46,14 @@ JobManager *JobManager::m_self = 0;
 JobManager::JobManager()
     : QThread(qApp),
     m_stop(false),
-    m_idCounter(0)
+           m_jobNumber(0)
 {}
 
 JobManager::~JobManager()
 {
   stop();
 
-  foreach(AbstractJob *job, m_jobHash) {
+  foreach(AbstractJob *job, m_jobMap) {
     job->stop();
     job->wait();
     delete job;
@@ -62,116 +62,65 @@ JobManager::~JobManager()
   wait();
 }
 
-void JobManager::registerJob(const QString &jobName, AbstractJob *job)
+Job JobManager::createGalleryJob(const QString &name, const QModelIndex &parent, const QString &source, const QStringList &images, bool deleteSource)
 {
-  m_jobHash.insert(jobName, job);
-}
-
-void JobManager::registerJob(const QString &jobName, QObject *job)
-{
-  registerJob(jobName, static_cast<AbstractJob*>(job));
-}
-
-QString JobManager::createGalleryJob(const QString &name, const QModelIndex &parent, const QString &source, const QStringList &images, bool deleteSource)
-{
-  QString hash = createHash();
-
   CreateJob *job = new CreateJob(name, parent, source, images, deleteSource, this);
-  registerJob(hash, job);
+  uint id = registerJob(job);
 
   connect(job, SIGNAL(finished(ImageItem*)), Data::self()->imageModel(), SLOT(addItem(ImageItem*)));
 
-  return hash;
+  return Job(id);
 }
 
-QString JobManager::addImages(const QModelIndex &galleryIndex, const QStringList &images, bool deleteSource)
+Job JobManager::addImages(const QModelIndex &galleryIndex, const QStringList &images, bool deleteSource)
 {
-  QString hash = createHash();
-
   CopyJob *job = new CopyJob(galleryIndex, images, deleteSource, this);
-  registerJob(hash, job);
+  uint id = registerJob(job);
 
   connect(job, SIGNAL(process(ImageItem*)), Data::self()->imageModel(), SLOT(addItem(ImageItem*)));
 
-  return hash;
+  return Job(id);
 }
 
-QString JobManager::deleteGallery(const QModelIndex &galleryIndex)
+Job JobManager::deleteGallery(const QModelIndex &galleryIndex)
 {
-  QString hash = createHash();
-
   DeleteJob *job = new DeleteJob(galleryIndex, this);
-  registerJob(hash, job);
+  uint id = registerJob(job);
 
   connect(job, SIGNAL(remove(const QModelIndex&)), Data::self()->imageModel(), SLOT(removeItem(const QModelIndex&)));
 
-  return hash;
+  return Job(id);
 }
 
-QString JobManager::deleteImages(const QModelIndexList &images)
+Job JobManager::deleteImages(const QModelIndexList &images)
 {
-  QString hash = createHash();
-
   DeleteJob *job = new DeleteJob(images, this);
-  registerJob(hash, job);
+  uint id = registerJob(job);
 
   connect(job, SIGNAL(remove(const QModelIndex&)), Data::self()->imageModel(), SLOT(removeItem(const QModelIndex&)));
 
-  return hash;
+  return Job(id);
 }
 
-QString JobManager::readImages(const QDir &source, const QStringList &images, const QDir &destination, int parentId)
+Job JobManager::readImages(const QDir &source, const QStringList &images, const QDir &destination, int parentId)
 {
-  QString hash = createHash();
-
   ReadJob *job = new ReadJob(source, images, destination, parentId, this);
-  registerJob(hash, job);
+  uint id = registerJob(job);
 
-  return hash;
+  return Job(id);
 }
 
-QString JobManager::moveGalleries(const QString &destination)
+Job JobManager::moveGalleries(const QString &destination)
 {
-  QString hash = createHash();
-
   MoveJob *job = new MoveJob(destination, this);
-  registerJob(hash, job);
+  uint id = registerJob(job);
 
-  return hash;
-}
-
-void JobManager::stopJob(const QString &jobName)
-{
-  m_jobHash.value(jobName)->stop();
+  return Job(id);
 }
 
 void JobManager::stop()
 {
   m_stop = true;
-}
-
-bool JobManager::isRunning(const QString &jobName)
-{
-  AbstractJob *job = m_jobHash.value(jobName);
-  if (job)
-    return job->isRunning();
-  else
-    return false;
-}
-
-AbstractJob *JobManager::job(const QString &jobName)
-{
-  return m_jobHash.value(jobName);
-}
-
-void JobManager::pauseJob(const QString &jobName)
-{
-  m_jobHash.value(jobName)->pause();
-}
-
-void JobManager::unpauseJob(const QString &jobName)
-{
-  m_jobHash.value(jobName)->unpause();
 }
 
 JobManager *JobManager::self()
@@ -187,33 +136,57 @@ JobManager *JobManager::self()
 void JobManager::run()
 {
   while (!m_stop) {
-    if (m_jobHash.isEmpty()) {
+    if (m_jobMap.isEmpty()) {
       usleep(50);
-      m_idCounter = 0;
+      continue;
     }
 
-    QStringList deletedJobs;
-    QHashIterator<QString, AbstractJob*> count(m_jobHash);
+    QList<AbstractJob*> runningJobs;
+    int idealThreads = idealThreadCount();
+
+    QList<uint> deletedJobs;
+    QMapIterator<uint, AbstractJob*> count(m_jobMap);
     while (count.hasNext()) {
       count.next();
       AbstractJob *job = count.value();
       job->start();
-      job->wait();
+      runningJobs << job;
+
+      if (runningJobs.count() >= idealThreads) {
+        foreach (AbstractJob *job, runningJobs)
+          job->wait();
+
+        runningJobs.clear();
+      }
+
       deletedJobs << count.key();
     }
 
-    foreach(QString jobName, deletedJobs) {
-      delete m_jobHash.value(jobName);
-      m_jobHash.remove(jobName);
+    foreach(uint jobId, deletedJobs) {
+      m_jobMap.value(jobId)->wait();
+      delete m_jobMap.value(jobId);
+      m_jobMap.remove(jobId);
     }
     deletedJobs.clear();
+
+    if (m_jobMap.isEmpty())
+      m_jobNumber = 0;
   }
 }
 
-QString JobManager::createHash() const
+uint JobManager::registerJob(AbstractJob *job)
 {
-  qsrand(time(0));
-  return QCryptographicHash::hash(QString(QString::number(qrand()) + QString::number(time(0))).toAscii(), QCryptographicHash::Md5);
+  m_jobNumber++;
+  uint id = m_jobNumber;
+
+  m_jobMap.insert(id, job);
+
+  return id;
+}
+
+AbstractJob *JobManager::job(uint id) const
+{
+  return m_jobMap.value(id);
 }
 
 }

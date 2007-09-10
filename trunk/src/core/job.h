@@ -18,63 +18,43 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GCORE_GJOBSMOVEJOB_H
-#define GCORE_GJOBSMOVEJOB_H
-
-#include <QtCore/QDir>
-#include <QtCore/QModelIndex>
-
-#include "core/jobs/abstractjob.h"
+#ifndef GCOREJOB_H
+#define GCOREJOB_H
 
 namespace GCore
 {
 
 namespace GJobs
 {
+class AbstractJob;
+}
 
 /**
- * @short Job for moving objects.
+ * @short Represents a job.
  * @author Gregor Kališnik <gregor@unimatrix-one.org>
  */
-class MoveJob : public GCore::GJobs::AbstractJob
+class Job
 {
-    Q_OBJECT
-  signals:
-    void directoryProgress(const QString &name);
-
   public:
-    /**
-     * A constructor.
-     */
-    MoveJob(const QDir &destination, QObject *parent = 0);
+    Job();
 
-    /**
-     * A destructor.
-     */
-    ~MoveJob();
+    Job(unsigned int id);
 
-  protected:
-    /**
-     * Reimplemented method.
-     */
-    void job();
+    GJobs::AbstractJob *jobPtr() const;
+
+    void stop() const;
+
+    void pause() const;
+
+    void resume() const;
+
+    bool isValid() const;
+
+    void clear();
 
   private:
-    QDir m_destination;
-
-    /**
-     * Deletes the old galleries.
-     *
-     * @param indexes Indexes to delete.
-     *
-     * @return @c true "The roots go deep, Saruman." <= Report a warning :D.
-     * @return @c false It went like a charm.
-     */
-    inline bool deleteOldGalleries(const QModelIndexList &indexes) const;
-
+    unsigned int m_id;
 };
-
-}
 
 }
 

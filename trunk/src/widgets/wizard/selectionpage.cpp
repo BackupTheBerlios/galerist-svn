@@ -26,7 +26,6 @@
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/metadatamanager.h"
-#include "core/jobmanager.h"
 
 #include "widgets/lineedit.h"
 
@@ -115,22 +114,20 @@ void SelectionPage::setPredefinedImages(const QString &path, const QStringList &
 
 void SelectionPage::makePreview(const QString &path, const QStringList &images) const
 {
-  if (m_hash.isEmpty()) {
+  if (m_job.isValid()) {
     previewList->clear();
-    m_hash = JobManager::self()->readImages(path, images);
+    m_job = JobManager::self()->readImages(path, images);
 
-    connect(JobManager::self()->job(m_hash), SIGNAL(progress(const QString&, const QImage&, int)), this, SLOT(addImage(const QString&, const QImage&, int)));
-    connect(JobManager::self()->job(m_hash), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+    connect(m_job.jobPtr(), SIGNAL(progress(const QString&, const QImage&, int)), this, SLOT(addImage(const QString&, const QImage&, int)));
+    connect(m_job.jobPtr(), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
   }
 }
 
 void SelectionPage::slotBrowseClicked()
 {
   QString directory = QFileDialog::getExistingDirectory(0, tr("Select the directory with images for you gallary."), imagesEdit->text());
-  if (!directory.isEmpty()) {
-    m_hash.clear();
+  if (!directory.isEmpty())
     imagesEdit->setText(directory);
-  }
 }
 
 void SelectionPage::addImage(const QString&, const QImage &image, int)
@@ -141,7 +138,6 @@ void SelectionPage::addImage(const QString&, const QImage &image, int)
 
 void SelectionPage::clearPreview(bool isValid)
 {
-  m_hash.clear();
   previewList->clear();
 
   if (isValid)

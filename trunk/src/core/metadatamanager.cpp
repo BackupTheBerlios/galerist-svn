@@ -100,7 +100,6 @@ ImageItem *MetaDataManager::registerImage(const QString &fileName, int galleryId
   query.bindValue(":galleryId", galleryId);
   query.bindValue(":name", fileName);
   query.bindValue(":fileName", fileName);
-  qDebug() << query.exec() << query.lastError().text();
 
   ImageItem *item = new ImageItem(query.lastInsertId().toInt(), ImageItem::Image);
   item->setParentId(galleryId);

@@ -26,6 +26,8 @@
 
 #include "ui_selectionpage.h"
 
+#include "core/jobmanager.h"
+
 namespace GWidgets
 {
 
@@ -80,7 +82,7 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
 
   private:
     bool m_initialised;
-    mutable QString m_hash;
+    mutable GCore::Job m_job;
 
     /**
      * Shows what images will be added.

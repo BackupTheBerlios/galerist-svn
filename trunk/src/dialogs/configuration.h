@@ -86,7 +86,7 @@ class Configuration : public QDialog, private Ui::Configuration
      * @param total Total images to move.
      * @param name Curent gallery name.
      */
-    void updateGalleryProgress(int done, int total, const QString &name);
+    void updateGalleryProgress(const QString &name);
     /**
      * Updates the prograssbar for total progress.
      *

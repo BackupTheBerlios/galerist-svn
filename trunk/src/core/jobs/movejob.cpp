@@ -55,24 +55,15 @@ void MoveJob::job()
   while (!queue.isEmpty()) {
     QModelIndexList currentList = Data::self()->imageModel()->indexList(ImageItem::Image, queue.dequeue());
     foreach(QModelIndex current, currentList) {
-      if (current.data(ImageModel::ImageTypeRole).toInt() == ImageItem::Image) {
+      if (current.data(ImageModel::ImageTypeRole).toInt() == ImageItem::Image)
         images << current;
-      }
     }
   }
 
   int total = 1;
-  QStringList galleries;
 
-  foreach (QModelIndex image, images) {
+  foreach (QModelIndex image, images)
     total++;
-    QString gallery = image.parent().data(ImageModel::ImageNameRole).toString();
-
-    if (!galleries.contains(gallery))
-      galleries << gallery;
-  }
-
-  int totalGalleries = galleries.count();
 
   int moved = 1;
   foreach(QModelIndex imageIndex, images) {
@@ -91,14 +82,13 @@ void MoveJob::job()
 
     QString galleryName = imageIndex.parent().data(ImageModel::ImageNameRole).toString();
 
-    emit directoryProgress(galleries.indexOf(galleryName) + 1, totalGalleries, galleryName);
+    emit directoryProgress(galleryName);
     emit progress(moved, total, imageIndex.data(ImageModel::ImageNameRole).toString(), QImage(imageIndex.data(ImageModel::ImageThumbnailPathRole).toString()));
     moved++;
   }
 
   bool successful = total == moved;
 
-  // Brisanje itd.
   if (successful) {
     QFile::copy(Data::self()->galleriesDir().absoluteFilePath("manifest.db"), m_destination.absoluteFilePath("manifest.db"));
     QFile::remove(Data::self()->galleriesDir().absoluteFilePath("manifest.db"));

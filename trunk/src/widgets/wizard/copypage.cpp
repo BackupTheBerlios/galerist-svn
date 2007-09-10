@@ -57,9 +57,9 @@ void CopyPage::initializePage()
     parentGallery = Data::self()->imageModel()->findGallery(field("ParentGallery").toString());
 
   // We copy the images to the right place
-  m_jobHash = JobManager::self()->createGalleryJob(field("GalleryName").toString(), parentGallery, field("GalleryPath").toString(), m_prefedinedImages, field("DeleteSourceImages").toBool());
+  m_job = JobManager::self()->createGalleryJob(field("GalleryName").toString(), parentGallery, field("GalleryPath").toString(), m_prefedinedImages, field("DeleteSourceImages").toBool());
 
-  connect(JobManager::self()->job(m_jobHash), SIGNAL(progress(int, int, const QString&, const QImage&)), this, SLOT(slotProgress(int, int, const QString&, const QImage&)));
+  connect(m_job.jobPtr(), SIGNAL(progress(int, int, const QString&, const QImage&)), this, SLOT(slotProgress(int, int, const QString&, const QImage&)));
 }
 
 bool CopyPage::isComplete() const
@@ -69,17 +69,17 @@ bool CopyPage::isComplete() const
 
 void CopyPage::pauseCopy()
 {
-  JobManager::self()->pauseJob(m_jobHash);
+  m_job.pause();
 }
 
 void CopyPage::resumeCopy()
 {
-  JobManager::self()->unpauseJob(m_jobHash);
+  m_job.resume();
 }
 
 void CopyPage::stopCopy()
 {
-  JobManager::self()->stopJob(m_jobHash);
+  m_job.stop();
 }
 
 void CopyPage::setPredefinedImages(const QString &path, const QStringList &images)

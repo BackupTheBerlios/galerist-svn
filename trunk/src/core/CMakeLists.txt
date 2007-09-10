@@ -13,6 +13,7 @@ set(core_SRCS
   metadatamanager.cpp
   exifmanager.cpp
   jobmanager.cpp
+  job.cpp
 )
 
 SET(core_MOC_HDRS

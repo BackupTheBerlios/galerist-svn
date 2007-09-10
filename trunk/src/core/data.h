@@ -29,6 +29,7 @@
 #include <QtGui/QSortFilterProxyModel>
 
 #include "core/imagemodel.h"
+#include "core/jobmanager.h"
 
 class QCompleter;
 class QSettings;
@@ -109,7 +110,7 @@ class Data : public QObject
     /**
      * Sets the gallery path.
      */
-    QString setGalleriesPath(const QString &path);
+    GCore::Job setGalleriesPath(const QString &path);
 
     /**
      * Returns the path to the settings.

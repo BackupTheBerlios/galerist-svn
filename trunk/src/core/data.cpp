@@ -31,9 +31,7 @@
 #include <QtGui/QSortFilterProxyModel>
 
 #include "core/errorhandler.h"
-#include "core/imagemodel.h"
 #include "core/imageitem.h"
-#include "core/jobmanager.h"
 #include "core/metadatamanager.h"
 
 namespace GCore
@@ -206,25 +204,15 @@ QString Data::galleriesPath() const
   return m_settings->value("GalleriesPath", settingsPath() + "/galleries").toString();;
 }
 
-QString Data::setGalleriesPath(const QString &path)
+Job Data::setGalleriesPath(const QString &path)
 {
-  QString job = JobManager::self()->moveGalleries(path);
+  Job job = JobManager::self()->moveGalleries(path);
 
-  connect(JobManager::self()->job(job), SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
+  connect(job.jobPtr(), SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
 
   m_backup.insert("GalleriesPath", QDir::toNativeSeparators(path));
-  //m_settings->setValue("GalleriesPath", );
 
   return job;
-/*  GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(galleriesDir(), path, m_mainWindow);
-
-  JobManager::self()->registerJob("GalleriesMove", job);
-
-  connect(job, SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
-
-  m_backup.insert("GalleriesPath", galleriesDir().absolutePath());
-
-  m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));*/
 }
 
 QString Data::settingsPath() const

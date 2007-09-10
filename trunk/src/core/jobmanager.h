@@ -28,6 +28,8 @@
 #include <QtCore/QDir>
 #include <QtCore/QModelIndex>
 
+#include "core/job.h"
+
 #include "core/jobs/abstractjob.h"
 
 namespace GCore
@@ -51,57 +53,21 @@ class JobManager : public QThread
      */
     ~JobManager();
 
-    /**
-     * Registers the job with the manager.
-     *
-     * @param jobName Name to use to access this job.
-     * @param job The actual job.
-     *
-     * @return Pointer to the job.
-     */
-    void registerJob(const QString &jobName, GJobs::AbstractJob *job);
-    void registerJob(const QString &jobName, QObject *job);
+    Job createGalleryJob(const QString &name, const QModelIndex &parentItem, const QString &source, const QStringList &images, bool deleteSource);
 
-    QString createGalleryJob(const QString &name, const QModelIndex &parentItem, const QString &source, const QStringList &images, bool deleteSource);
+    Job addImages(const QModelIndex &galleryIndex, const QStringList &images, bool deleteSource = false);
 
-    QString addImages(const QModelIndex &galleryIndex, const QStringList &images, bool deleteSource = false);
+    Job deleteGallery(const QModelIndex &galleryIndex);
+    Job deleteImages(const QModelIndexList &images);
 
-    QString deleteGallery(const QModelIndex &galleryIndex);
-    QString deleteImages(const QModelIndexList &images);
+    Job readImages(const QDir &source, const QStringList &images, const QDir &destination = QDir(), int parentId = 0);
 
-    QString readImages(const QDir &source, const QStringList &images, const QDir &destination = QDir(), int parentId = 0);
-
-    QString moveGalleries(const QString &destination);
-
-    /**
-     * Stops the job.
-     */
-    void stopJob(const QString &jobName);
+    Job moveGalleries(const QString &destination);
 
     /**
      * Method to stop the JobManager.
      */
     void stop();
-
-    /**
-     * Checks if the job is running.
-     */
-    bool isRunning(const QString &jobName);
-
-    /**
-     * Gets the job.
-     */
-    GJobs::AbstractJob *job(const QString &jobName);
-
-    /**
-     * Pauses the job.
-     */
-    void pauseJob(const QString &jobName);
-
-    /**
-     * Unpauses the job.
-     */
-    void unpauseJob(const QString &jobName);
 
     /**
      * Static self method.
@@ -116,12 +82,15 @@ class JobManager : public QThread
     void run();
 
   private:
-    QHash<QString, GJobs::AbstractJob*> m_jobHash;
+    QMap<uint, GJobs::AbstractJob*> m_jobMap;
     bool m_stop;
     static JobManager *m_self;
-    mutable unsigned long m_idCounter;
+    uint m_jobNumber;
 
-    inline QString createHash() const;
+    uint registerJob(GJobs::AbstractJob *job);
+    GJobs::AbstractJob *job(uint id) const;
+
+    friend class Job;
 };
 
 }

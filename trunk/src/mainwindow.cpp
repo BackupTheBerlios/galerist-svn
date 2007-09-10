@@ -241,8 +241,8 @@ void MainWindow::slotAddImages()
   QStringList images = pictures;
   images.replaceInStrings(path, QString());
 
-  QString job = JobManager::self()->addImages(imageList->rootIndex(), pictures);
-  connect(JobManager::self()->job(job), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+  Job job = JobManager::self()->addImages(imageList->rootIndex(), pictures);
+  connect(job.jobPtr(), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
 }
 
 void MainWindow::startUpdater()

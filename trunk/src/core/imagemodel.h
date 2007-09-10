@@ -26,6 +26,7 @@
 #include <QtGui/QIcon>
 
 #include "core/imageitem.h"
+#include "core/jobmanager.h"
 
 class QDir;
 
@@ -222,7 +223,7 @@ class ImageModel : public QAbstractItemModel
   private:
     bool m_delete;
     bool m_showGalleries;
-    mutable QMap<QString,QString> m_progressRead;
+    mutable QMap<QString,Job> m_progressRead;
 
     ImageItem *m_rootItem;
 

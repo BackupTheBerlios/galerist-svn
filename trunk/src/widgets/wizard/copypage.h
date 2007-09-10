@@ -24,6 +24,8 @@
 #include <QtGui/QWizardPage>
 #include "ui_copypage.h"
 
+#include "core/jobmanager.h"
+
 namespace GWidgets
 {
 
@@ -91,7 +93,7 @@ class CopyPage : public QWizardPage, private Ui::CopyPage
     bool m_finished;
     QString m_predefinedPath;
     QStringList m_prefedinedImages;
-    QString m_jobHash;
+    GCore::Job m_job;
 
   private slots:
     /**

@@ -18,64 +18,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GCORE_GJOBSMOVEJOB_H
-#define GCORE_GJOBSMOVEJOB_H
+#include "job.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QModelIndex>
-
-#include "core/jobs/abstractjob.h"
+#include "core/jobmanager.h"
 
 namespace GCore
 {
 
-namespace GJobs
+Job::Job()
+  : m_id(0)
+{}
+
+Job::Job(unsigned int id) : m_id(id)
+{}
+
+GJobs::AbstractJob *Job::jobPtr() const
 {
+  if (!isValid())
+    qCritical("GCore::Job: Using invalid job!");
 
-/**
- * @short Job for moving objects.
- * @author Gregor Kališnik <gregor@unimatrix-one.org>
- */
-class MoveJob : public GCore::GJobs::AbstractJob
+  return JobManager::self()->job(m_id);
+}
+
+void Job::stop() const
 {
-    Q_OBJECT
-  signals:
-    void directoryProgress(const QString &name);
+  if (isValid())
+    JobManager::self()->job(m_id)->stop();
+}
 
-  public:
-    /**
-     * A constructor.
-     */
-    MoveJob(const QDir &destination, QObject *parent = 0);
+void Job::pause() const
+{
+  if (isValid())
+    JobManager::self()->job(m_id)->pause();
+}
 
-    /**
-     * A destructor.
-     */
-    ~MoveJob();
+void Job::resume() const
+{
+  if (isValid())
+    JobManager::self()->job(m_id)->unpause();
+}
 
-  protected:
-    /**
-     * Reimplemented method.
-     */
-    void job();
-
-  private:
-    QDir m_destination;
-
-    /**
-     * Deletes the old galleries.
-     *
-     * @param indexes Indexes to delete.
-     *
-     * @return @c true "The roots go deep, Saruman." <= Report a warning :D.
-     * @return @c false It went like a charm.
-     */
-    inline bool deleteOldGalleries(const QModelIndexList &indexes) const;
-
-};
-
+bool Job::isValid() const
+{
+  return JobManager::self()->job(m_id);
 }
 
 }
-
-#endif

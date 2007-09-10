@@ -57,8 +57,8 @@ void GalleryTreeView::slotDelete()
   QModelIndex selectedGallery = Data::self()->galleryProxy()->mapToSource(selectedIndexes().first());
 
   if (QMessageBox::question(0, tr("Confirm deletion"), tr("Are you sure you want to delete %1?").arg(selectedGallery.data(ImageModel::ImageNameRole).toString()), tr("Delete"), tr("Keep"), QString(), 1, 1) == 0) {
-    QString job = JobManager::self()->deleteGallery(selectedGallery);
-    connect(JobManager::self()->job(job), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString &, const QImage &)));
+    Job job = JobManager::self()->deleteGallery(selectedGallery);
+    connect(job.jobPtr(), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString &, const QImage &)));
   }
 }
 

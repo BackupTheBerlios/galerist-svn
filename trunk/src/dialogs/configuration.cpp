@@ -124,17 +124,15 @@ void Configuration::accept()
   bool wait = false;
   if (GCore::Data::self()->galleriesPath() != dirEdit->text() && dirEdit->isValid())
     if (QMessageBox::question(this, tr("Confirm move"), tr("Are you sure you want to move all the galleries?"), tr("&Move"), tr("&No"), "", 1, 1) == 0) {
-      QString hash = Data::self()->setGalleriesPath(dirEdit->text());
-      QObject *job = JobManager::self()->job(hash);
-      //job->setParent(this);
+      Job job = Data::self()->setGalleriesPath(dirEdit->text());
       moveGroup->show();
       buttonBox->setDisabled(true);
 
       wait = true;
 
-      connect(job, SIGNAL(directoryProgress(int, int, const QString&)), this, SLOT(updateGalleryProgress(int, int, const QString&)));
-      connect(job, SIGNAL(progress(int, int, const QString&, const QImage&)), this, SLOT(updateImagesProgress(int, int, const QString&, const QImage&)));
-      connect(job, SIGNAL(finished(bool)), this, SLOT(finish(bool)));
+      connect(job.jobPtr(), SIGNAL(directoryProgress(const QString&)), this, SLOT(updateGalleryProgress(const QString&)));
+      connect(job.jobPtr(), SIGNAL(progress(int, int, const QString&, const QImage&)), this, SLOT(updateImagesProgress(int, int, const QString&, const QImage&)));
+      connect(job.jobPtr(), SIGNAL(finished(bool)), this, SLOT(finish(bool)));
     } else {
       return;
     }
@@ -186,10 +184,8 @@ void Configuration::slotBrowse()
     imageEditorEdit->setText(editorPath);
 }
 
-void Configuration::updateGalleryProgress(int done, int total, const QString &name)
+void Configuration::updateGalleryProgress(const QString &name)
 {
-  galleriesBar->setMaximum(total);
-  galleriesBar->setValue(done);
   galleryLabel->setText(name);
 }
 
