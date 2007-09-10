@@ -31,6 +31,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QAbstractItemModel>
 
+#include <QtDebug>
+
 namespace GCore
 {
 
@@ -55,6 +57,9 @@ void ReadJob::job()
   QStringList images = m_images.isEmpty() ? m_source.entryList(Data::self()->supportedFormatsList()) : m_images;
   int total = images.count();
   int read = 1;
+
+  m_destination.mkdir("thumbnails");
+  m_destination.cd("thumbnails");
 
   foreach(QString imageName, images) {
     if (freeze())

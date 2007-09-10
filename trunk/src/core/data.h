@@ -109,7 +109,7 @@ class Data : public QObject
     /**
      * Sets the gallery path.
      */
-    void setGalleriesPath(const QString &path);
+    QString setGalleriesPath(const QString &path);
 
     /**
      * Returns the path to the settings.

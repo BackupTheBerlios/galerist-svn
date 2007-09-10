@@ -31,6 +31,7 @@
 #include "core/jobs/copyjob.h"
 #include "core/jobs/deletejob.h"
 #include "core/jobs/readjob.h"
+#include "core/jobs/movejob.h"
 
 
 #include <QtDebug>
@@ -44,15 +45,15 @@ JobManager *JobManager::m_self = 0;
 
 JobManager::JobManager()
     : QThread(qApp),
-      m_stop(false),
-             m_idCounter(0)
+    m_stop(false),
+    m_idCounter(0)
 {}
 
 JobManager::~JobManager()
 {
   stop();
 
-  foreach (AbstractJob *job, m_jobHash) {
+  foreach(AbstractJob *job, m_jobHash) {
     job->stop();
     job->wait();
     delete job;
@@ -68,7 +69,7 @@ void JobManager::registerJob(const QString &jobName, AbstractJob *job)
 
 void JobManager::registerJob(const QString &jobName, QObject *job)
 {
-  registerJob(jobName, static_cast<AbstractJob*> (job));
+  registerJob(jobName, static_cast<AbstractJob*>(job));
 }
 
 QString JobManager::createGalleryJob(const QString &name, const QModelIndex &parent, const QString &source, const QStringList &images, bool deleteSource)
@@ -123,9 +124,17 @@ QString JobManager::readImages(const QDir &source, const QStringList &images, co
 {
   QString hash = createHash();
 
-  qDebug() << images;
-  
   ReadJob *job = new ReadJob(source, images, destination, parentId, this);
+  registerJob(hash, job);
+
+  return hash;
+}
+
+QString JobManager::moveGalleries(const QString &destination)
+{
+  QString hash = createHash();
+
+  MoveJob *job = new MoveJob(destination, this);
   registerJob(hash, job);
 
   return hash;
@@ -193,7 +202,7 @@ void JobManager::run()
       deletedJobs << count.key();
     }
 
-    foreach (QString jobName, deletedJobs) {
+    foreach(QString jobName, deletedJobs) {
       delete m_jobHash.value(jobName);
       m_jobHash.remove(jobName);
     }

@@ -100,7 +100,7 @@ void PropertiesView::updateData()
   m_oldDescription = description;
   m_rotation = 0;
 
-  QStringList invalidValues = MetaDataManager::self()->imageList(m_currentIndex.parent().data(ImageModel::IdRole).toInt());
+  QStringList invalidValues = MetaDataManager::self()->imageNames(m_currentIndex.parent().data(ImageModel::IdRole).toInt());
   invalidValues.removeAll(name);
   ui.nameEdit->setInvalidValues(invalidValues);
 

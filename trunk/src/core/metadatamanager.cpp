@@ -48,8 +48,8 @@ MetaDataManager::MetaDataManager()
   manifest.setDatabaseName(Data::self()->galleriesDir().absoluteFilePath("manifest.db"));
   manifest.open();
 
-  manifest.exec("CREATE TABLE IF NOT EXISTS gallery (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100) UNIQUE, parent_id INTEGER);");
-  manifest.exec("CREATE TABLE IF NOT EXISTS image (id INTEGER PRIMARY KEY AUTOINCREMENT, gallery_id INTEGER, name VARCHAR(150) UNIQUE, file_name VARCHAR(150), description TEXT);");
+  manifest.exec("CREATE TABLE IF NOT EXISTS gallery (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(100) UNIQUE, parent_id INTEGER DEFAULT -1);");
+  manifest.exec("CREATE TABLE IF NOT EXISTS image (id INTEGER PRIMARY KEY AUTOINCREMENT, gallery_id INTEGER, name VARCHAR(150), file_name VARCHAR(150), description TEXT);");
 }
 
 bool MetaDataManager::driverAvailable()
@@ -101,7 +101,6 @@ ImageItem *MetaDataManager::registerImage(const QString &fileName, int galleryId
   query.bindValue(":name", fileName);
   query.bindValue(":fileName", fileName);
   qDebug() << query.exec() << query.lastError().text();
-  
 
   ImageItem *item = new ImageItem(query.lastInsertId().toInt(), ImageItem::Image);
   item->setParentId(galleryId);
@@ -226,7 +225,7 @@ QString MetaDataManager::imageName(int id) const
   return QString();
 }
 
-QStringList MetaDataManager::imageList(int galleryId) const
+QStringList MetaDataManager::imageNames(int galleryId) const
 {
   QMutexLocker locker(&m_locker);
   QSqlQuery query;
@@ -242,7 +241,7 @@ QStringList MetaDataManager::imageList(int galleryId) const
   return output;
 }
 
-QStringList MetaDataManager::galleryList() const
+QStringList MetaDataManager::galleryNames() const
 {
   QMutexLocker locker(&m_locker);
   QSqlQuery query;
@@ -336,6 +335,42 @@ bool MetaDataManager::imageExists(const QString &name, int galleryId)
   return query.next();
 }
 
+QList<int> MetaDataManager::galleryList(int parentId) const
+{
+  QList<int> output;
+
+  parentId = !parentId ? -1 : parentId;
+
+  QMutexLocker locker(&m_locker);
+
+  QSqlQuery query;
+  query.prepare("SELECT id FROM gallery WHERE parent_id = ?");
+  query.addBindValue(parentId);
+  query.exec();
+
+  while (query.next())
+    output << query.value(0).toInt();
+
+  return output;
+}
+
+QList<int> MetaDataManager::imageList(int galleryId) const
+{
+  QList<int> output;
+
+  QMutexLocker locker(&m_locker);
+
+  QSqlQuery query;
+  query.prepare("SELECT id FROM image WHERE gallery_id = ?");
+  query.addBindValue(galleryId);
+  query.exec();
+
+  while(query.next())
+    output << query.value(0).toInt();
+
+  return output;
+}
+
 ImageItem *MetaDataManager::readManifest()
 {
   QMutexLocker locker(&m_locker);
@@ -379,6 +414,14 @@ ImageItem *MetaDataManager::readManifest()
   }
 
   return root;
+}
+
+void MetaDataManager::reopenManifest()
+{
+  QSqlDatabase::database().close();
+  QSqlDatabase manifest = QSqlDatabase::addDatabase("QSQLITE");
+  manifest.setDatabaseName(Data::self()->galleriesDir().absoluteFilePath("manifest.db"));
+  manifest.open();
 }
 
 void MetaDataManager::imageList(ImageItem *gallery) const

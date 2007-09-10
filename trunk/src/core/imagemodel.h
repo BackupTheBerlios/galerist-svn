@@ -65,17 +65,21 @@ class ImageModel : public QAbstractItemModel
       ImageFilenameRole      = Qt::UserRole + 3,
       /** Image's path with filename (/path/to/image.jpg). */
       ImageFilepathRole      = Qt::UserRole + 4,
+      RelativeFilePathRole   = Qt::UserRole + 5,
       /** Image's directory path (/path/to). */
-      ImagePathRole       = Qt::UserRole + 5,
+      ImagePathRole          = Qt::UserRole + 6,
+      RelativePathRole           = Qt::UserRole + 7,
       /** Path to image's thumbnail. */
-      ImageThumbnailPathRole = Qt::UserRole + 6,
+      ImageThumbnailPathRole = Qt::UserRole + 8,
+      RelativeThumbnailPathRole = Qt::UserRole + 9,
       /** Thumbnails path. */
-      ThumbnailsPathRole     = Qt::UserRole + 7,
+      ThumbnailsPathRole     = Qt::UserRole + 10,
+      RelativeThumbnailsPathRole     = Qt::UserRole + 11,
       /** Returns the actual image. */
-      ImagePictureRole       = Qt::UserRole + 8,
-      ImageRotateCW          = Qt::UserRole + 9,
-      ImageRotateCCW         = Qt::UserRole + 10,
-      IdRole                 = Qt::UserRole + 11
+      ImagePictureRole       = Qt::UserRole + 12,
+      ImageRotateCW          = Qt::UserRole + 13,
+      ImageRotateCCW         = Qt::UserRole + 14,
+      IdRole                 = Qt::UserRole + 15
   };
 
     /**
@@ -120,10 +124,17 @@ class ImageModel : public QAbstractItemModel
      * @param role Role of the name.
      */
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
     /**
      * Gets the index of a item at a specific row and column.
      */
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+    /**
+     * Gets the list of indexes
+     */
+    QModelIndexList indexList(const QList<int> &ids, ImageItem::Type type) const;
+
+    QModelIndexList indexList(ImageItem::Type type, const QModelIndex &parent = QModelIndex()) const;
 
     /**
      * Get the item's parent index.

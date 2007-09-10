@@ -72,11 +72,11 @@ void SelectionPage::initializePage()
     setField("GalleryName", "");
 
     // Add all available galleries
-    parentBox->addItems(MetaDataManager::self()->galleryList());
+    parentBox->addItems(MetaDataManager::self()->galleryNames());
 
     nameEdit->setType(GWidgets::LineEdit::WithInternalVerify);
     nameEdit->setValidationMethod(GWidgets::LineEdit::InvalidStatesDefined);
-    nameEdit->addInvalidValues(MetaDataManager::self()->galleryList());
+    nameEdit->addInvalidValues(MetaDataManager::self()->galleryNames());
     nameEdit->setErrorMessage(tr("Gallery allready exists. Please select a different name."));
 
     imagesEdit->setType(GWidgets::LineEdit::DirSelector);

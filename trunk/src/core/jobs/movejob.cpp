@@ -22,8 +22,11 @@
 
 #include <QtCore/QDirIterator>
 #include <QtCore/QFileInfo>
+#include <QtCore/QQueue>
 
 #include <QtGui/QImage>
+
+#include "core/data.h"
 
 #include <QtDebug>
 
@@ -33,9 +36,8 @@ namespace GCore
 namespace GJobs
 {
 
-MoveJob::MoveJob(const QDir &source, const QDir &destination, QObject *parent)
+MoveJob::MoveJob(const QDir &destination, QObject *parent)
     : GCore::GJobs::AbstractJob(parent),
-    m_source(source),
     m_destination(destination)
 {}
 
@@ -44,172 +46,86 @@ MoveJob::~MoveJob()
 
 void MoveJob::job()
 {
-  bool isSuccessful = true;
+  QModelIndexList images;
+  QQueue<QModelIndex> queue;
+  queue << Data::self()->imageModel()->indexList(ImageItem::Gallery);
 
-  if (!m_destination.mkpath(m_destination.absolutePath()) && !m_destination.exists()) {
-    qDebug("Error creating directory.");
-    emit failed(tr("Cannot create destination directory %1.").arg(m_destination.absolutePath()), GCore::ErrorHandler::Critical);
-    return;
-  }
-  long totalGalleryImages = -1;
-  long totalImages = calculateImages();
-  QString currentParent = 0;
+  QString sourcePath = queue.at(0).data(ImageModel::ImagePathRole).toString();
 
-  long gallerieImagesDone, imagesDone;
-  gallerieImagesDone = imagesDone = 0;
-
-  QDir destinationPath(m_destination);
-
-  QDirIterator sourceIterator(m_source.absolutePath(), QDir::AllEntries | QDir::Hidden | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-  while (sourceIterator.hasNext()) {
-    sourceIterator.next();
-    QString item = sourceIterator.filePath();
-    QDir path(item);
-    path.cdUp();
-
-    QString itemName = item;
-    itemName.remove(path.absolutePath());
-
-    QString parents = item;
-    parents.remove(sourceIterator.path()).remove(itemName);
-
-    itemName.remove('/');
-
-    QFileInfo itemInfo(item);
-    if (item.contains("thumbnails") || item.contains(".metadata"))
-      continue;
-
-    destinationPath.cd(m_destination.absolutePath());
-
-    foreach(QString parent, parents.split('/'))
-    destinationPath.cd(parent);
-
-    if (currentParent != parents) {
-      currentParent = parents;
-      gallerieImagesDone = 0;
-      totalGalleryImages = calculateGallerieImages(parents);
-    }
-
-    if (itemInfo.isDir() && !item.contains("thumbnails")) {
-      destinationPath.mkdir(itemName);
-      destinationPath.cd(itemName);
-      path.cd(itemName);
-      if (!QFile::copy(path.absoluteFilePath(".metadata"), destinationPath.absoluteFilePath(".metadata"))) {
-        emit failed(tr("Cannot move gallery %1.").arg(item), GCore::ErrorHandler::Critical);
-        isSuccessful = false;
-        break;
+  while (!queue.isEmpty()) {
+    QModelIndexList currentList = Data::self()->imageModel()->indexList(ImageItem::Image, queue.dequeue());
+    foreach(QModelIndex current, currentList) {
+      if (current.data(ImageModel::ImageTypeRole).toInt() == ImageItem::Image) {
+        images << current;
       }
-      continue;
     }
-
-    destinationPath.mkdir("thumbnails");
-    destinationPath.cd("thumbnails");
-    path.cd("thumbnails");
-
-    QString thumbnailName = itemName;
-    thumbnailName.append(".jpg");
-    QString thumbnailPath = path.absoluteFilePath(thumbnailName);
-
-    // Notifying
-    QImage thumbnail(thumbnailPath);
-    emit progress(imagesDone, totalImages, itemName, thumbnail);
-
-    if (!QFile::copy(thumbnailPath, destinationPath.absoluteFilePath(thumbnailName))) {
-      emit failed(tr("Cannot move thumbnail %1.").arg(thumbnailPath), GCore::ErrorHandler::Critical);
-      isSuccessful = false;
-      break;
-    }
-
-    path.cdUp();
-    destinationPath.cdUp();
-
-    if (!QFile::copy(item, destinationPath.absoluteFilePath(itemName))) {
-      emit failed(tr("Cannot move image %1.").arg(item), GCore::ErrorHandler::Critical);
-      isSuccessful = false;
-      break;
-    }
-
-    imagesDone++;
-    gallerieImagesDone++;
-    emit directoryProgress(gallerieImagesDone, totalGalleryImages, parents);
   }
 
-  if (isSuccessful) {
-    if (deleteDirectory(m_source))
+  int total = 1;
+  QStringList galleries;
+
+  foreach (QModelIndex image, images) {
+    total++;
+    QString gallery = image.parent().data(ImageModel::ImageNameRole).toString();
+
+    if (!galleries.contains(gallery))
+      galleries << gallery;
+  }
+
+  int totalGalleries = galleries.count();
+
+  int moved = 1;
+  foreach(QModelIndex imageIndex, images) {
+    if (freeze())
+      break;
+
+    m_destination.mkpath(imageIndex.data(ImageModel::RelativePathRole).toString());
+    m_destination.mkpath(imageIndex.data(ImageModel::RelativeThumbnailsPathRole).toString());
+
+    if (!QFile::copy(imageIndex.data(ImageModel::ImageFilepathRole).toString(), m_destination.absoluteFilePath(imageIndex.data(ImageModel::RelativeFilePathRole).toString()))) {
+      emit failed(tr("Galleries folder move failed!"), ErrorHandler::Critical);
+      break;
+    }
+
+    QFile::copy(imageIndex.data(ImageModel::ImageThumbnailPathRole).toString(), m_destination.absoluteFilePath(imageIndex.data(ImageModel::RelativeThumbnailPathRole).toString()));
+
+    QString galleryName = imageIndex.parent().data(ImageModel::ImageNameRole).toString();
+
+    emit directoryProgress(galleries.indexOf(galleryName) + 1, totalGalleries, galleryName);
+    emit progress(moved, total, imageIndex.data(ImageModel::ImageNameRole).toString(), QImage(imageIndex.data(ImageModel::ImageThumbnailPathRole).toString()));
+    moved++;
+  }
+
+  bool successful = total == moved;
+
+  // Brisanje itd.
+  if (successful) {
+    QFile::copy(Data::self()->galleriesDir().absoluteFilePath("manifest.db"), m_destination.absoluteFilePath("manifest.db"));
+    QFile::remove(Data::self()->galleriesDir().absoluteFilePath("manifest.db"));
+    if (deleteOldGalleries(images))
       emit failed(tr("Old Gallery directory couldn't be deleted."), GCore::ErrorHandler::Warning);
-  } else {
-    deleteDirectory(m_destination);
   }
 
-  emit finished(isSuccessful);
+  emit finished(successful);
 }
 
-long MoveJob::calculateGallerieImages(const QString &gallery) const
+bool MoveJob::deleteOldGalleries(const QModelIndexList &indexes) const
 {
-  long counter = 0;
+  foreach (QModelIndex index, indexes) {
+    QString filePath = index.data(ImageModel::ImageFilepathRole).toString();
+    QString thumbPath = index.data(ImageModel::ImageThumbnailPathRole).toString();
+    QString path = index.data(ImageModel::RelativePathRole).toString();
 
-  QDir galleryDir(m_source);
-  foreach(QString part, gallery.split('/'))
-  galleryDir.cd(part);
+    if (!QFile::remove(filePath))
+      return true;
 
-  foreach(QFileInfo image, galleryDir.entryInfoList())
-  if (image.isFile() && image.fileName() != ".metadata")
-    counter++;
+    QFile::remove(thumbPath);
 
-  return counter;
-}
-
-long MoveJob::calculateImages() const
-{
-  long counter = 0;
-
-  QDirIterator imagesIterator(m_source.absolutePath(), QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files, QDirIterator::Subdirectories);
-  while (imagesIterator.hasNext()) {
-    QFileInfo info(imagesIterator.filePath());
-    if (info.isFile() && !imagesIterator.filePath().contains("thumbnails") && imagesIterator.fileName() != ".metadata")
-      counter++;
-    imagesIterator.next();
+    Data::self()->galleriesDir().rmpath(path + "/thumbnails");
+    Data::self()->galleriesDir().rmpath(path);
   }
 
-  return counter;
-}
-
-bool MoveJob::deleteDirectory(const QDir &path) const
-{
-  bool reportWarning = false;
-  QList<QDir> lowestGalleries;
-  QDirIterator sourceIterator(path.absolutePath(), QDir::AllDirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-  while (sourceIterator.hasNext()) {
-    QDir gallery(sourceIterator.next());
-
-    // If it is the lowest gallery in the tree, we add it to the list of later deletion (rmpath)
-    if (gallery.entryList(QDir::AllDirs | QDir::NoDotAndDotDot).isEmpty())
-      lowestGalleries << gallery;
-
-    // Deleting images
-    foreach(QString image, gallery.entryList(QDir::Files | QDir::Hidden))
-      if (!gallery.remove(image))
-        reportWarning = true;
-
-    gallery.cd("thumbnails");
-
-    // Deleting thumbnails
-    foreach(QString thumbnail, gallery.entryList(QDir::Files | QDir::Hidden))
-      if (!gallery.remove(thumbnail))
-        reportWarning = true;
-
-    // We delete the thumbnails directory
-    gallery.cdUp();
-    if (!gallery.rmdir("thumbnails"))
-      reportWarning = true;
-  }
-
-  foreach(QDir gallery, lowestGalleries)
-    !gallery.rmpath(".");
-
-  path.mkpath(path.absolutePath());
-
-  return reportWarning;
+  return false;
 }
 
 }

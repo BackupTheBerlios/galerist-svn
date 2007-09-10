@@ -22,6 +22,7 @@
 #define GCORE_GJOBSMOVEJOB_H
 
 #include <QtCore/QDir>
+#include <QtCore/QModelIndex>
 
 #include "core/jobs/abstractjob.h"
 
@@ -45,7 +46,7 @@ class MoveJob : public GCore::GJobs::AbstractJob
     /**
      * A constructor.
      */
-    MoveJob(const QDir &source, const QDir &destination, QObject *parent = 0);
+    MoveJob(const QDir &destination, QObject *parent = 0);
 
     /**
      * A destructor.
@@ -59,31 +60,17 @@ class MoveJob : public GCore::GJobs::AbstractJob
     void job();
 
   private:
-    QDir m_source;
     QDir m_destination;
 
     /**
-     * Calculates how many galleries needs to be moved.
+     * Deletes the old galleries.
      *
-     * @return Number of galleries.
-     */
-    inline long calculateGallerieImages(const QString &gallery) const;
-    /**
-     * Calculates how many images needs to be moved.
-     *
-     * @return Number of images.
-     */
-    long calculateImages() const;
-
-    /**
-     * Deletes the path directory tree.
-     *
-     * @param path Path to delete.
+     * @param indexes Indexes to delete.
      *
      * @return @c true "The roots go deep, Saruman." <= Report a warning :D.
      * @return @c false It went like a charm.
      */
-    bool deleteDirectory(const QDir &path) const;
+    inline bool deleteOldGalleries(const QModelIndexList &indexes) const;
 
 };
 

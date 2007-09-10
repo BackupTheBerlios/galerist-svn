@@ -71,6 +71,8 @@ class JobManager : public QThread
 
     QString readImages(const QDir &source, const QStringList &images, const QDir &destination = QDir(), int parentId = 0);
 
+    QString moveGalleries(const QString &destination);
+
     /**
      * Stops the job.
      */

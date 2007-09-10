@@ -24,8 +24,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
-//#include <QtSql>
-
 namespace GCore
 {
 
@@ -66,8 +64,8 @@ class MetaDataManager : public QObject
     QString galleryName(int id) const;
     QString imageName(int id) const;
 
-    QStringList imageList(int galleryId) const;
-    QStringList galleryList() const;
+    QStringList imageNames(int galleryId) const;
+    QStringList galleryNames() const;
 
     bool setGalleryName(int id, const QString &name, const QString &path) const;
     void setImageName(int id, const QString &name) const;
@@ -80,7 +78,12 @@ class MetaDataManager : public QObject
     bool galleryExists(int galleryId);
     bool imageExists(const QString &name, int galleryId);
 
+    QList<int> galleryList(int parentId) const;
+    QList<int> imageList(int galleryId) const;
+
     ImageItem *readManifest();
+
+    void reopenManifest();
 
   private:
     static MetaDataManager *m_self;

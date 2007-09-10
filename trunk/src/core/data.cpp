@@ -34,8 +34,7 @@
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
 #include "core/jobmanager.h"
-
-#include "core/jobs/movejob.h"
+#include "core/metadatamanager.h"
 
 namespace GCore
 {
@@ -207,9 +206,17 @@ QString Data::galleriesPath() const
   return m_settings->value("GalleriesPath", settingsPath() + "/galleries").toString();;
 }
 
-void Data::setGalleriesPath(const QString &path)
+QString Data::setGalleriesPath(const QString &path)
 {
-  GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(galleriesDir(), path, m_mainWindow);
+  QString job = JobManager::self()->moveGalleries(path);
+
+  connect(JobManager::self()->job(job), SIGNAL(finished(bool)), this, SLOT(processGalleryMove(bool)));
+
+  m_backup.insert("GalleriesPath", QDir::toNativeSeparators(path));
+  //m_settings->setValue("GalleriesPath", );
+
+  return job;
+/*  GCore::GJobs::MoveJob *job = new GCore::GJobs::MoveJob(galleriesDir(), path, m_mainWindow);
 
   JobManager::self()->registerJob("GalleriesMove", job);
 
@@ -217,7 +224,7 @@ void Data::setGalleriesPath(const QString &path)
 
   m_backup.insert("GalleriesPath", galleriesDir().absolutePath());
 
-  m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));
+  m_settings->setValue("GalleriesPath", QDir::toNativeSeparators(path));*/
 }
 
 QString Data::settingsPath() const
@@ -329,10 +336,12 @@ void Data::setImageEditor(const QString &editor) const
 
 void Data::processGalleryMove(bool successful)
 {
-  if (!successful)
-    m_settings->setValue("GalleriesPath", m_backup.take("GalleriesPath"));
-  else
+  QVariant backup = m_backup.take("GalleriesPath");
+  if (successful) {
+    m_settings->setValue("GalleriesPath", backup);
+    MetaDataManager::self()->reopenManifest();
     m_imageModel->reconstruct();
+  }
 }
 
 }

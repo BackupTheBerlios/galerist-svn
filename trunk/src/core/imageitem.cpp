@@ -118,7 +118,9 @@ ImageItem::Type ImageItem::type() const
 QDir ImageItem::dir() const
 {
   QDir dir = Data::self()->galleriesDir();
-  dir.cd(path());
+  QString relativePath = path();
+  if (relativePath != "/")
+    dir.cd(relativePath);
   return dir;
 }
 
@@ -132,12 +134,12 @@ QString ImageItem::path() const
     parent = parent->parent();
   }
 
-  return names.join("/");
+  return names.join("/") + "/";
 }
 
 QString ImageItem::absolutePath() const
 {
-  return dir().absolutePath();
+  return dir().path();
 }
 
 QString ImageItem::filePath() const
@@ -162,14 +164,15 @@ QString ImageItem::fileName() const
 
 QDir ImageItem::thumbDir() const
 {
-  QDir thumbnails = dir();
+  QDir thumbnails = QDir(Data::self()->galleriesDir());
+  thumbnails.cd(path());
   thumbnails.cd("thumbnails");
   return thumbnails;
 }
 
 QString ImageItem::thumbPath() const
 {
-  return thumbDir().relativeFilePath(thumbName());
+  return Data::self()->galleriesDir().relativeFilePath(path() + "thumbnails/" + thumbName());
 }
 
 QString ImageItem::absoluteThumbPath() const

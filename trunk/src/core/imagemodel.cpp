@@ -105,14 +105,26 @@ QVariant ImageModel::data(const QModelIndex &index, int role) const
     case ImageModel::ImageFilepathRole : {
       return item->absoluteFilePath();
     }
+    case RelativeFilePathRole : {
+      return item->filePath();
+    }
     case ImageModel::ImagePathRole : {
       return item->absolutePath();
+    }
+    case RelativePathRole : {
+      return item->path();
     }
     case ImageModel::ImageThumbnailPathRole : {
       return item->absoluteThumbPath();
     }
+    case RelativeThumbnailPathRole : {
+      return item->thumbPath();
+    }
     case ThumbnailsPathRole : {
       return item->thumbDir().absolutePath();
+    }
+    case RelativeThumbnailsPathRole : {
+      return item->path() + "thumbnails";
     }
     case Qt::EditRole : {
       return item->name();
@@ -203,6 +215,22 @@ QModelIndex ImageModel::index(int row, int column, const QModelIndex &parent) co
     return QModelIndex();
 }
 
+QModelIndexList ImageModel::indexList(const QList<int> &ids, ImageItem::Type type) const
+{
+  QModelIndexList output;
+  foreach (int id, ids)
+    output << index(id, type);
+
+  return output;
+}
+
+QModelIndexList ImageModel::indexList(ImageItem::Type type, const QModelIndex &parent) const
+{
+  QList<int> ids = type == ImageItem::Image ? MetaDataManager::self()->imageList(parent.data(IdRole).toInt()) : MetaDataManager::self()->galleryList(parent.data(IdRole).toInt());
+  qDebug() << ids;
+  return indexList(ids, type);
+}
+
 QModelIndex ImageModel::parent(const QModelIndex &index) const
 {
   if (!index.isValid())
@@ -280,9 +308,9 @@ QIcon ImageModel::fileIcon(const QModelIndex &item) const
 
     QDir thumbPath(item.data(ImageModel::ImagePathRole).toString());
 
-    if (!thumbPath.cd("thumbnails") || !QFile::exists(item.data(ImageModel::ImageThumbnailPathRole).toString())) {
+    if (!thumbPath.exists("thumbnails") || !QFile::exists(item.data(ImageModel::ImageThumbnailPathRole).toString())) {
       if (!JobManager::self()->job(m_progressRead.value(item.data(ImageFilenameRole).toString()))) {
-      QString hash = JobManager::self()->readImages(item.data(ImagePathRole).toString(), item.data(ImageFilenameRole).toStringList(), item.data(ThumbnailsPathRole).toString());
+        QString hash = JobManager::self()->readImages(item.data(ImagePathRole).toString(), item.data(ImageFilenameRole).toStringList(), item.data(ImagePathRole).toString());
       connect(JobManager::self()->job(hash), SIGNAL(progress(const QString&, const QImage&, int)), this, SLOT(processThumbnail(const QString&, const QImage&, int)));
       m_progressRead.insert(item.data(ImageFilenameRole).toString(), hash);
       }
