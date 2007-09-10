@@ -28,6 +28,8 @@
 
 #include "core/jobmanager.h"
 
+class QProgressBar;
+
 namespace GWidgets
 {
 
@@ -83,6 +85,7 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
   private:
     bool m_initialised;
     mutable GCore::Job m_job;
+    QProgressBar *m_progressBar;
 
     /**
      * Shows what images will be added.
@@ -103,6 +106,10 @@ class SelectionPage : public QWizardPage, private Ui::SelectionPage
     void addImage(const QString&, const QImage &image, int);
 
     void clearPreview(bool isValid);
+
+    void setProgress(int finished, int total);
+
+    void stopPreview();
 
 };
 

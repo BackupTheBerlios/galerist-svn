@@ -21,13 +21,18 @@
 
 #include "selectionpage.h"
 
+#include <QtCore/QTimer>
+
 #include <QtGui/QFileDialog>
+#include <QtGui/QProgressBar>
 
 #include "core/data.h"
 #include "core/imagemodel.h"
 #include "core/metadatamanager.h"
 
 #include "widgets/lineedit.h"
+
+#include <QtDebug>
 
 using namespace GCore;
 
@@ -45,6 +50,10 @@ SelectionPage::SelectionPage()
   setSubTitle(tr("Main settings of the new gallery"));
 
   setupUi(this);
+
+  m_progressBar = new QProgressBar(previewList);
+  m_progressBar->hide();
+  m_progressBar->setGeometry(0, 0, 100, 20);
 
   registerField("GalleryName*", nameEdit);
   registerField("GalleryPath*", imagesEdit);
@@ -83,6 +92,7 @@ void SelectionPage::initializePage()
     connect(nameEdit, SIGNAL(validityChanged(bool)), this, SIGNAL(completeChanged()));
     connect(imagesEdit, SIGNAL(validityChanged(bool)), this, SIGNAL(completeChanged()));
     connect(imagesEdit, SIGNAL(validityChanged(bool)), this, SLOT(clearPreview(bool)));
+    connect(wizard()->button(QWizard::NextButton), SIGNAL(clicked(bool)), this, SLOT(stopPreview()));
 
     // Insert the path to the home directory
     // Only if there is no predefined images!
@@ -114,12 +124,12 @@ void SelectionPage::setPredefinedImages(const QString &path, const QStringList &
 
 void SelectionPage::makePreview(const QString &path, const QStringList &images) const
 {
-  if (m_job.isValid()) {
+  if (!m_job.isValid()) {
     previewList->clear();
     m_job = JobManager::self()->readImages(path, images);
 
     connect(m_job.jobPtr(), SIGNAL(progress(const QString&, const QImage&, int)), this, SLOT(addImage(const QString&, const QImage&, int)));
-    connect(m_job.jobPtr(), SIGNAL(progress(int, int, const QString&, const QImage&)), Data::self()->imageAddProgress(), SLOT(setProgress(int, int, const QString&, const QImage&)));
+    connect(m_job.jobPtr(), SIGNAL(progress(int, int, const QString&, const QImage&)), this, SLOT(setProgress(int, int)));
   }
 }
 
@@ -142,6 +152,24 @@ void SelectionPage::clearPreview(bool isValid)
 
   if (isValid)
     makePreview(imagesEdit->text());
+}
+
+void SelectionPage::setProgress(int finished, int total)
+{
+  m_progressBar->show();
+  m_progressBar->move(QPoint(previewList->width() - m_progressBar->width() - 20, previewList->height() - m_progressBar->height()));
+
+  m_progressBar->setMaximum(total);
+  m_progressBar->setValue(finished);
+
+  if (finished == total)
+    QTimer::singleShot(2000, m_progressBar, SLOT(hide()));
+}
+
+void SelectionPage::stopPreview()
+{
+  m_job.stop();
+  m_progressBar->hide();
 }
 
 }

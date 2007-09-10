@@ -58,8 +58,10 @@ void ReadJob::job()
   int total = images.count();
   int read = 1;
 
-  m_destination.mkdir("thumbnails");
-  m_destination.cd("thumbnails");
+  if (m_destination == QDir()) {
+    m_destination.mkdir("thumbnails");
+    m_destination.cd("thumbnails");
+  }
 
   foreach(QString imageName, images) {
     if (freeze())
