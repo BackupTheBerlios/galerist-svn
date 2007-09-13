@@ -60,6 +60,8 @@ MainWindow::MainWindow()
   initToolbar();
   initDocks();
 
+  searchBar->setListView(imageList);
+
   // Check if the user has the required Sql driver
   if (!MetaDataManager::driverAvailable()) {
     QMessageBox::critical(this, tr("Fatal error"), tr("Qt doesn't have Sql driver for Sqlite3! %1 cannot operate without it! %1 will now close.").arg(Data::self()->value(Data::AppName).toString()));
