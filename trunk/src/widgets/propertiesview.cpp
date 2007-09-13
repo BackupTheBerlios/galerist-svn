@@ -80,6 +80,22 @@ void PropertiesView::mouseReleaseEvent(QMouseEvent *event)
   }
 }
 
+void PropertiesView::resizeEvent(QResizeEvent *event)
+{
+  updateImage();
+
+  QWidget::resizeEvent(event);
+}
+
+void PropertiesView::showEvent(QShowEvent *event)
+{
+  // A workaround for proper sizing of the initialy hidden tab
+  ui.tabWidget->setCurrentIndex(1);
+  ui.tabWidget->setCurrentIndex(0);
+
+  QWidget::showEvent(event);
+}
+
 void PropertiesView::setCurrentIndex(const QModelIndex &index)
 {
   m_currentIndex = index;
@@ -107,10 +123,14 @@ void PropertiesView::updateData()
   ui.nameEdit->setText(name);
   ui.descriptionEdit->setText(description);
 
-  QPixmap pixmap = QPixmap::fromImage(m_currentIndex.data(ImageModel::ImagePictureRole).value<QImage>());
+  updateImage();
+}
 
-  if (pixmap.height() > 512 || pixmap.width() > 512)
-    pixmap = pixmap.scaled(512, 512, pixmap.height() > pixmap.width() ? Qt::KeepAspectRatio : Qt::KeepAspectRatioByExpanding);
+void PropertiesView::updateImage()
+{
+  QPixmap pixmap = QPixmap::fromImage(m_currentIndex.data(ImageModel::ImagePictureRole).value<QImage>());
+  
+  pixmap = pixmap.scaled(ui.scrollArea->width(), ui.scrollArea->height(), Qt::KeepAspectRatio);
 
   ui.photo->setPixmap(pixmap);
 }
@@ -165,7 +185,7 @@ void PropertiesView::rotateCW()
 {
   QPixmap pixmap = QPixmap::fromImage(m_currentIndex.data(ImageModel::ImageRotateCW).value<QImage>());
 
-  pixmap = pixmap.scaled(512, 512, pixmap.height() > pixmap.width() ? Qt::KeepAspectRatio : Qt::KeepAspectRatioByExpanding);
+  pixmap = pixmap.scaled(ui.scrollArea->width(), ui.scrollArea->height(), Qt::KeepAspectRatio);
   ui.photo->setPixmap(pixmap);
 
   m_rotation += 90;
@@ -179,7 +199,7 @@ void PropertiesView::rotateCCW()
 {
   QPixmap pixmap = QPixmap::fromImage(m_currentIndex.data(ImageModel::ImageRotateCCW).value<QImage>());
 
-  pixmap = pixmap.scaled(512, 512, pixmap.height() > pixmap.width() ? Qt::KeepAspectRatio : Qt::KeepAspectRatioByExpanding);
+  pixmap = pixmap.scaled(ui.scrollArea->width(), ui.scrollArea->height(), Qt::KeepAspectRatio);
   ui.photo->setPixmap(pixmap);
 
   m_rotation -= 90;

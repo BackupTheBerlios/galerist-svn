@@ -51,14 +51,17 @@ class PropertiesView : public QWidget
      */
     ~PropertiesView();
 
+  public slots:
+    void setCurrentIndex(const QModelIndex &index);
+
   protected:
     /**
      * Reimplemented method for implementing "open image in external viewer".
      */
     void mouseReleaseEvent(QMouseEvent *event);
-    
-  public slots:
-    void setCurrentIndex(const QModelIndex &index);
+
+    void resizeEvent(QResizeEvent *event);
+    void showEvent(QShowEvent *event);
 
   private:
     Ui::PropertiesView ui;
@@ -68,6 +71,7 @@ class PropertiesView : public QWidget
     short m_rotation;
 
     void updateData();
+    void updateImage();
     void updateNavigation();
 
   private slots:
