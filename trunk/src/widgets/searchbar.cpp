@@ -82,7 +82,7 @@ void SearchBar::hide()
   QWidget::hide();
 }
 
-void SearchBar::setListView(QWidget *filterList)
+void SearchBar::setListFilter(QWidget *filterList)
 {
   connect(this, SIGNAL(focusLost()), filterList, SLOT(slotRetakeFocus()));
   connect(this, SIGNAL(filterChanged(const QString&)), filterList, SLOT(setFilter(const QString&)));

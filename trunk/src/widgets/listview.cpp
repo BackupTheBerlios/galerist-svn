@@ -87,21 +87,12 @@ void ListView::invertSelection()
     setSelection(visualRect(index), QItemSelectionModel::Deselect);
 }
 
-void ListView::setFilter(const QString &filter)
-{
-}
-
 void ListView::mousePressEvent(QMouseEvent *event)
 {
   if (!(event->modifiers() & Qt::ControlModifier) && !(event->modifiers() & Qt::ShiftModifier) && !indexAt(event->pos()).isValid() && event->button() != Qt::RightButton)
     clearSelection();
 
   QListView::mousePressEvent(event);
-}
-
-void ListView::keyPressEvent(QKeyEvent *event)
-{
-  
 }
 
 void ListView::dragEnterEvent(QDragEnterEvent *event)

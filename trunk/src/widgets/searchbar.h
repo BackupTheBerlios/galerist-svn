@@ -68,7 +68,7 @@ class SearchBar : public QWidget
     /**
      * Set filter output.
      */
-    void setListView(QWidget *filterList);
+    void setListFilter(QWidget *filterList);
 
   public slots:
     /**

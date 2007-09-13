@@ -36,7 +36,6 @@ class ListView : public QListView
   signals:
     void signalSelected(bool selected);
     void signalOneSelected(bool yes);
-    void keyPressed(const QString &key);
 
   public:
     ListView(QWidget *parent);
@@ -52,13 +51,9 @@ class ListView : public QListView
      */
     void invertSelection();
 
-    void setFilter(const QString &filter);
-
   protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void paintEvent(const QPaintEvent *event);
 
     /**
      * Method that allows Drag in images.
@@ -91,7 +86,6 @@ class ListView : public QListView
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
   private:
-
 };
 
 }
