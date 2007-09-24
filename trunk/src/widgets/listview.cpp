@@ -30,6 +30,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QMessageBox>
 #include <QtGui/QSortFilterProxyModel>
+#include <QtGui/QPainter>
 
 #include "core/imagemodel.h"
 #include "core/imageitem.h"
@@ -87,12 +88,84 @@ void ListView::invertSelection()
     setSelection(visualRect(index), QItemSelectionModel::Deselect);
 }
 
+void ListView::paintEvent(QPaintEvent *event)
+{
+  QModelIndexList indexes = Data::self()->imageModel()->childs(rootIndex());
+  QRect renderingRect = event->rect().translated(horizontalOffset(), verticalOffset());
+  QPainter painter(viewport());
+
+  QStyleOptionViewItem option = viewOptions();
+  QStyle::State defaultState = option.state;
+
+  foreach (QModelIndex index, indexes) {
+    if (!rectForIndex(index).intersects(renderingRect))
+      continue;
+
+    option.rect = visualRect(index);
+    option.state = defaultState;
+
+    if (selectionModel()->isSelected(index)) {
+      option.state |= QStyle::State_Selected;
+    }
+
+    if (index == m_hoverItem)
+      option.state |= QStyle::State_MouseOver;
+    else
+      option.state &= ~QStyle::State_MouseOver;
+
+    painter.save();
+    itemDelegate()->paint(&painter, option, index);
+    painter.restore();
+  }
+
+  if (m_rubberBandRect.isValid()) {
+    QStyleOptionRubberBand opt;
+    opt.initFrom(this);
+    opt.shape = QRubberBand::Rectangle;
+    opt.opaque = false;
+    opt.rect = m_rubberBandRect;
+    painter.save();
+    style()->drawControl(QStyle::CE_RubberBand, &opt, &painter);
+    painter.restore();
+  }
+}
+
+bool ListView::viewportEvent(QEvent *event)
+{
+  if (event->type() == QEvent::HoverEnter || event->type() == QEvent::HoverMove) {
+    QHoverEvent *hoverEvent = static_cast<QHoverEvent*>(event);
+    m_hoverItem = indexAt(hoverEvent->pos());
+  } else if (event->type() == QEvent::HoverLeave) {
+    m_hoverItem = QModelIndex();
+  }
+
+  return QListView::viewportEvent(event);
+}
+
 void ListView::mousePressEvent(QMouseEvent *event)
 {
   if (!(event->modifiers() & Qt::ControlModifier) && !(event->modifiers() & Qt::ShiftModifier) && !indexAt(event->pos()).isValid() && event->button() != Qt::RightButton)
     clearSelection();
 
+  m_originPos = event->pos();
+  m_rubberBandRect = QRect(m_originPos, QSize());
+
   QListView::mousePressEvent(event);
+}
+
+void ListView::mouseMoveEvent(QMouseEvent *event)
+{
+  m_rubberBandRect = QRect(m_originPos - QPoint(0, verticalOffset()), event->pos()).normalized();
+
+  QListView::mouseMoveEvent(event);
+}
+
+void ListView::mouseReleaseEvent(QMouseEvent *event)
+{
+  m_rubberBandRect = QRect();
+  m_originPos = QPoint();
+
+  QListView::mouseReleaseEvent(event);
 }
 
 void ListView::dragEnterEvent(QDragEnterEvent *event)

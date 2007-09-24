@@ -53,7 +53,12 @@ class ListView : public QListView
 
   protected:
     void contextMenuEvent(QContextMenuEvent *event);
+    void paintEvent(QPaintEvent *event);
+    bool viewportEvent(QEvent *event);
+
     void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
     /**
      * Method that allows Drag in images.
@@ -86,6 +91,9 @@ class ListView : public QListView
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
   private:
+    QModelIndex m_hoverItem;
+    QRect m_rubberBandRect;
+    QPoint m_originPos;
 };
 
 }
