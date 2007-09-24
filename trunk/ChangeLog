@@ -1,16 +1,15 @@
-0.2.0 => 0.3.0
+0.2.0 => 0.3.0 Beta1
 
 Features:
 -Posibility to change temporary directory of galleries
 -Option to move images to the temporary directory
--Option to disalbe visual effects
 
 Changes:
--Photo controls are disabled when there is a transformation in progress
 -Configuration dialog redesigned
 -Bubble hides on input edit's focus loss
 -Redesigned LineEdit with internal validiting mechanism
 -Redesigned Data
+-Moved from QGraphicsView based list to QListView
 
 Fixes:
 -Gallery renaming with double click
